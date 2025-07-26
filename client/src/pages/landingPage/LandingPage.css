@@ -1,0 +1,45 @@
+.landing-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100vh;
+  text-align: center;
+  background: linear-gradient(to bottom right, #cbe2ec, #5b8fca);
+  color: #333;
+  font-family: sans-serif;
+}
+
+.landing-header {
+  margin-top: 10vh;
+}
+
+.landing-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.landing-header p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+.landing-button {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.landing-button:hover {
+  background-color: #555;
+}
+
+.landing-footer {
+  margin-top: auto;
+  font-size: 0.8rem;
+  color: #666;
+}
