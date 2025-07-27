@@ -1,0 +1,9 @@
+.page-layout-container {
+  margin-left: 220px;
+}
+
+@media (max-width: 768px) {
+  .page-layout-container {
+    margin-left: 0;
+  }
+}

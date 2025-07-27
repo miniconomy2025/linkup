@@ -8,6 +8,7 @@ import FeedPage from "./pages/feedPage/FeedPage";
 import Navbar from "./components/navbar/Navbar";
 import { useAuth } from "./hooks/useAuth";
 import "./App.css";
+import { ProfilePage } from "./pages/profilePage/ProfilePage";
 
 const App = () => {
   const { isAuthenticated } = useAuth();
@@ -22,8 +23,9 @@ const App = () => {
         {isAuthenticated ? (
           <>
             <Route path="/feed" element={<FeedPage />} />
-            {/* <Route path="/create" element={<CreatePostPage />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
+            {/* <Route path="/create" element={<CreatePostPage />} />
+            
             <Route path="/settings" element={<SettingsPage />} /> */}
           </>
         ) : (
