@@ -1,5 +1,6 @@
 import React from "react";
 import "./FeedPage.css";
+import { PageLayout } from "../../components/pageLayout/PageLayout";
 
 const mockPosts = [
   {
@@ -73,6 +74,7 @@ const mockSuggested = [
 
 const FeedPage: React.FC = () => {
   return (
+    <PageLayout>
     <div className="feed-container">
     <div className="post-container">
       {mockPosts.map(post => (
@@ -106,6 +108,7 @@ const FeedPage: React.FC = () => {
         
       </div>
     </div>
+    </PageLayout>
   );
 };
 
