@@ -24,7 +24,6 @@ module.exports = {
             },
             privateKeyPem: { bsonType: ["string","null"] },
             isLocal: { bsonType: "bool" },
-            googleSub: { bsonType: ["string","null"] },
             createdAt: { bsonType: ["date","null"] },
             updatedAt: { bsonType: ["date","null"] }
           }
