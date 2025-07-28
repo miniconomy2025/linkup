@@ -1,13 +1,15 @@
 import express from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 import { connectMongoDB } from './config/mongoose';
 import userRoutes from './routes/users.route';
 import postRoutes from './routes/posts.route';
 import commentRoutes from './routes/comments.route';
 import inboxRoutes from './routes/inbox.route';
 import outboxRoutes from './routes/outbox.route';
-
 import { errorHandler } from './middleware/errorHandler';
-
 
 const app = express();
 app.use(express.json());
