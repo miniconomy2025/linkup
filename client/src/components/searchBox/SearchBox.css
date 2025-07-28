@@ -1,0 +1,28 @@
+.search-box {
+  display: flex;
+  align-items: center;
+  max-width: 800px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 16px;
+  background-color: #fff;
+}
+
+.search-icon {
+  font-size: 20px;
+  margin-right: 8px;
+  color: #aaa;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-box input::placeholder {
+  font-size: 16px; /* or any size you want */
+  color: #aaa;     /* optional: change color */
+}

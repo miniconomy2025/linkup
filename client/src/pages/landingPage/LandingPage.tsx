@@ -7,14 +7,14 @@ const LandingPage = () => {
   return (
     <div className="landing-container">
       <header className="landing-header">
-        <h1>Welcome to MySocial</h1>
+        <h1>Welcome to LinkUp</h1>
         <p>Share your thoughts, moments, and media with the world.</p>
         <button onClick={() => navigate("/login")} className="landing-button">
           Get Started
         </button>
       </header>
       <footer className="landing-footer">
-        <p>© {new Date().getFullYear()} MySocial. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} LinkUp. All rights reserved.</p>
       </footer>
     </div>
   );
