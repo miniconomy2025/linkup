@@ -20,7 +20,6 @@ const UserSchema = new Schema<UserDoc>({
   publicKey: { type: PublicKeySchema, required: true },
   privateKeyPem: { type: String, select: false },
   isLocal: { type: Boolean, required: true },
-  googleSub: String,
 }, { timestamps: true });
 
 export default model<UserDoc>('User', UserSchema); 

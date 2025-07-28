@@ -15,5 +15,4 @@ export interface User {
   publicKey: PublicKey;
   privateKeyPem?: string;
   isLocal: boolean;
-  googleSub?: string;
 } 
