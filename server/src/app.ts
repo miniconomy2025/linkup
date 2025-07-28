@@ -6,6 +6,7 @@ import commentRoutes from './routes/comments.route';
 import inboxRoutes from './routes/inbox.route';
 import outboxRoutes from './routes/outbox.route';
 
+import { errorHandler } from './middleware/errorHandler';
 
 
 const app = express();
@@ -18,5 +19,6 @@ app.use('/posts', postRoutes);
 app.use('/comments', commentRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/outbox', outboxRoutes);
+app.use(errorHandler);
 
 export default app;
