@@ -1,0 +1,20 @@
+.post-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.image-container {
+  width: 100%;
+  max-width: 600px;
+  /* aspect-ratio: 4 / 5; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
