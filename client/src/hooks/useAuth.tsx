@@ -10,7 +10,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  loginWithGoogle: () => void;
+  setUser: (user: User | null) => void;
   logout: () => void;
 }
 
@@ -24,30 +24,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  const loginWithGoogle = async () => {
-    // TODO replace with google auth
-    const fakeUser = {
-      id: "1",
-      name: "John Doe",
-      email: "john@example.com",
-      avatar: "https://i.pravatar.cc/150?u=1"
-    };
-    setUser(fakeUser);
-    localStorage.setItem("user", JSON.stringify(fakeUser));
-  };
-
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user || !!localStorage.getItem("token"), setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
