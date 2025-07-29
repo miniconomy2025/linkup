@@ -9,10 +9,12 @@ const BaseActivityFields = {
   to: { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },
 };
 
-const LikeSchema = new Schema<LikeActivity>({
+type LikeActivityDocument = LikeActivity & Document;
+
+const LikeSchema = new Schema<LikeActivityDocument>({
   ...BaseActivityFields,
   type: { type: String, enum: ['Like'], required: true },
   object: { type: String, required: true },
 });
 
-export const LikeModel = model<LikeActivity & Document>('Like', LikeSchema); 
+export const LikeModel = model<LikeActivityDocument>('Like', LikeSchema);

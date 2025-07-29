@@ -1,31 +1,47 @@
 module.exports = {
   async up(db, client) {
-    // Note documents
+    const baseObjectFields = {
+      _id: {
+        bsonType: 'objectId',
+        description: 'MongoDB document ID'
+      },
+      id: {
+        bsonType: 'string',
+        description: 'Object URI (string) is required and must be unique'
+      },
+      attributedTo: {
+        bsonType: 'string',
+        description: 'Actor URI who created the object'
+      },
+      published: {
+        bsonType: 'string', // stored as string per your Mongoose schema
+        description: 'ISO date string when the object was published'
+      },
+      to: {
+        bsonType: ['array'],
+        items: { bsonType: 'string' },
+        description: 'Array of recipient URIs'
+      },
+      createdAt: {
+        bsonType: ['date', 'null'],
+        description: 'Optional creation timestamp'
+      },
+      updatedAt: {
+        bsonType: ['date', 'null'],
+        description: 'Optional update timestamp'
+      }
+    };
+
+    // Notes collection
     const noteValidator = {
       $jsonSchema: {
         bsonType: 'object',
         required: ['id', 'type', 'attributedTo', 'published', 'content'],
         properties: {
-          id: {
-            bsonType: 'string',
-            description: 'Object URI (string) is required and must be unique'
-          },
+          ...baseObjectFields,
           type: {
             enum: ['Note'],
             description: 'Must be "Note"'
-          },
-          attributedTo: {
-            bsonType: 'string',
-            description: 'Actor URI who created this note'
-          },
-          published: {
-            bsonType: 'date',
-            description: 'ISO date when the note was published'
-          },
-          to: {
-            bsonType: ['array'],
-            items: { bsonType: 'string' },
-            description: 'Array of recipient URIs'
           },
           content: {
             bsonType: 'string',
@@ -41,44 +57,29 @@ module.exports = {
       validationLevel: 'strict',
       validationAction: 'error'
     });
+
     await db.collection('notes').createIndex({ id: 1 }, { unique: true });
     await db.collection('notes').createIndex({ published: -1 });
 
-    // Image documents
+    // Images collection
     const imageValidator = {
       $jsonSchema: {
         bsonType: 'object',
         required: ['id', 'type', 'attributedTo', 'published', 'url'],
         properties: {
-          id: {
-            bsonType: 'string',
-            description: 'Object URI (string) is required and unique'
-          },
+          ...baseObjectFields,
           type: {
             enum: ['Image'],
             description: 'Must be "Image"'
-          },
-          attributedTo: {
-            bsonType: 'string',
-            description: 'Actor URI who posted the image'
-          },
-          published: {
-            bsonType: 'date',
-            description: 'ISO date when the image was published'
-          },
-          to: {
-            bsonType: ['array'],
-            items: { bsonType: 'string' },
-            description: 'Array of recipient URIs'
           },
           url: {
             bsonType: 'string',
             description: 'URL pointing to the image file'
           },
-          name: { bsonType: 'string' },
-          mediaType: { bsonType: 'string' },
-          width: { bsonType: 'int' },
-          height: { bsonType: 'int' }
+          name: {
+            bsonType: 'string',
+            description: 'Optional display name or caption'
+          }
         },
         additionalProperties: false
       }
@@ -89,6 +90,7 @@ module.exports = {
       validationLevel: 'strict',
       validationAction: 'error'
     });
+
     await db.collection('images').createIndex({ id: 1 }, { unique: true });
     await db.collection('images').createIndex({ published: -1 });
   },
@@ -97,4 +99,4 @@ module.exports = {
     await db.collection('notes').drop();
     await db.collection('images').drop();
   }
-}; 
+};

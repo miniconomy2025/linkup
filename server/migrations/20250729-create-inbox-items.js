@@ -1,39 +1,50 @@
 module.exports = {
   async up(db, client) {
-    // JSON‐Schema for InboxItem documents
     const inboxValidator = {
       $jsonSchema: {
         bsonType: 'object',
         required: ['actor', 'activity', 'receivedAt'],
         properties: {
+          _id: {
+            bsonType: 'objectId',
+            description: 'MongoDB document ID'
+          },
           actor: {
             bsonType: 'string',
-            description: 'must be a string and is required (actor URI)'
+            description: 'Actor URI as a string; required'
           },
           activity: {
             bsonType: 'string',
-            description: 'must be a string and is required (activity URI)'
+            description: 'Activity URI as a string; required and must be unique'
           },
           receivedAt: {
             bsonType: 'date',
-            description: 'must be a date and is required'
+            description: 'Date when the inbox item was received; required'
+          },
+          createdAt: {
+            bsonType: ['date', 'null'],
+            description: 'Optional creation timestamp'
+          },
+          updatedAt: {
+            bsonType: ['date', 'null'],
+            description: 'Optional update timestamp'
           }
-        }
+        },
+        additionalProperties: false
       }
     };
 
-    // Create collection with validation
     await db.createCollection('inboxitems', {
       validator: inboxValidator,
       validationLevel: 'strict',
       validationAction: 'error'
     });
 
-    // Indexes
     await db.collection('inboxitems').createIndex(
       { activity: 1 },
       { unique: true }
     );
+
     await db.collection('inboxitems').createIndex(
       { actor: 1, receivedAt: -1 }
     );
@@ -42,4 +53,4 @@ module.exports = {
   async down(db, client) {
     await db.collection('inboxitems').drop();
   }
-}; 
+};

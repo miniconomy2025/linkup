@@ -1,20 +1,54 @@
 module.exports = {
   async up(db, client) {
+    // Shared schema properties
+    const commonActivityFields = {
+      _id: {
+        bsonType: 'objectId',
+        description: 'MongoDB document ID',
+      },
+      id: { 
+        bsonType: 'string', 
+        description: 'ActivityPub ID (URI)' 
+      },
+      type: { 
+        enum: ['Create', 'Follow', 'Like', 'Undo'], 
+        description: 'Activity type' 
+      },
+      actor: { 
+        bsonType: 'string', 
+        description: 'Actor ID (URI)' 
+      },
+      published: { 
+        bsonType: 'date', 
+        description: 'Published date (ISO)' 
+      },
+      to: {
+        bsonType: 'array',
+        items: { bsonType: 'string' },
+        description: 'Recipients (URIs)',
+      },
+      createdAt: {
+        bsonType: ['date', 'null'],
+        description: 'Document creation timestamp',
+      },
+      updatedAt: {
+        bsonType: ['date', 'null'],
+        description: 'Document update timestamp',
+      }
+    };
+
     // Create Activity
     const createValidator = {
       $jsonSchema: {
         bsonType: 'object',
         required: ['id', 'type', 'actor', 'object'],
         properties: {
-          id: { bsonType: 'string' },
+          ...commonActivityFields,
           type: { enum: ['Create'] },
-          actor: { bsonType: 'string' },
-          published: { bsonType: 'date' },
-          to: {
-            bsonType: ['array'],
-            items: { bsonType: 'string' }
-          },
-          object: { bsonType: 'object' }
+          object: {
+            bsonType: 'object',
+            description: 'Embedded object being created'
+          }
         },
         additionalProperties: false
       }
@@ -31,15 +65,12 @@ module.exports = {
         bsonType: 'object',
         required: ['id', 'type', 'actor', 'object'],
         properties: {
-          id: { bsonType: 'string' },
+          ...commonActivityFields,
           type: { enum: ['Follow'] },
-          actor: { bsonType: 'string' },
-          published: { bsonType: 'date' },
-          to: {
-            bsonType: ['array'],
-            items: { bsonType: 'string' }
-          },
-          object: { bsonType: 'string' }
+          object: {
+            bsonType: 'string',
+            description: 'URI of the actor being followed'
+          }
         },
         additionalProperties: false
       }
@@ -56,15 +87,12 @@ module.exports = {
         bsonType: 'object',
         required: ['id', 'type', 'actor', 'object'],
         properties: {
-          id: { bsonType: 'string' },
+          ...commonActivityFields,
           type: { enum: ['Like'] },
-          actor: { bsonType: 'string' },
-          published: { bsonType: 'date' },
-          to: {
-            bsonType: ['array'],
-            items: { bsonType: 'string' }
-          },
-          object: { bsonType: 'string' }
+          object: {
+            bsonType: 'string',
+            description: 'URI of the object being liked'
+          }
         },
         additionalProperties: false
       }
@@ -81,15 +109,12 @@ module.exports = {
         bsonType: 'object',
         required: ['id', 'type', 'actor', 'object'],
         properties: {
-          id: { bsonType: 'string' },
+          ...commonActivityFields,
           type: { enum: ['Undo'] },
-          actor: { bsonType: 'string' },
-          published: { bsonType: 'date' },
-          to: {
-            bsonType: ['array'],
-            items: { bsonType: 'string' }
-          },
-          object: { bsonType: 'string', description: 'ID of the Follow activity being undone' }
+          object: {
+            bsonType: 'object',
+            description: 'Follow activity being undone (embedded)'
+          }
         },
         additionalProperties: false
       }
@@ -100,7 +125,7 @@ module.exports = {
       validationAction: 'error'
     });
 
-    // Indexes for all activities
+    // Indexes for each activity collection
     for (const col of ['creates', 'follows', 'likes', 'undos']) {
       await db.collection(col).createIndex({ id: 1 }, { unique: true });
       await db.collection(col).createIndex({ actor: 1 });
@@ -113,4 +138,4 @@ module.exports = {
       await db.collection(col).drop();
     }
   }
-}; 
+};

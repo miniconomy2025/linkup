@@ -9,10 +9,12 @@ const BaseActivityFields = {
   to: { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },
 };
 
-const FollowSchema = new Schema<FollowActivity>({
+type FollowActivityDocument = FollowActivity & Document;
+
+const FollowSchema = new Schema<FollowActivityDocument>({
   ...BaseActivityFields,
   type: { type: String, enum: ['Follow'], required: true },
   object: { type: String, required: true },
 });
 
-export const FollowModel = model<FollowActivity & Document>('Follow', FollowSchema); 
+export const FollowModel = model<FollowActivityDocument>('Follow', FollowSchema);

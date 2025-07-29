@@ -49,14 +49,11 @@ export interface BaseActor {
   id: string;       // Actor ID (URI)
   type: string;     // 'Person' or 'Group'
   preferredUsername: string;
+  name: string;
   inbox: string;    // Inbox URI
   outbox: string;   // Outbox URI
   followers: string;// Followers collection URI
-  publicKey?: {
-    id: string;
-    owner: string;
-    publicKeyPem: string;
-  };
+  following: string;
 }
 
 export interface PersonActor extends BaseActor {
@@ -88,9 +85,19 @@ export interface ImageObject extends BaseObject {
   type: 'Image';
   url: string;
   name?: string;
-  mediaType?: string;
-  width?: number;
-  height?: number;
 }
 
 export type ActivityObject = NoteObject | ImageObject; 
+
+
+export interface OutboxItem {
+  actor: string;     // Actor’s URI
+  activity: string;  // Activity’s URI
+  createdAt?: Date;  // auto‐set
+}
+
+export interface InboxItem {
+  actor: string;     // Actor’s URI
+  activity: string;  // Activity’s URI
+  receivedAt?: Date; // auto‐set
+}

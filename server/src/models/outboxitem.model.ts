@@ -11,7 +11,4 @@ const OutboxItemSchema = new Schema<OutboxItemDoc>({
 
 OutboxItemSchema.index({ actor: 1, createdAt: -1 });
 
-export const OutboxItemModel = model<OutboxItemDoc>(
-  'OutboxItem',
-  OutboxItemSchema
-); 
+export const OutboxItemModel = model<OutboxItemDoc>('OutboxItem', OutboxItemSchema); 

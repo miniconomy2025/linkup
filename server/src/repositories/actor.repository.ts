@@ -3,6 +3,6 @@ import { Actor } from '../types/activitypub';
 
 export const ActorRepository = {
   getActorById: async (id: string): Promise<Actor | null> => {
-    return ActorModel.findOne({ id }).lean<Actor>().exec();
+    return ActorModel.findOne({ preferredUsername: id }).lean<Actor>().exec();
   },
 }; 

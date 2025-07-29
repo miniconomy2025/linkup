@@ -11,7 +11,4 @@ const InboxItemSchema = new Schema<InboxItemDoc>({
 
 InboxItemSchema.index({ actor: 1, receivedAt: -1 });
 
-export const InboxItemModel = model<InboxItemDoc>(
-  'InboxItem',
-  InboxItemSchema
-); 
+export const InboxItemModel = model<InboxItemDoc>('InboxItem', InboxItemSchema); 

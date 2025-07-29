@@ -9,10 +9,12 @@ const BaseActivityFields = {
   to: { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },
 };
 
-const CreateSchema = new Schema<CreateActivity>({
+type CreateActivityDocument = CreateActivity & Document;
+
+const CreateSchema = new Schema<CreateActivityDocument>({
   ...BaseActivityFields,
   type: { type: String, enum: ['Create'], required: true },
-  object: { type: Schema.Types.Mixed, required: true }, // Populated with Note or Image
+  object: { type: Schema.Types.Mixed, required: true },
 });
 
-export const CreateModel = model<CreateActivity & Document>('Create', CreateSchema); 
+export const CreateModel = model<CreateActivityDocument>('Create', CreateSchema);
