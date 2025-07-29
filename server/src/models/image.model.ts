@@ -11,7 +11,7 @@ const BaseObjectFields: Record<string, any> = {
 
 type ImageObjectDocument = ImageObject & Document;
 
-const ImageSchema = new Schema<ImageObjectDocument>({
+export const ImageSchema = new Schema<ImageObjectDocument>({
   ...BaseObjectFields,
   type: { type: String, enum: ['Image'], required: true },
   url: { type: String, required: true },

@@ -46,14 +46,15 @@ export type Activity = CreateActivity | FollowActivity | LikeActivity | UndoActi
 // Base Actor Interface
 export interface BaseActor {
   _id?: string;
-  id: string;       // Actor ID (URI)
-  type: string;     // 'Person' or 'Group'
+  id: string;        // Actor ID (URI)
+  type: string;      // 'Person' or 'Group'
   preferredUsername: string;
-  name: string;
-  inbox: string;    // Inbox URI
-  outbox: string;   // Outbox URI
-  followers: string;// Followers collection URI
+  name: string;      // Display name
+  inbox: string;     // Inbox URI
+  outbox: string;    // Outbox URI
+  followers: string; // Followers collection URI
   following: string;
+  icon?: ImageObject; // Profile photo (reusing ImageObject)
 }
 
 export interface PersonActor extends BaseActor {
