@@ -9,6 +9,8 @@ import postRoutes from './routes/posts.route';
 import commentRoutes from './routes/comments.route';
 import inboxRoutes from './routes/inbox.route';
 import outboxRoutes from './routes/outbox.route';
+import followerRoutes from './routes/followers.route';
+import followingRoutes from './routes/following.route';
 import actorsRoutes from './routes/actors.route';
 import authRoutes from './routes/auth.route';
 
@@ -21,11 +23,12 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 
 connectMongoDB();
 
-app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/comments', commentRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/outbox', outboxRoutes);
+app.use('followers', followerRoutes);
+app.use('/following', followingRoutes);
 app.use('/actors', actorsRoutes);
 app.use('/auth', authRoutes);
 
