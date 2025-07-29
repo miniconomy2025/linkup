@@ -133,3 +133,7 @@ resource "aws_budgets_budget" "monthly_budget" {
     subscriber_email_addresses = var.budget_emails
   }
 }
+
+resource "aws_s3_bucket" "tf_state" {
+  bucket = "linkup-terraform-state-bucket"
+}
