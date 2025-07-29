@@ -89,7 +89,7 @@ resource "aws_s3_bucket" "linkup_app_bucket" {
   bucket = var.s3_bucket_name
 
   tags = {
-    Name        = "linkup-app-bucket"
+    Name        = "linkup-bucket"
     Environment = "production"
   }
 }
