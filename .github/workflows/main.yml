@@ -1,0 +1,167 @@
+name: Full Deploy Pipeline
+
+on:
+#  push:
+#    branches: [main]
+#    paths:
+#      - 'terraform/**'
+#      - 'server/**'
+#      - 'client/**'
+  workflow_dispatch: {}
+jobs:
+  infra:
+    name: Provision Infrastructure
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan (with detailed exit code)
+        id: tfplan
+        run: |
+          terraform plan -detailed-exitcode -out=tfplan.out
+        continue-on-error: true
+
+      - name: Check for Changes
+        id: tfcheck
+        run: |
+          if [ "${{ steps.tfplan.outputs.exitcode }}" == "2" ]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Terraform Apply (only if changes)
+        if: steps.tfcheck.outputs.changes == 'true'
+        run: terraform apply -auto-approve tfplan.out
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: af-south-1
+
+  server-deploy:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    needs: infra
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install and Build Backend
+        working-directory: ./server
+        run: |
+          npm install
+          npm run build
+
+      - name: Upload Backend to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: server/dist/
+          target: ~/app/backend
+
+      - name: Restart Backend with PM2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/app/backend
+            pm2 restart linkup-api || pm2 start index.js --name linkup-api
+            pm2 save
+
+
+
+
+  client-deploy:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    needs: server-deploy
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+
+      - name: Install and Build React App
+        working-directory: ./client
+        run: |
+          npm install
+          npm run build
+
+      - name: Upload Build to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: client/build/
+          target: ~/app/client
+
+      - name: Configure Nginx for React
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo apt update
+            sudo apt install -y nginx certbot python3-certbot-nginx
+
+            sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
+            server {
+              listen 80;
+              server_name yourdomain.com www.yourdomain.com; ##TODO: custom domain/ ec2
+            
+              root /home/ubuntu/app/client;
+              index index.html;
+            
+              location / {
+                try_files \$uri /index.html;
+              }
+            
+              location /api/ {
+                proxy_pass http://localhost:3000/;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade \$http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host \$host;
+                proxy_cache_bypass \$http_upgrade;
+              }
+            }
+            EOF
+            
+            sudo nginx -t && sudo systemctl restart nginx
+            
+            # Run only on first deploy or cert expiration
+            sudo certbot --non-interactive --nginx \
+            -d yourdomain.com -d www.yourdomain.com \
+            --agree-tos -m admin@yourdomain.com
+
