@@ -23,7 +23,7 @@ module.exports = {
           },
           name: {
             bsonType: 'string',
-            description: 'Name from google account'
+            description: 'Name from Google account'
           },
           inbox: {
             bsonType: 'string',
@@ -40,6 +40,24 @@ module.exports = {
           following: {
             bsonType: 'string',
             description: 'Following collection URI'
+          },
+          icon: {
+            bsonType: 'object',
+            required: false,
+            properties: {
+              id: { bsonType: 'string', description: 'URI of the image object' },
+              type: { enum: ['Image'], description: 'Must be "Image"' },
+              attributedTo: { bsonType: 'string', description: 'Actor ID' },
+              published: { bsonType: 'string', description: 'ISO date string' },
+              to: {
+                bsonType: ['array'],
+                items: { bsonType: 'string' },
+                description: 'Array of recipient URIs'
+              },
+              url: { bsonType: 'string', description: 'URL pointing to the image file' },
+              name: { bsonType: 'string', description: 'Optional caption or alt text' }
+            },
+            additionalProperties: false
           },
           createdAt: {
             bsonType: 'date',
