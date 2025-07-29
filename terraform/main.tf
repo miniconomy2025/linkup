@@ -95,7 +95,7 @@ resource "aws_s3_bucket" "linkup_app_bucket" {
 }
 
 resource "aws_budgets_budget" "monthly_budget" {
-  name              = "thoh-monthly-budget"
+  name              = "link-up-monthly-budget"
   budget_type       = "COST"
   limit_amount      = "25"
   limit_unit        = "USD"
