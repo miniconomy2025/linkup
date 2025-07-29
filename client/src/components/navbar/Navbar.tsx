@@ -4,10 +4,10 @@ import { useAuth } from "../../hooks/useAuth";
 import "./Navbar.css";
 import { IoHomeOutline } from "react-icons/io5";
 import { FiSearch } from "react-icons/fi";
-import { FiSettings } from "react-icons/fi";
 import { FiPlusSquare } from "react-icons/fi";
 import { MdLogout } from "react-icons/md";
 import { RxAvatar } from "react-icons/rx";
+import { MdOutlineNotifications } from "react-icons/md";
 
 const Navbar: React.FC = () => {
   const { user, logout } = useAuth();
@@ -19,15 +19,22 @@ const Navbar: React.FC = () => {
         LinkUp
       </div>
       <nav className="sidebar-links">
-        <Link to="/feed" className=""><IoHomeOutline size={20} />Home</Link>
-        <Link to="/search"><FiSearch size={20} />Search</Link>
-        <Link to="/create"><FiPlusSquare size={20} />Create</Link>
-        <Link to={`/profile/${user?.name.toLowerCase().replace(/\\s+/g, '')}`}>
-            {user?.avatar ? <img src={user.avatar} alt="avatar" width={20} height={20} className="sidebar-avatar" /> : <RxAvatar size={20} />}
-            Profile
+        <Link to="/feed"><IoHomeOutline size={20} /><span className="label">Home</span></Link>
+        <Link to="/search"><FiSearch size={20} /><span className="label">Search</span></Link>
+        <Link to="/notifications"><MdOutlineNotifications size={20} /><span className="label">Notifications</span></Link>
+        <Link to="/create"><FiPlusSquare size={20} /><span className="label">Create</span></Link>
+        <Link to={`/profile/${user?.name.toLowerCase().replace(/\s+/g, '')}`}>
+          {user?.avatar ? (
+            <img src={user.avatar} alt="avatar" width={20} height={20} className="sidebar-avatar" />
+          ) : (
+            <RxAvatar size={20} />
+          )}
+          <span className="label">Profile</span>
         </Link>
-        <Link to="/settings"><FiSettings size={20} />Settings</Link>
-        <button className="logout-btn" onClick={logout}><MdLogout size={20} />Logout</button>
+        <button className="logout-btn" onClick={logout}>
+          <MdLogout size={20} />
+          <span className="label">Logout</span>
+        </button>
       </nav>
     </aside>
   );

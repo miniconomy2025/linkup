@@ -1,9 +1,11 @@
 .page-layout-container {
   margin-left: 220px;
+  padding: 2rem;
 }
 
 @media (max-width: 768px) {
   .page-layout-container {
     margin-left: 0;
+    padding: 2rem 2rem calc(60px + 2rem) 2rem;
   }
 }

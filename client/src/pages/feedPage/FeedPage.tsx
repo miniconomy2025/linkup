@@ -1,5 +1,8 @@
 import React from "react";
 import "./FeedPage.css";
+import { PageLayout } from "../../components/pageLayout/PageLayout";
+import { PostImage } from "../../components/postImage/PostImage";
+import { useNavigate } from "react-router-dom";
 
 const mockPosts = [
   {
@@ -28,58 +31,66 @@ const mockPosts = [
   },
 ];
 
-const mockSuggested = [
-    {
-    id: "1",
-    username: "Tebogo",
-    avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
-    followedBy: [
-        "Chris_123", "Ron_321"
-    ]
-  },
-  {
-    id: "2",
-    username: "Tiya",
-    avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
-    followedBy: [
-        "Chris_123", "Ron_321"
-    ]
-  },
-  {
-    id: "3",
-    username: "Ron",
-    avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
-    followedBy: [
-        "Chris_123", "Ron_321"
-    ]
-  },
-  {
-    id: "4",
-    username: "Rivo",
-    avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
-    followedBy: [
-        "Chris_123", "Ron_321"
-    ]
-  },
-  {
-    id: "5",
-    username: "Chris",
-    avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
-    followedBy: [
-        "Chris_123", "Ron_321"
-    ]
-  },
-]
+// const mockSuggested = [
+//     {
+//     id: "1",
+//     username: "Tebogo",
+//     avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+//     followedBy: [
+//         "Chris_123", "Ron_321"
+//     ]
+//   },
+//   {
+//     id: "2",
+//     username: "Tiya",
+//     avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+//     followedBy: [
+//         "Chris_123", "Ron_321"
+//     ]
+//   },
+//   {
+//     id: "3",
+//     username: "Ron",
+//     avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+//     followedBy: [
+//         "Chris_123", "Ron_321"
+//     ]
+//   },
+//   {
+//     id: "4",
+//     username: "Rivo",
+//     avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+//     followedBy: [
+//         "Chris_123", "Ron_321"
+//     ]
+//   },
+//   {
+//     id: "5",
+//     username: "Chris",
+//     avatar: "https://tse3.mm.bing.net/th/id/OIP.Sko8CQSOZhYy3u_kQB6J3QHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+//     followedBy: [
+//         "Chris_123", "Ron_321"
+//     ]
+//   },
+// ]
 
 const FeedPage: React.FC = () => {
+
+  const navigate = useNavigate();
+
+  const handlePostClick = (id: string) => {
+    navigate(`/post/${id}`)
+  }
+
   return (
+    <PageLayout>
     <div className="feed-container">
     <div className="post-container">
       {mockPosts.map(post => (
         <div key={post.id} className="post-card">
           <div className="post-header">@{post.username}</div>
-          <div className="post-image">
-            <img src={post.image} alt="post" />
+          <div className="post-image" onClick={() => handlePostClick(post.id)}>
+            <PostImage src={post.image} alt="post" />
           </div>
           <div className="post-content">{post.content}</div>
           <div className="post-actions">
@@ -90,7 +101,7 @@ const FeedPage: React.FC = () => {
       ))}
       
     </div>
-    <div className="suggested-container">
+    {/* <div className="suggested-container">
         <div className="suggested-title">Suggested for you</div>
         {mockSuggested.map(suggested => (
             <div className="suggested-info-container">
@@ -104,8 +115,9 @@ const FeedPage: React.FC = () => {
             </div>
         ))}
         
-      </div>
+      </div> */}
     </div>
+    </PageLayout>
   );
 };
 
