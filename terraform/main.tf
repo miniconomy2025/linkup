@@ -6,6 +6,12 @@ data "aws_vpc" "default" {
   default = true
 }
 
+data "aws_ssm_parameter" "ubuntu2204" {
+  name   = "/aws/service/canonical/ubuntu/server/jammy/stable/current/amd64/hvm/ebs-gp2/ami-id"
+  region = var.aws_region
+}
+
+
 resource "aws_security_group" "app_sg" {
   name        = "linkup_app_sg"
   description = "Allow web, SSH, MongoDB, Neo4j ports"
@@ -72,7 +78,7 @@ resource "aws_security_group" "app_sg" {
 }
 
 resource "aws_instance" "app_instance" {
-  ami                         = var.ami_id
+  ami                         = data.aws_ssm_parameter.ubuntu2204.value
   instance_type               = var.instance_type
   key_name                    = var.key_name
   security_groups             = [aws_security_group.app_sg.name]

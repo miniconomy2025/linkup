@@ -6,7 +6,7 @@ apt update -y && apt upgrade -y
 apt install -y curl wget gnupg unzip software-properties-common
 
 # Node.js (v18)
-curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
 
 # MongoDB
