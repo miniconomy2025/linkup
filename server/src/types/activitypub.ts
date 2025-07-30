@@ -95,7 +95,7 @@ export interface VideoObject extends BaseObject {
   name?: string;
 }
 
-export type ActivityObject = NoteObject | ImageObject; 
+export type ActivityObject = NoteObject | ImageObject | VideoObject; 
 
 
 export interface OutboxItem {

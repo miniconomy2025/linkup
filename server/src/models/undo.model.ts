@@ -1,6 +1,8 @@
 import { Schema, model, Document } from 'mongoose';
 import { UndoActivity } from '../types/activitypub';
 
+const BASE_URL = process.env.BASE_URL || 'https://localhost:3000'; 
+
 const BaseActivityFields = {
     id: { type: String, required: true, unique: true },
     type: { type: String, required: true, enum: ['Create', 'Follow', 'Like', 'Undo'] },
@@ -15,6 +17,13 @@ const UndoSchema = new Schema<UndoActivityDocument>({
   ...BaseActivityFields,
   type: { type: String, enum: ['Undo'], required: true },
   object: { type: Schema.Types.Mixed, required: true },
-} as const);
+} as const, { versionKey: false });
+
+UndoSchema.pre('save', function (next) {
+  if (!this.id) {
+    this.id = `${BASE_URL}/activities/undo/${this._id.toString()}`;
+  }
+  next();
+});
 
 export const UndoModel = model<UndoActivityDocument>('Undo', UndoSchema);

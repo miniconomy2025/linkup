@@ -1,6 +1,8 @@
 import { Schema, model, Document } from 'mongoose';
 import { VideoObject } from '../types/activitypub';
 
+const BASE_URL = process.env.BASE_URL || 'https://localhost:3000'; 
+
 const BaseObjectFields: Record<string, any> = {
   id: { type: String, required: true, unique: true },
   type: { type: String, required: true, enum: ['Note', 'Image', 'Video'] },
@@ -16,6 +18,13 @@ export const VideoSchema = new Schema<VideoObjectDocument>({
   type: { type: String, enum: ['Video'], required: true },
   url: { type: String, required: true },
   name: { type: String, required: false }
-} as const);
+} as const, { versionKey: false });
+
+VideoSchema.pre('save', function (next) {
+  if (!this.id) {
+    this.id = `${BASE_URL}/activities/create/${this._id.toString()}`;
+  }
+  next();
+});
 
 export const VideoModel = model<VideoObjectDocument>('Video', VideoSchema);

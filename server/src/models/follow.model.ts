@@ -1,6 +1,8 @@
 import { Schema, model, Document } from 'mongoose';
 import { FollowActivity } from '../types/activitypub';
 
+const BASE_URL = process.env.BASE_URL || 'https://localhost:3000'; 
+
 const BaseActivityFields = {
   id: { type: String, required: true, unique: true },
   type: { type: String, required: true, enum: ['Create', 'Follow', 'Like', 'Undo'] },
@@ -15,6 +17,13 @@ const FollowSchema = new Schema<FollowActivityDocument>({
   ...BaseActivityFields,
   type: { type: String, enum: ['Follow'], required: true },
   object: { type: String, required: true },
+}, { versionKey: false });
+
+FollowSchema.pre('save', function (next) {
+  if (!this.id) {
+    this.id = `${BASE_URL}/activities/follow/${this._id.toString()}`;
+  }
+  next();
 });
 
 export const FollowModel = model<FollowActivityDocument>('Follow', FollowSchema);

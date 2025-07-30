@@ -43,7 +43,6 @@ module.exports = {
           },
           icon: {
             bsonType: 'object',
-            required: false,
             properties: {
               id: { bsonType: 'string', description: 'URI of the image object' },
               type: { enum: ['Image'], description: 'Must be "Image"' },

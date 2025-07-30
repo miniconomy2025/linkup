@@ -15,6 +15,6 @@ const ActorSchema = new Schema<ActorDoc>({
   followers:        { type: String, required: true },
   following:        { type: String, required: true },
   icon:             { type: ImageSchema, required: false },
-}, { timestamps: true });
+}, { timestamps: true, versionKey: false });
 
 export const ActorModel = model<ActorDoc>('Actor', ActorSchema);
