@@ -3,7 +3,7 @@ import { NoteObject } from '../types/activitypub';
 
 const BaseObjectFields: Record<string, any> = {
   id: { type: String, required: true, unique: true },
-  type: { type: String, required: true, enum: ['Note', 'Image'] },
+  type: { type: String, required: true, enum: ['Note', 'Image', 'Video'] },
   attributedTo: { type: String, required: true },
   published: { type: String, required: true },
   to: { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },

@@ -72,7 +72,7 @@ export type Actor = PersonActor | GroupActor;
 export interface BaseObject {
   _id?: string;
   id: string;      // Object ID (URI)
-  type: string;    // 'Image' or 'Note'
+  type: string;    // 'Image' or 'Note' or 'Video'
   attributedTo: string;  // Actor ID
   published: string;     // ISO date
   to: string[];
@@ -85,6 +85,12 @@ export interface NoteObject extends BaseObject {
 
 export interface ImageObject extends BaseObject {
   type: 'Image';
+  url: string;
+  name?: string;
+}
+
+export interface VideoObject extends BaseObject {
+  type: 'Video';
   url: string;
   name?: string;
 }

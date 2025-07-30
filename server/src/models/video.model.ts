@@ -1,5 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
-import { ImageObject } from '../types/activitypub';
+import { VideoObject } from '../types/activitypub';
 
 const BaseObjectFields: Record<string, any> = {
   id: { type: String, required: true, unique: true },
@@ -9,13 +9,13 @@ const BaseObjectFields: Record<string, any> = {
   to: { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },
 };
 
-type ImageObjectDocument = ImageObject & Document;
+type VideoObjectDocument = VideoObject & Document;
 
-export const ImageSchema = new Schema<ImageObjectDocument>({
+export const VideoSchema = new Schema<VideoObjectDocument>({
   ...BaseObjectFields,
-  type: { type: String, enum: ['Image'], required: true },
+  type: { type: String, enum: ['Video'], required: true },
   url: { type: String, required: true },
   name: { type: String, required: false }
 } as const);
 
-export const ImageModel = model<ImageObjectDocument>('Image', ImageSchema);
+export const VideoModel = model<VideoObjectDocument>('Video', VideoSchema);
