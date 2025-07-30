@@ -9,6 +9,7 @@ import { NotificationsPage } from './pages/notificationsPage/NotificationsPage';
 import { PostPage } from './pages/postPage/PostPage';
 import { LoginSuccessPage } from './pages/loginSuccessPage/LoginSuccessPage';
 import AuthenticatedLayout from './layouts/authenticatedLayout/AuthenticatedLayout';
+import CreatePostPage from './pages/createPostPage/CreatePostPage';
 
 const App = () => {
 
@@ -25,6 +26,7 @@ const App = () => {
                         <Route path='/feed' element={<FeedPage />} />
                         <Route path='/profile/:username' element={<ProfilePage />} />
                         <Route path='/search' element={<SearchPage />} />
+                        <Route path='/create' element={<CreatePostPage />} />
                         <Route path='/notifications' element={<NotificationsPage />} />
                         <Route path='/post/:id' element={<PostPage />} />
                     </Route>
