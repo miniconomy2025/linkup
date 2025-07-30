@@ -24,12 +24,12 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 
 connectMongoDB();
 
-app.use('/posts', postRoutes);
-app.use('/comments', commentRoutes);
-app.use('/inbox', inboxRoutes);
-app.use('/outbox', outboxRoutes);
-app.use('followers', followerRoutes);
-app.use('/following', followingRoutes);
+// app.use('/posts', postRoutes);
+// app.use('/comments', commentRoutes);
+// app.use('/inbox', inboxRoutes);
+// app.use('/outbox', outboxRoutes);
+// app.use('followers', followerRoutes);
+// app.use('/following', followingRoutes);
 app.use('/actors', actorsRoutes);
 app.use('/auth', authRoutes);
 app.use('/search', searchRoutes)
