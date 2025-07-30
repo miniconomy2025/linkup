@@ -15,4 +15,36 @@ export const ActorController = {
       next(error);
     }
   },
+
+  postActivityToInbox: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getUserOutbox: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    } catch (error) {
+      next(error);
+    }
+  },
+  
+  getUserFollowers: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getUserFollowing: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    } catch (error) {
+      next(error);
+    }
+  },
 }; 
