@@ -4,7 +4,7 @@ import { LikeActivity } from '../types/activitypub';
 const BASE_URL = process.env.BASE_URL || 'https://localhost:3000'; 
 
 const BaseActivityFields = {
-  id: { type: String, required: true, unique: true },
+  id: { type: String, unique: true },
   type: { type: String, required: true, enum: ['Create', 'Follow', 'Like', 'Undo'] },
   actor: { type: String, required: true },
   published: { type: Date, required: false },

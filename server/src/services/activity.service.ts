@@ -16,7 +16,6 @@ const saveActivityInOutbox = async (activity: Activity): Promise<OutboxItem> => 
 
 export const ActivityService = {
   handleCreateActivity: async (createActivity: CreateActivity): Promise<CreateActivity> => {
-    console.log("HERE");
     let activityObject = createActivity.object;
     switch (activityObject.type) {
       case 'Note':
@@ -31,7 +30,6 @@ export const ActivityService = {
       default:
         throw new Error('Not an accepted activity type');
     }
-    console.log("HERE2");
     createActivity.object = activityObject;
 
     createActivity = await ActivityRepository.saveCreateActivity(createActivity);

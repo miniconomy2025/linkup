@@ -4,7 +4,7 @@ import { NoteObject } from '../types/activitypub';
 const BASE_URL = process.env.BASE_URL || 'https://localhost:3000'; 
 
 const BaseObjectFields: Record<string, any> = {
-  id: { type: String, required: true, unique: true },
+  id: { type: String, unique: true },
   type: { type: String, required: true, enum: ['Note', 'Image', 'Video'] },
   attributedTo: { type: String, required: true },
   published: { type: String, required: true },

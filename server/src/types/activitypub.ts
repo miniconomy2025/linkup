@@ -7,7 +7,7 @@ import { Schema, model, Document } from 'mongoose';
 // Base Activity Interface
 export interface BaseActivity {
   _id?: string;    // MongoDB ID
-  id: string;      // ActivityPub ID (URI)
+  id?: string;      // ActivityPub ID (URI)
   type: string;    // Activity type
   actor: string;   // Actor ID (URI)
   published?: string; // ISO date
@@ -71,7 +71,7 @@ export type Actor = PersonActor | GroupActor;
 // ActivityPub Objects
 export interface BaseObject {
   _id?: string;
-  id: string;      // Object ID (URI)
+  id?: string;      // Object ID (URI)
   type: string;    // 'Image' or 'Note' or 'Video'
   attributedTo: string;  // Actor ID
   published: string;     // ISO date
