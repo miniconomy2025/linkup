@@ -63,6 +63,7 @@ export interface PersonActor extends BaseActor {
 export interface GroupActor extends BaseActor {
   type: 'Group';
 }
+
 export type Actor = PersonActor | GroupActor;
 
 
