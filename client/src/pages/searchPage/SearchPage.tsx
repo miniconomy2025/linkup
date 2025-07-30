@@ -3,38 +3,9 @@ import { PageLayout } from '../../components/pageLayout/PageLayout';
 import SearchBox from '../../components/searchBox/SearchBox';
 import SearchItem from '../../components/searchItem/SearchItem';
 import "./SearchPage.css";
-import axios from 'axios';
+import { searchActor } from '../../api/requests/actor';
 
-const mockUsers = [
-    {
-        userId: 1,
-        name: 'Chris',
-        username: 'chrismchardy123',
-        followers: 126,
-        avatar: 'https://i.pravatar.cc/150?u=1',
-        visible: false,
-        following: true
-    },
-    {
-        userId: 2,
-        name: 'Chris',
-        username: 'chrismchardy123',
-        followers: 126,
-        avatar: 'https://i.pravatar.cc/150?u=1',
-        visible: true,
-        following: false
-    },
-     {
-        userId: 3,
-        name: 'Chris',
-        username: 'chrismchardy123',
-        followers: 126,
-        avatar: 'https://i.pravatar.cc/150?u=1',
-        visible: false,
-        following: false
-    }
-]
-
+// TODO change to actor model to avoid mapping
 type User = {
     userId: number;
     name: string;
@@ -52,37 +23,45 @@ export const SearchPage = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     const handleSearch = (query: string) => {
         setSearchQuery(query);
+        setPage(1);
         setUsers([]);
     };
 
     useEffect(() => {
-        const fetchUsers = async () => {
-            if (!searchQuery) return;
-            setLoading(true);
-            setError(null);
-            try {
-                // simulate API call
-                const response = await new Promise<{ data: User[] }>((resolve) => {
-                    setTimeout(() => {
-                        resolve({ data: mockUsers });
-                    }, 500); // simulate 500ms
-                });
-                // const response = await axios.get(`/api/search`, {
-                //     params: { query: searchQuery }
-                // });
-                setUsers(response.data);
-            } catch (err) {
-                setError('Failed to fetch users.');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchUsers = async () => {
+        if (!searchQuery) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await searchActor({ query: searchQuery, page, limit: 5 });
+            console.log(response)
+            // assuming response: { results, total, page, limit, pages }
+            const mappedUsers: User[] = response.results.map((actor: any, index: number) => ({
+                userId: index, // or actor._id if available
+                name: actor.name,
+                username: actor.preferredUsername,
+                followers: Math.floor(Math.random() * 500),
+                avatar: actor.icon?.url || `https://i.pravatar.cc/150?u=${actor.id}`,
+                visible: true,
+                following: false,
+            }));
 
-        fetchUsers();
-    }, [searchQuery]);
+            setUsers(mappedUsers);
+            setTotalPages(response.pages);
+        } catch (err: any) {
+            setError(err.message || 'Failed to fetch users.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchUsers();
+}, [searchQuery, page]);
 
 
     return (
@@ -104,6 +83,13 @@ export const SearchPage = () => {
                         />
                     ))}
                 </div>
+                {totalPages > 1 && (
+                    <div className="pagination">
+                        <button className='button-secondary' onClick={() => setPage(p => Math.max(p - 1, 1))} disabled={page === 1}>Prev</button>
+                        <span>Page {page} of {totalPages}</span>
+                        <button className='button-secondary' onClick={() => setPage(p => Math.min(p + 1, totalPages))} disabled={page === totalPages}>Next</button>
+                    </div>
+                )}
             </div>
         </PageLayout>
     );
