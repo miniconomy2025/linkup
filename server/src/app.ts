@@ -13,6 +13,7 @@ import followerRoutes from './routes/followers.route';
 import followingRoutes from './routes/following.route';
 import actorsRoutes from './routes/actors.route';
 import authRoutes from './routes/auth.route';
+import searchRoutes from './routes/search.route';
 
 import { errorHandler } from './middleware/errorHandler';
 
@@ -31,6 +32,7 @@ app.use('followers', followerRoutes);
 app.use('/following', followingRoutes);
 app.use('/actors', actorsRoutes);
 app.use('/auth', authRoutes);
+app.use('/search', searchRoutes)
 
 app.use(errorHandler);
 
