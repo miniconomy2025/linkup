@@ -5,12 +5,12 @@ import cors from 'cors';
 dotenv.config();
 
 import { connectMongoDB } from './config/mongoose';
-import postRoutes from './routes/posts.route';
-import commentRoutes from './routes/comments.route';
-import inboxRoutes from './routes/inbox.route';
-import outboxRoutes from './routes/outbox.route';
-import followerRoutes from './routes/followers.route';
-import followingRoutes from './routes/following.route';
+// import postRoutes from './routes/posts.route';  //TODO: Implementation,commented out for deploy purposes
+// import commentRoutes from './routes/comments.route';
+// import inboxRoutes from './routes/inbox.route';
+// import outboxRoutes from './routes/outbox.route';
+// import followerRoutes from './routes/followers.route';
+// import followingRoutes from './routes/following.route';
 import actorsRoutes from './routes/actors.route';
 import authRoutes from './routes/auth.route';
 import searchRoutes from './routes/search.route';
