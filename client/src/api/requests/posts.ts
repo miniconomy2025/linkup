@@ -1,0 +1,11 @@
+import { apiPost } from '../client';
+
+export interface CreatePostInput {
+    content: string;
+    caption: string;
+};
+
+export const newTextPost = (data: CreatePostInput) => apiPost('/object/text', data);
+export const newImagePost = (data: FormData) => apiPost('/object/image', data);
+export const newVideoPost = (data: FormData) => apiPost('/object/video', data);
+
