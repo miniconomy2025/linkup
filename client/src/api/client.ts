@@ -18,6 +18,8 @@ export async function apiFetch<T>(
     if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
             console.error('Unauthorized, redirecting...');
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
             window.location.href = '/login';
         };
 
