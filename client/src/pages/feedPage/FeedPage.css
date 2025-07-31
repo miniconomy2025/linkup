@@ -30,6 +30,7 @@
   padding: 1rem;
   font-weight: bold;
   border-bottom: 1px solid #eee;
+  cursor: pointer;
 }
 
 .post-image img {
@@ -38,6 +39,7 @@
   max-height: 600px;
   aspect-ratio: 4 / 5;
   object-fit: cover;
+  cursor: pointer;
 }
 
 .post-content {
@@ -53,6 +55,10 @@
   color: #555;
 }
 
+.post-action {
+  display: flex;
+  gap: 0.5rem;
+}
 
 
 /* Suggested follows */
