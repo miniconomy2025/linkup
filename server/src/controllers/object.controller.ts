@@ -9,13 +9,24 @@ export const ObjectController = {
     }
   },
 
-  postImage: async (req: Request, res: Response, next: NextFunction) => {
-    try {
+    postImage: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            console.log(req.file); // The uploaded file info and buffer
+            console.log(req.body.caption); // The caption text
+            
+            if (!req.file) {
+                return res.status(400).json({ message: 'No file uploaded' });
+            }
 
-    } catch (error) {
-      next(error);
-    }
-  },
+            // You can now access the file buffer with req.file.buffer
+            // and the caption with req.body.caption
+
+            // Process file or save it, then send response
+            res.json({ message: 'File received' });
+        } catch (error) {
+            next(error);
+        }
+    },
   
   getVideoById: async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -25,11 +36,22 @@ export const ObjectController = {
     }
   },
 
-  postVideo: async (req: Request, res: Response, next: NextFunction) => {
-    try {
+    postVideo: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            console.log(req.file); // The uploaded file info and buffer
+            console.log(req.body.caption); // The caption text
+            
+            if (!req.file) {
+                return res.status(400).json({ message: 'No file uploaded' });
+            }
 
-    } catch (error) {
-      next(error);
-    }
-  },
+            // You can now access the file buffer with req.file.buffer
+            // and the caption with req.body.caption
+
+            // Process file or save it, then send response
+            res.json({ message: 'File received' });
+        } catch (error) {
+            next(error);
+        }
+    },
 }; 
