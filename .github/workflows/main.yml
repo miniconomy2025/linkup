@@ -80,7 +80,7 @@ jobs:
           npm run build
 
       - name: Create .env File
-        working-directory: ./server/dist
+        working-directory: ./server
         run: |
           echo "NEO4J_URI=${{ secrets.NEO4J_URI }}" >> .env
           echo "NEO4J_USER=${{ secrets.NEO4J_USER }}" >> .env
@@ -116,10 +116,6 @@ jobs:
             cd ~/app/backend/server/dist
             pm2 restart linkup-api || pm2 start server.js --name linkup-api
             pm2 save
-
-
-
-
 
   client-deploy:
     name: Deploy Frontend
