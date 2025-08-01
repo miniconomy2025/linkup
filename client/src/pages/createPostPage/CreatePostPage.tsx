@@ -38,30 +38,34 @@ const CreatePostPage: React.FC = () => {
     });
 
     const handlePostSubmit = async () => {
+        if (postType === 'text' && textContent.length > 1500) {
+            toast.error('Text post content cannot exceed 1500 characters.');
+            return;
+        }
+
         setLoading(true);
         try {
             if (postType === 'image' && mediaPreview) {
                 const formData = new FormData();
-                if (!mediaFile) throw new Error('No file set.')
+                if (!mediaFile) throw new Error('No file set.');
                 formData.append('file', mediaFile);
                 formData.append('caption', caption);
                 await newImagePost(formData);
             } else if (postType === 'video' && mediaPreview) {
                 const formData = new FormData();
-                if (!mediaFile) throw new Error('No file set.')
+                if (!mediaFile) throw new Error('No file set.');
                 formData.append('file', mediaFile);
                 formData.append('caption', caption);
                 await newVideoPost(formData);
             } else if (postType === 'text') {
                 await newTextPost({ content: textContent, caption });
-            };
+            }
             notifySuccess();
             setPostType(null);
             setTextContent('');
             setCaption('');
             setMediaFile(null);
             setMediaPreview(null);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             notifyError();
         } finally {
@@ -145,7 +149,9 @@ const CreatePostPage: React.FC = () => {
                             value={textContent}
                             onChange={(e) => setTextContent(e.target.value)}
                             className='text-area'
+                            maxLength={1500}
                         />
+                        <div className='char-counter'>{textContent.length}/1500</div>
                         <input
                             type='text'
                             placeholder='Add a caption...'
