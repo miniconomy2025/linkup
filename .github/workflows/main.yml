@@ -60,11 +60,6 @@ jobs:
         if: steps.tfcheck.outputs.changes == 'true'
         run: terraform apply -auto-approve tfplan.out
 
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_REGION: af-south-1
-
   server-deploy:
     name: Deploy Backend
     runs-on: ubuntu-latest
