@@ -16,9 +16,19 @@ jobs:
       run:
         working-directory: terraform
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{vars.OIDC}}
+          aws-region: af-south-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
