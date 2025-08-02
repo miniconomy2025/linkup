@@ -10,18 +10,19 @@ export async function getAllUsers(): Promise<any[]> {
   }
 }
 
-export async function createUser(userId: string, username: string): Promise<void> {
+export async function createUser(userId: string): Promise<void> {
   const session = driver.session();
   try {
     await session.run(
       `
-      CREATE (u:User {id: $id, username: $username})
+      MERGE (u:User {id: $id})
       RETURN u
       `,
-      { id: userId, username }
+      { id: userId }
     );
   } finally {
     await session.close();
   }
 }
+
 

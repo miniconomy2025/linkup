@@ -3,11 +3,11 @@ import { Actor } from '../types/activitypub';
 import { UserNotFoundError } from '../middleware/errorHandler';
 
 export const ActorService = {
-  getActorById: async (id: string): Promise<Actor> => {
+  getActorById: async (id: string): Promise<Actor | null> => {
     const actor = await ActorRepository.getActorById(id);
-    if (!actor) {
-      throw new UserNotFoundError(`Actor with id ${id} not found`);
-    }
     return actor;
+  },
+   createActor: async (actor: Actor): Promise<Actor> => {
+    return ActorRepository.createActor(actor);
   },
 }; 
