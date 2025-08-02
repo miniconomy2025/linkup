@@ -2,14 +2,12 @@ import { Request, Response, NextFunction } from 'express';
 import { 
   ActivitySchema, 
   CreateActivitySchema, 
-  FollowActivitySchema, 
-  LikeActivitySchema, 
-  UndoActivitySchema 
 } from '../types/validationSchemas'
 import { ActorService } from '../services/actor.service';
 import { BadRequestError } from '../middleware/errorHandler';
 import { ActivityService } from '../services/activity.service';
 import { Activity } from '../types/activitypub';
+export type RequestWithUser = Request & { user?: any };
 
 export const ActorController = {
   getActorById: async (req: Request, res: Response, next: NextFunction) => {
@@ -98,4 +96,15 @@ export const ActorController = {
       next(error);
     }
   },
+  getActivitySummary: async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    const user = req.user
+    if(user){
+       const summary = await ActorService.getActorActivitySummary(user.sub);
+        return res.status(200).json(summary);
+    }
+    else{
+      res.status(401).json({ message: 'User not authenticated' });
+    }
+       
+  }
 }; 
