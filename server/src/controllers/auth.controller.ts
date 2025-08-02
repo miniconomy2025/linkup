@@ -34,23 +34,24 @@ export const AuthController = {
             
             let actor = await ActorService.getActorById(googleId);
             const appUrl = process.env.FRONTEND_URL;
-            await createUser(`${appUrl}/actors/${googleId}`)
+            const url = process.env.BASE_URL;
+
+            await createUser(`${url}/actors/${googleId}`)
             if (!actor) {
                     actor = await ActorService.createActor({
-                    id: `${appUrl}/actors/${googleId}`,
+                    id: `${url}/actors/${googleId}`,
                     type: "Person",
                     preferredUsername: googleId,
                     name: name!,
-                    inbox: `${appUrl}/actors/${googleId}/inbox`,
-                    outbox: `${appUrl}/actors/${googleId}/outbox`,
-                    followers: `${appUrl}/actors/${googleId}/followers`,
-                    following: `${appUrl}/actors/${googleId}/following`,
+                    inbox: `${url}/actors/${googleId}/inbox`,
+                    outbox: `${url}/actors/${googleId}/outbox`,
+                    followers: `${url}/actors/${googleId}/followers`,
+                    following: `${url}/actors/${googleId}/following`,
                     icon: {
                         id: 'test',
                         type: 'Image',  
                         url: picture,
-                        attributedTo: `${appUrl}/actors/${googleId}`,
-                        published: new Date().toISOString(),
+                        attributedTo: `${url}/actors/${googleId}`,
                         to: ['https://www.w3.org/ns/activitystreams#Public'],
                     }});
         }
@@ -60,7 +61,6 @@ export const AuthController = {
             if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
             const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        
             res.redirect(`${appUrl}/login/success?token=${token}`);
             
         } catch (error) {

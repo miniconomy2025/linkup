@@ -11,7 +11,7 @@ export interface BaseActivity {
   type: string;    // Activity type
   actor: string;   // Actor ID (URI)
   published?: string; // ISO date
-  to: string[];    // Recipients (URIs), default to peublic
+  to?: string[];    // Recipients (URIs), default to peublic
 }
 
 // Create Activity: wraps an object creation
@@ -74,8 +74,8 @@ export interface BaseObject {
   id?: string;      // Object ID (URI)
   type: string;    // 'Image' or 'Note' or 'Video'
   attributedTo: string;  // Actor ID
-  published: string;     // ISO date
-  to: string[];
+  published?: string;     // ISO date
+  to?: string[];
 }
 
 export interface NoteObject extends BaseObject {

@@ -5,7 +5,7 @@ export interface CreatePostInput {
     caption: string;
 };
 
-export const newTextPost = (data: CreatePostInput) => apiPost('/object/text', data);
-export const newImagePost = (data: FormData) => apiPost('/object/image', data);
-export const newVideoPost = (data: FormData) => apiPost('/object/video', data);
+export const newTextPost = (data: CreatePostInput) => apiPost('/api/object/text', data);
+export const newImagePost = (data: FormData) => apiPost('/api/object/image', data);
+export const newVideoPost = (data: FormData) => apiPost('/api/object/video', data);
 
