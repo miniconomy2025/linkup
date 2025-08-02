@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ActorService } from '../services/actor.service';
 import { BadRequestError } from '../middleware/errorHandler';
+export type RequestWithUser = Request & { user?: any };
 
 export const ActorController = {
   getActorById: async (req: Request, res: Response, next: NextFunction) => {
@@ -47,4 +48,15 @@ export const ActorController = {
       next(error);
     }
   },
+  getUserProfile: async (req: RequestWithUser, res: Response, next: NextFunction) => {
+    const user = req.user
+    if(user){
+       const summary = await ActorService.getActorProfile(user.googleId);
+        return res.status(200).json(summary);
+    }
+    else{
+      res.status(401).json({ message: 'User not authenticated' });
+    }
+       
+  }
 }; 

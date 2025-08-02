@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { ActorService } from '../services/actor.service';
-import { createUser } from '../graph/graph.queries.';
+import { ActorGraphRepository } from '../graph/repositories/actor';
 
 const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
@@ -36,7 +36,7 @@ export const AuthController = {
             const appUrl = process.env.FRONTEND_URL;
             const url = process.env.BASE_URL;
 
-            await createUser(`${url}/actors/${googleId}`)
+            await  ActorGraphRepository.createActor(`${url}/actors/${googleId}`)
             if (!actor) {
                     actor = await ActorService.createActor({
                     id: `${url}/actors/${googleId}`,

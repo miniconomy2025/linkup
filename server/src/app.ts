@@ -9,8 +9,10 @@ import actorsRoutes from './routes/actors.route';
 import authRoutes from './routes/auth.route';
 import searchRoutes from './routes/search.route';
 import objectRoutes from './routes/object.route';
+import profileRoutes from './routes/profile.route';
 
 import { errorHandler } from './middleware/errorHandler';
+import { authenticateJWT } from './middleware/authMiddleware';
 
 const app = express();
 
@@ -20,10 +22,9 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 connectMongoDB();
 
 app.use('/auth', authRoutes);
-
-app.use('/api/actors', actorsRoutes);
-app.use('/api/search', searchRoutes);
-app.use('/api/object', objectRoutes)
+app.use('/search', searchRoutes);
+app.use('/object', objectRoutes)
+app.use('/api/profile',authenticateJWT,profileRoutes )
 
 app.use(errorHandler);
 
