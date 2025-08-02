@@ -43,18 +43,47 @@ module.exports = {
           },
           icon: {
             bsonType: 'object',
+            required: ['id', 'type', 'attributedTo', 'published', 'url'],
             properties: {
-              id: { bsonType: 'string', description: 'URI of the image object' },
-              type: { enum: ['Image'], description: 'Must be "Image"' },
-              attributedTo: { bsonType: 'string', description: 'Actor ID' },
-              published: { bsonType: 'string', description: 'ISO date string' },
+              id: {
+                bsonType: 'string',
+                description: 'Object URI (string) is required and must be unique'
+              },
+              type: {
+                enum: ['Image'],
+                description: 'Must be "Image"'
+              },
+              attributedTo: {
+                bsonType: 'string',
+                description: 'Actor URI who created the object'
+              },
+              published: {
+                bsonType: 'string',
+                description: 'ISO date string when the object was published'
+              },
               to: {
                 bsonType: ['array'],
-                items: { bsonType: 'string' },
+                items: {
+                  bsonType: 'string'
+                },
                 description: 'Array of recipient URIs'
               },
-              url: { bsonType: 'string', description: 'URL pointing to the image file' },
-              name: { bsonType: 'string', description: 'Optional caption or alt text' }
+              createdAt: {
+                bsonType: ['date', 'null'],
+                description: 'Optional creation timestamp'
+              },
+              updatedAt: {
+                bsonType: ['date', 'null'],
+                description: 'Optional update timestamp'
+              },
+              url: {
+                bsonType: 'string',
+                description: 'URL pointing to the image file'
+              },
+              name: {
+                bsonType: 'string',
+                description: 'Optional display name or caption'
+              }
             },
             additionalProperties: false
           },

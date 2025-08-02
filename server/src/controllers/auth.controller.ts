@@ -46,6 +46,7 @@ export const AuthController = {
                     followers: `${appUrl}/actors/${googleId}/followers`,
                     following: `${appUrl}/actors/${googleId}/following`,
                     icon: {
+                        id: 'test',
                         type: 'Image',  
                         url: picture,
                         attributedTo: `${appUrl}/actors/${googleId}`,
