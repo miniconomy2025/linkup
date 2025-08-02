@@ -31,11 +31,10 @@ export const AuthController = {
             };
 
             const { email, name, sub: googleId, picture = '' } = payload;
-            
-            let actor = await ActorService.getActorById(googleId);
             const appUrl = process.env.FRONTEND_URL;
-            await createUser(`${appUrl}/actors/${googleId}`)
+            let actor = await ActorService.getActorById(`${appUrl}/actors/${googleId}`);
             if (!actor) {
+                    await createUser(`${appUrl}/actors/${googleId}`)
                     actor = await ActorService.createActor({
                     id: `${appUrl}/actors/${googleId}`,
                     type: "Person",
