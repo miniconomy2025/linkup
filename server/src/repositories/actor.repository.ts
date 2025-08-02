@@ -5,4 +5,9 @@ export const ActorRepository = {
   getActorById: async (id: string): Promise<Actor | null> => {
     return ActorModel.findOne({ preferredUsername: id }).lean<Actor>().exec();
   },
+   createActor: async (actor: Actor): Promise<Actor> => {
+    const created = new ActorModel(actor);
+    await created.save();
+    return created.toObject();
+  },
 }; 

@@ -11,7 +11,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 
   try {
-    await createUser(id, username);
+    await createUser(id);
     res.status(201).json({ message: 'User created' });
   } catch (err) {
     console.error(err);
