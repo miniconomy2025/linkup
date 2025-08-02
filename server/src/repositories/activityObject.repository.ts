@@ -10,17 +10,8 @@ export const ActivityObjectRepository = {
   },
 
   createImage: async (image: ImageObject): Promise<ImageObject> => {
-    try {
-      const created = await ImageModel.create(image);
-      return created.toObject() as ImageObject;
-    }
-    catch(err) {
-      console.log(err);
-      const error = err as any;
-      console.log('Full error details:', JSON.stringify(error.errInfo?.details, null, 2));
-      console.log('Schema rules not satisfied:', error.errInfo?.details?.schemaRulesNotSatisfied);
-      throw error;
-    }
+    const created = await ImageModel.create(image);
+    return created.toObject() as ImageObject;
   },
 
   createVideo: async (video: VideoObject): Promise<VideoObject> => {

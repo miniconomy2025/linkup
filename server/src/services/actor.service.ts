@@ -1,6 +1,5 @@
 import { ActorRepository } from '../repositories/actor.repository';
 import { Actor } from '../types/activitypub';
-import { UserNotFoundError } from '../middleware/errorHandler';
 
 export const ActorService = {
   getActorById: async (id: string): Promise<Actor | null> => {
