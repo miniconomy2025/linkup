@@ -62,5 +62,22 @@ export const ActorGraphRepository = {
     } finally {
       await session.close();
     }
-  }
+  },
+
+  createLikeForPost: async (postId: string, userId: string) => {
+    const session = driver.session();
+    try {
+      await session.run(
+        `
+        MERGE (p:POST {id: $postId})
+        WITH p
+        MATCH (u:User {id: $userId})
+        MERGE (u)-[:LIKES]->(p)
+        `,
+        { postId, userId }
+      );
+    } finally {
+      await session.close();
+    }
+  },
 };

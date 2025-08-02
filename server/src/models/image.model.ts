@@ -22,7 +22,7 @@ export const ImageSchema = new Schema<ImageObjectDocument>({
 
 ImageSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/images/${this._id.toString()}`;
+    this.id = `${BASE_URL}/objects/images/${this._id.toString()}`;
   }
   next();
 });

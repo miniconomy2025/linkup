@@ -21,7 +21,7 @@ const NoteSchema = new Schema<NoteObjectDocument>({
 
 NoteSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/notes/${this._id.toString()}`;
+    this.id = `${BASE_URL}/objects/notes/${this._id.toString()}`;
   }
   next();
 });

@@ -21,7 +21,7 @@ const LikeSchema = new Schema<LikeActivityDocument>({
 
 LikeSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/activities/like/${this._id.toString()}`;
+    this.id = `${BASE_URL}/activities/likes/${this._id.toString()}`;
   }
   next();
 });

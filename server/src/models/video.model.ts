@@ -22,7 +22,7 @@ export const VideoSchema = new Schema<VideoObjectDocument>({
 
 VideoSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/videos/${this._id.toString()}`;
+    this.id = `${BASE_URL}/objects/videos/${this._id.toString()}`;
   }
   next();
 });
