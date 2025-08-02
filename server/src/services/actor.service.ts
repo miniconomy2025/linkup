@@ -12,7 +12,7 @@ export const ActorService = {
   },
   getActorProfile: async (preferredUsername: string) => {
     const actor = await ActorRepository.getActorById(preferredUsername);
-    const activitySummary = await ActorGraphRepository.getActivitySummary(preferredUsername);
+    const activitySummary = await ActorGraphRepository.getActivitySummary(actor?.id || "");
     return {...actor, ...activitySummary};
   }
 }; 
