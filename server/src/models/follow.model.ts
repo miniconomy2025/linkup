@@ -21,7 +21,7 @@ const FollowSchema = new Schema<FollowActivityDocument>({
 
 FollowSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/activities/follow/${this._id.toString()}`;
+    this.id = `${BASE_URL}/activities/follows/${this._id.toString()}`;
   }
   next();
 });

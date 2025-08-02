@@ -21,7 +21,7 @@ const UndoSchema = new Schema<UndoActivityDocument>({
 
 UndoSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/activities/undo/${this._id.toString()}`;
+    this.id = `${BASE_URL}/activities/undos/${this._id.toString()}`;
   }
   next();
 });

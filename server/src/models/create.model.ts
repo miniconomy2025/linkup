@@ -21,7 +21,7 @@ const CreateSchema = new Schema<CreateActivityDocument>({
 
 CreateSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/activities/create/${this._id.toString()}`;
+    this.id = `${BASE_URL}/activities/creates/${this._id.toString()}`;
   }
   next();
 });
