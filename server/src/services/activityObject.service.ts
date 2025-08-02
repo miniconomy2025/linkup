@@ -1,7 +1,7 @@
 import { s3Service } from "../config/s3Uploader";
-import { createPostForUser } from "../graph/graph.queries.";
+import { ActorGraphRepository } from "../graph/repositories/actor";
 import { ActivityObjectRepository } from "../repositories/activityObject.repository";
-import { Activity, ActivityObject, ImageObject, NoteObject, VideoObject } from "../types/activitypub";
+import { ImageObject, NoteObject, VideoObject } from "../types/activitypub";
 import { ActivityService } from "./activity.service";
 import { OutboxService } from "./outbox.service";
 
@@ -40,7 +40,7 @@ export const ActivityObjectService = {
       name: caption
     })
 
-    await createPostForUser(imageObject.id!, `${appUrl}/actors/${googleId}`)
+    await ActorGraphRepository.createPostForUser(imageObject.id!, `${appUrl}/actors/${googleId}`)
 
     const activity = await ActivityService.makeCreateActivity(imageObject);
 

@@ -21,9 +21,9 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 
 connectMongoDB();
 
-app.use('/auth', authRoutes);
-app.use('/search', searchRoutes);
-app.use('/object', objectRoutes)
+app.use('/api/auth', authRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/object', objectRoutes)
 app.use('/api/profile',authenticateJWT,profileRoutes )
 
 app.use(errorHandler);
