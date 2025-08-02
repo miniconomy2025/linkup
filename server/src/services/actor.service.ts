@@ -10,7 +10,7 @@ export const ActorService = {
    createActor: async (actor: Actor): Promise<Actor> => {
     return ActorRepository.createActor(actor);
   },
-  getActorActivitySummary: async (preferredUsername: string) => {
+  getActorProfile: async (preferredUsername: string) => {
     const actor = await ActorRepository.getActorById(preferredUsername);
     const activitySummary = await ActorGraphRepository.getActivitySummary(preferredUsername);
     return {...actor, ...activitySummary};

@@ -96,10 +96,10 @@ export const ActorController = {
       next(error);
     }
   },
-  getActivitySummary: async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  getUserProfile: async (req: RequestWithUser, res: Response, next: NextFunction) => {
     const user = req.user
     if(user){
-       const summary = await ActorService.getActorActivitySummary(user.sub);
+       const summary = await ActorService.getActorProfile(user.sub);
         return res.status(200).json(summary);
     }
     else{
