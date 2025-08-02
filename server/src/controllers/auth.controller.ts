@@ -33,29 +33,30 @@ export const AuthController = {
             const { email, name, sub: googleId, picture = '' } = payload;
             
             let actor = await ActorService.getActorById(googleId);
+            const apiUrl= process.env.BASE_URL;
             const appUrl = process.env.FRONTEND_URL;
             await  ActorGraphRepository.createActor(`${appUrl}/actors/${googleId}`)
             if (!actor) {
                     actor = await ActorService.createActor({
-                    id: `${appUrl}/actors/${googleId}`,
+                    id: `${apiUrl}/actors/${googleId}`,
                     type: "Person",
                     preferredUsername: googleId,
                     name: name!,
-                    inbox: `${appUrl}/actors/${googleId}/inbox`,
-                    outbox: `${appUrl}/actors/${googleId}/outbox`,
-                    followers: `${appUrl}/actors/${googleId}/followers`,
-                    following: `${appUrl}/actors/${googleId}/following`,
+                    inbox: `${apiUrl}/actors/${googleId}/inbox`,
+                    outbox: `${apiUrl}/actors/${googleId}/outbox`,
+                    followers: `${apiUrl}/actors/${googleId}/followers`,
+                    following: `${apiUrl}/actors/${googleId}/following`,
                     icon: {
                         id: 'test',
                         type: 'Image',  
                         url: picture,
-                        attributedTo: `${appUrl}/actors/${googleId}`,
+                        attributedTo: `${apiUrl}/actors/${googleId}`,
                         published: new Date().toISOString(),
                         to: ['https://www.w3.org/ns/activitystreams#Public'],
                     }});
         }
     
-            const user = { ...actor, email, googleId, picture };
+            const user = { id:actor.id, name, email, googleId, picture };
             
             if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
             const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
