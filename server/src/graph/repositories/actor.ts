@@ -46,4 +46,21 @@ export const ActorGraphRepository = {
       await session.close();
     }
   },
+
+  createPostForUser: async (postId: string, userId: string) => {
+    const session = driver.session();
+    try {
+      await session.run(
+        `
+        MERGE (p:POST {id: $postId})
+        WITH p
+        MATCH (u:User {id: $userId})
+        MERGE (u)-[:POSTED]->(p)
+        `,
+        { postId, userId }
+      );
+    } finally {
+      await session.close();
+    }
+  }
 };
