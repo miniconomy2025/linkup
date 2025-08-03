@@ -8,10 +8,6 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.34.0"
     }
-    mongodbatlas = {
-      source  = "mongodb/mongodbatlas"
-      version = "1.15.0"
-    }
   }
 }
 
@@ -104,7 +100,11 @@ resource "aws_instance" "app_instance" {
   security_groups             = [aws_security_group.app_sg.name]
   associate_public_ip_address = true
 
-  user_data = file("user-data.sh")
+  user_data = templatefile("user-data.tpl.sh", {
+    neo4j_uri      = var.neo4j_uri
+    neo4j_username = var.neo4j_user
+    neo4j_password = var.neo4j_password
+  })
 
   tags = {
     Name = "linkup-app-ec2"
