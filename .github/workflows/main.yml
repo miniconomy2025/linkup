@@ -170,7 +170,7 @@ jobs:
 
       - name: Health Check
         run: |
-          curl --fail https://${{ secrets.EC2_HOST }}/health || exit 1
+          curl --fail http://${{ secrets.EC2_HOST }}/health || exit 1
 
   client-deploy:
     name: Deploy Frontend
