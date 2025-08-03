@@ -4,5 +4,6 @@ import { authenticateJWT } from '../middleware/authMiddleware';
 const router = Router();
 
 router.get('/me', authenticateJWT, ActorController.getUserProfile);
+router.get('/me/posts', authenticateJWT, ActorController.getUserPosts);
 
 export default router; 
