@@ -1,6 +1,6 @@
 resource "aws_docdb_subnet_group" "docdb_subnet_group" {
   name       = "linkup-docdb-subnet-group"
-  subnet_ids = data.aws_vpc.default.id
+  subnet_ids = data.aws_subnets.default_vpc_subnets.ids
 
   tags = {
     Name = "linkup-docdb-subnet-group"
