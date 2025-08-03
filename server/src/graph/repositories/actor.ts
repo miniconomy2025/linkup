@@ -7,7 +7,7 @@ export const ActorGraphRepository = {
     try {
       await session.run(
         `
-        MERGE (u:User {id: $id})
+        MERGE (u:ACTOR {id: $id})
         RETURN u
         `,
         { id: userId }
@@ -24,9 +24,9 @@ export const ActorGraphRepository = {
     try {
       const result = await session.run(
         `
-        MATCH (u:User {id: $id})
-        OPTIONAL MATCH (u)-[:FOLLOWS]->(following:User)
-        OPTIONAL MATCH (follower:User)-[:FOLLOWS]->(u)
+        MATCH (u:ACTOR {id: $id})
+        OPTIONAL MATCH (u)-[:FOLLOWS]->(following:ACTOR)
+        OPTIONAL MATCH (follower:ACTOR)-[:FOLLOWS]->(u)
         OPTIONAL MATCH (u)-[:POSTED]->(post)
         RETURN 
         count(DISTINCT following) AS following,
@@ -54,7 +54,7 @@ export const ActorGraphRepository = {
         `
         MERGE (p:POST {id: $postId})
         WITH p
-        MATCH (u:User {id: $userId})
+        MATCH (u:ACTOR {id: $userId})
         MERGE (u)-[:POSTED]->(p)
         `,
         { postId, userId }
@@ -71,7 +71,7 @@ export const ActorGraphRepository = {
         `
         MERGE (p:POST {id: $postId})
         WITH p
-        MATCH (u:User {id: $userId})
+        MATCH (u:ACTOR {id: $userId})
         MERGE (u)-[:LIKES]->(p)
         `,
         { postId, userId }
@@ -85,8 +85,8 @@ export const ActorGraphRepository = {
     try {
       await session.run(
         `
-      MERGE (follower:User {id: $followerId})
-      MERGE (target:User {id: $followedActorId})
+      MERGE (follower:ACTOR {id: $followerId})
+      MERGE (target:ACTOR {id: $followedActorId})
       MERGE (follower)-[:FOLLOWS]->(target)
       `,
         { followerId, followedActorId }
