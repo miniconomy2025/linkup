@@ -25,8 +25,8 @@ export const ActorGraphRepository = {
       const result = await session.run(
         `
         MATCH (u:User {id: $id})
-        OPTIONAL MATCH (u)-[:FOLLOW]->(following:User)
-        OPTIONAL MATCH (follower:User)-[:FOLLOW]->(u)
+        OPTIONAL MATCH (u)-[:FOLLOWS]->(following:User)
+        OPTIONAL MATCH (follower:User)-[:FOLLOWS]->(u)
         OPTIONAL MATCH (u)-[:POSTED]->(post)
         RETURN 
         count(DISTINCT following) AS following,
@@ -40,7 +40,7 @@ export const ActorGraphRepository = {
       return {
         followers: record.get("followers").toNumber(),
         following: record.get("following").toNumber(),
-        posts: record.get("following").toNumber(),
+        posts: record.get("posts").toNumber(),
       };
     } finally {
       await session.close();
@@ -75,6 +75,21 @@ export const ActorGraphRepository = {
         MERGE (u)-[:LIKES]->(p)
         `,
         { postId, userId }
+      );
+    } finally {
+      await session.close();
+    }
+  },
+  createFollowActorActivity: async (followerId: string, followedActorId : string): Promise<void> => {
+    const session = driver.session();
+    try {
+      await session.run(
+        `
+      MERGE (follower:User {id: $followerId})
+      MERGE (target:User {id: $followedActorId})
+      MERGE (follower)-[:FOLLOWS]->(target)
+      `,
+        { followerId, followedActorId }
       );
     } finally {
       await session.close();

@@ -1,9 +1,9 @@
-import { ActivityObject, CreateActivity, LikeActivity, OutboxItem } from "../types/activitypub";
+import { ActivityObject, CreateActivity, FollowActivity, LikeActivity, OutboxItem } from "../types/activitypub";
 import { ActivityRepository } from "../repositories/activity.repository";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { OutboxService } from "./outbox.service";
 
-const appUrl = process.env.BASE_URL;
+const apiUrl = process.env.BASE_URL;
 
 export const ActivityService = {
   makeCreateActivity: async (activityObject: ActivityObject): Promise<CreateActivity> => {
@@ -27,7 +27,7 @@ export const ActivityService = {
   },
 
   likePost: async (postId: string, googleId: string): Promise<LikeActivity> => {
-    const actorId = `${appUrl}/actors/${googleId}`;
+    const actorId = `${apiUrl}/actors/${googleId}`;
 
     await ActorGraphRepository.createLikeForPost(postId, actorId);
     
@@ -39,5 +39,30 @@ export const ActivityService = {
 
     return activity;
   },
-  
-}; 
+
+  makeFollowActorActivity: async (actorId: string, followedActorId: string): Promise<FollowActivity> => {
+    const activity = ActivityRepository.saveFollowActivity({
+      actor: actorId,
+      object: followedActorId,
+      type: "Follow",
+    });
+    return activity;
+  },
+
+  followActor: async (followerId: string, followedActorId: string ): Promise<FollowActivity> => {
+    await ActorGraphRepository.createFollowActorActivity(
+      followerId,
+      followedActorId
+    );
+
+    const activity = await ActivityService.makeFollowActorActivity(
+      followerId,
+      followedActorId
+    );
+
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
+
+
+    return activity;
+  },
+};
