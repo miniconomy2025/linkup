@@ -48,5 +48,4 @@ resource "aws_docdb_cluster_instance" "docdb_instance" {
   instance_class    = "db.t3.medium"
   engine            = aws_docdb_cluster.docdb_cluster.engine
   apply_immediately = true
-  publicly_accessible = true
 }
