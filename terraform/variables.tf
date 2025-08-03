@@ -58,7 +58,7 @@ variable "mongo_db_name" {
   default = "linkup"
 }
 
-variable "neo4j_username" {
+variable "neo4j_user" {
   default = "neo4j"
 }
 
@@ -68,8 +68,9 @@ variable "neo4j_password" {
   sensitive   = true
 }
 
-variable "neo4j_instance_uri" {}
-
-variable "neo4j_instance_name" {
-  default = "linkup-neo4j"
+variable "neo4j_uri" {
+  description = "Neo4J uri"
+  type        = string
+  sensitive   = true
 }
+
