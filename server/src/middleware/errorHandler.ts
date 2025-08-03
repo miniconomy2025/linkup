@@ -18,6 +18,15 @@ export class BadRequestError extends Error {
   }
 }
 
+export class NotAuthenticatedError extends Error {
+  status: number;
+  constructor(message = 'Not authenticated') {
+    super(message);
+    this.status = 401;
+    this.name = 'NotAuthenticatedError';
+  }
+}
+
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
   // Log the error for debugging
   console.error(err);

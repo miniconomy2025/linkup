@@ -38,7 +38,16 @@ services:
       mc policy set public local/linkup-media;
       "
 
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
 volumes:
   neo4j_data:
   neo4j_logs:
   minio_data:
+  mongodb_data:

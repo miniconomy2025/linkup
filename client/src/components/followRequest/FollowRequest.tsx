@@ -18,13 +18,14 @@ const FollowRequest: React.FC<FollowRequestProps> = ({ id, name, username, avata
 
     return (
         <div className="follow-request-item-container">
-            <div className='follow-request-item-info-container' onClick={handleUserClick}>
+            <div className='follow-request-item-info-container'>
                 <img 
                     src={avatar} 
                     alt='avatar' 
                     width={40} 
                     height={40} 
                     className='follow-request-item-avatar'
+                    onClick={handleUserClick}
                 />
                 <div >
                     <div>{name}</div>

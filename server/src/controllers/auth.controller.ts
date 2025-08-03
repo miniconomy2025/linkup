@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
+import { ActorService } from '../services/actor.service';
+import { ActorGraphRepository } from '../graph/repositories/actor';
 
 const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
@@ -29,15 +31,37 @@ export const AuthController = {
             };
 
             const { email, name, sub: googleId, picture = '' } = payload;
+            
+            let actor = await ActorService.getActorById(googleId);
+            const appUrl = process.env.FRONTEND_URL;
+            const url = process.env.BASE_URL;
 
-            // TODO userService create user else if exists return user
-            const user = { id: googleId, email, name, picture };
-
+            if (!actor) {
+                     await  ActorGraphRepository.createActor(`${url}/actors/${googleId}`)
+                    actor = await ActorService.createActor({
+                    id: `${url}/actors/${googleId}`,
+                    type: "Person",
+                    preferredUsername: googleId,
+                    name: name!,
+                    inbox: `${url}/actors/${googleId}/inbox`,
+                    outbox: `${url}/actors/${googleId}/outbox`,
+                    followers: `${url}/actors/${googleId}/followers`,
+                    following: `${url}/actors/${googleId}/following`,
+                    icon: {
+                        id: 'test',
+                        type: 'Image',  
+                        url: picture,
+                        attributedTo: `${url}/actors/${googleId}`,
+                        to: ['https://www.w3.org/ns/activitystreams#Public'],
+                    }});
+        }
+    
+            const user = { ...actor, email, googleId, picture };
+            
             if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
             const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-            const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-            res.redirect(`${FRONTEND_URL}/login/success?token=${token}`);
+            res.redirect(`${appUrl}/login/success?token=${token}`);
             
         } catch (error) {
             next(error);

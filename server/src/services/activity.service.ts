@@ -1,56 +1,68 @@
-import { Activity, CreateActivity, OutboxItem } from "../types/activitypub";
+import { ActivityObject, CreateActivity, FollowActivity, LikeActivity, OutboxItem } from "../types/activitypub";
 import { ActivityRepository } from "../repositories/activity.repository";
-import { ActivityObjectRepository } from "../repositories/activityObject.repository";
-import { OutboxRepository } from "../repositories/outbox.repository";
+import { ActorGraphRepository } from "../graph/repositories/actor";
+import { OutboxService } from "./outbox.service";
 
-const saveActivityInOutbox = async (activity: Activity): Promise<OutboxItem> => {
-  const outboxItem: OutboxItem = {
-    activity: activity.id!,
-    actor: activity.actor
-  };
-
-  await OutboxRepository.addItem(outboxItem);
-
-  return outboxItem;
-};
+const apiUrl = process.env.BASE_URL;
 
 export const ActivityService = {
-  handleCreateActivity: async (createActivity: CreateActivity): Promise<CreateActivity> => {
-    let activityObject = createActivity.object;
-    switch (activityObject.type) {
-      case 'Note':
-        activityObject = await ActivityObjectRepository.createNote(activityObject);
-        break;
-      case 'Image':
-        activityObject = await ActivityObjectRepository.createImage(activityObject);
-        break;
-      case 'Video':
-        activityObject = await ActivityObjectRepository.createVideo(activityObject);
-        break;
-      default:
-        throw new Error('Not an accepted activity type');
-    }
-    createActivity.object = activityObject;
+  makeCreateActivity: async (activityObject: ActivityObject): Promise<CreateActivity> => {
+    const activity = ActivityRepository.saveCreateActivity({
+      actor: activityObject.attributedTo,
+      object: activityObject,
+      type: 'Create'
+    })
 
-    createActivity = await ActivityRepository.saveCreateActivity(createActivity);
-    
-    await saveActivityInOutbox(createActivity);
-
-    // TODO: fanout to inboxes
-
-    return createActivity;
+    return activity;
   },
 
-//   handleFollowActivity: async (activity: Activity): Promise<Activity> => {
+  makeLikeActivity: async (actorId: string, postId: string): Promise<LikeActivity> => {
+    const activity = ActivityRepository.saveLikeActivity({
+      actor: actorId,
+      object: postId,
+      type: 'Like'
+    })
+
+    return activity;
+  },
+
+  likePost: async (postId: string, googleId: string): Promise<LikeActivity> => {
+    const actorId = `${apiUrl}/actors/${googleId}`;
+
+    await ActorGraphRepository.createLikeForPost(postId, actorId);
     
-//   },
+    const activity = await ActivityService.makeLikeActivity(actorId, postId);
+    
+    const outboxItem = await OutboxService.addActivityToOutbox(activity);
+    
+    // Fanout to inboxes
 
-//   handleLikeActivity: async (activity: Activity): Promise<Activity> => {
+    return activity;
+  },
 
-//   },
+  makeFollowActorActivity: async (actorId: string, followedActorId: string): Promise<FollowActivity> => {
+    const activity = ActivityRepository.saveFollowActivity({
+      actor: actorId,
+      object: followedActorId,
+      type: "Follow",
+    });
+    return activity;
+  },
 
-//   handleUndoActivity: async (activity: Activity): Promise<Activity> => {
+  followActor: async (followerId: string, followedActorId: string ): Promise<FollowActivity> => {
+    await ActorGraphRepository.createFollowActorActivity(
+      followerId,
+      followedActorId
+    );
 
-//   },
+    const activity = await ActivityService.makeFollowActorActivity(
+      followerId,
+      followedActorId
+    );
 
-}; 
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
+
+
+    return activity;
+  },
+};

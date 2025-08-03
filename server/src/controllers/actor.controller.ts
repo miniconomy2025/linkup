@@ -1,15 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { 
-  ActivitySchema, 
-  CreateActivitySchema, 
-  FollowActivitySchema, 
-  LikeActivitySchema, 
-  UndoActivitySchema 
-} from '../types/validationSchemas'
 import { ActorService } from '../services/actor.service';
-import { BadRequestError } from '../middleware/errorHandler';
-import { ActivityService } from '../services/activity.service';
-import { Activity } from '../types/activitypub';
+import { BadRequestError, NotAuthenticatedError } from '../middleware/errorHandler';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
+const apiUrl   = process.env.BASE_URL
 
 export const ActorController = {
   getActorById: async (req: Request, res: Response, next: NextFunction) => {
@@ -21,48 +14,6 @@ export const ActorController = {
       const actor = await ActorService.getActorById(id);
       res.json(actor);
     } catch (error) {
-      next(error);
-    }
-  },
-
-  postActivityToOutbox: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const parsed = ActivitySchema.safeParse(req.body);
-
-      if (!parsed.success) {
-        throw new BadRequestError(`Invalid activity payload: ${parsed.error.flatten}`)
-      }
-
-      let activity = parsed.data as Activity;
-
-      switch (activity.type) {
-        case 'Create':
-          CreateActivitySchema.parse(activity);
-          activity = await ActivityService.handleCreateActivity(activity);
-          break;
-
-        // case 'Follow':
-        //   FollowActivitySchema.parse(activity);
-        //   await ActivityService.handleFollowActivity(activity);
-        //   break;
-
-        // case 'Like':
-        //   LikeActivitySchema.parse(activity);
-        //   await ActivityService.handleLikeActivity(activity);
-        //   break;
-
-        // case 'Undo':
-        //   UndoActivitySchema.parse(activity);
-        //   await ActivityService.handleUndoActivity(activity);
-        //   break;
-
-        default:
-          throw new BadRequestError('Not an accepted activity type');
-      }
-
-      return res.status(201).json(activity);
-    } 
-    catch (error) {
       next(error);
     }
   },
@@ -97,5 +48,21 @@ export const ActorController = {
     } catch (error) {
       next(error);
     }
+  },
+  getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
+    const user = req.user
+    if(user){
+       const summary = await ActorService.getActorProfile(user.googleId);
+        return res.status(200).json(summary);
+    }
+    else{
+      res.status(401).json({ message: 'User not authenticated' });
+    }
+       
+  },
+  getUserPosts: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
+    const user = req.user
+    const summary = await ActorService.getActorCreateActivities(`${apiUrl}/actors/${user.googleId}`);
+    return res.status(200).json(summary);
   },
 }; 

@@ -1,6 +1,31 @@
 import { Request, Response, NextFunction } from 'express';
+import { BadRequestError } from '../middleware/errorHandler';
+import { ActivityObjectService } from '../services/activityObject.service';
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const ObjectController = {
+  getNoteById: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  postNote: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {      
+      if (!req.body.content) {
+        throw new BadRequestError('Content required to post a note');
+      }
+
+      const note = await ActivityObjectService.postNote(req.body.content, req.user.sub);
+
+      res.status(201).json(note);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getImageById: async (req: Request, res: Response, next: NextFunction) => {
     try {
 
@@ -9,24 +34,19 @@ export const ObjectController = {
     }
   },
 
-    postImage: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            console.log(req.file); // The uploaded file info and buffer
-            console.log(req.body.caption); // The caption text
-            
-            if (!req.file) {
-                return res.status(400).json({ message: 'No file uploaded' });
-            }
+  postImage: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.file) {
+        throw new BadRequestError('No file uploaded');
+      }
 
-            // You can now access the file buffer with req.file.buffer
-            // and the caption with req.body.caption
+      const image = await ActivityObjectService.postImage(req.file, req.user.googleId, req.body.caption);
 
-            // Process file or save it, then send response
-            res.json({ message: 'File received' });
-        } catch (error) {
-            next(error);
-        }
-    },
+      res.status(201).json(image);
+    } catch (error) {
+      next(error);
+    }
+  },
   
   getVideoById: async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -36,22 +56,17 @@ export const ObjectController = {
     }
   },
 
-    postVideo: async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            console.log(req.file); // The uploaded file info and buffer
-            console.log(req.body.caption); // The caption text
-            
-            if (!req.file) {
-                return res.status(400).json({ message: 'No file uploaded' });
-            }
+  postVideo: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {      
+      if (!req.file) {
+        throw new BadRequestError('No file uploaded');
+      }
 
-            // You can now access the file buffer with req.file.buffer
-            // and the caption with req.body.caption
+      const image = await ActivityObjectService.postVideo(req.file, req.user.googleId, req.body.caption);
 
-            // Process file or save it, then send response
-            res.json({ message: 'File received' });
-        } catch (error) {
-            next(error);
-        }
-    },
+      res.status(201).json(image);
+    } catch (error) {
+      next(error);
+    }
+  },
 }; 

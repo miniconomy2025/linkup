@@ -7,7 +7,7 @@ const OutboxItemSchema = new Schema<OutboxItemDoc>({
   actor:    { type: String, required: true, index: true },
   activity: { type: String, required: true, unique: true },
   createdAt:{ type: Date,   default: () => new Date() },
-}, { versionKey: false });
+}, { timestamps: true, versionKey: false });
 
 OutboxItemSchema.index({ actor: 1, createdAt: -1 });
 

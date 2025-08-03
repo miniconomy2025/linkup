@@ -1,0 +1,22 @@
+
+/* Suggested follows */
+
+.suggested-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+.suggested-avatar {
+    border-radius: 50%;
+}
+
+.suggested-info-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.suggested-name-container {
+    display: flex;
+    flex-direction: column;
+}

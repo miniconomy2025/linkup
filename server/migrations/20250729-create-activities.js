@@ -19,7 +19,7 @@ module.exports = {
         description: 'Actor ID (URI)' 
       },
       published: { 
-        bsonType: 'date', 
+        bsonType: 'string', 
         description: 'Published date (ISO)' 
       },
       to: {

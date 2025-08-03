@@ -7,7 +7,7 @@ const BaseObjectFields: Record<string, any> = {
   id: { type: String, unique: true },
   type: { type: String, required: true, enum: ['Note', 'Image', 'Video'] },
   attributedTo: { type: String, required: true },
-  published: { type: String, required: true },
+  published: { type: String, default: () => new Date().toISOString() },
   to: { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },
 };
 
@@ -18,11 +18,11 @@ export const ImageSchema = new Schema<ImageObjectDocument>({
   type: { type: String, enum: ['Image'], required: true },
   url: { type: String, required: true },
   name: { type: String, required: false }
-} as const, { versionKey: false });
+} as const, { timestamps: true, versionKey: false });
 
 ImageSchema.pre('save', function (next) {
   if (!this.id) {
-    this.id = `${BASE_URL}/activities/create/${this._id.toString()}`;
+    this.id = `${BASE_URL}/objects/images/${this._id.toString()}`;
   }
   next();
 });
