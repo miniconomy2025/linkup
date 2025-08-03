@@ -148,4 +148,21 @@ export const ActorGraphRepository = {
     }
   },
 
+  getFollowerIds: async (actorId: string): Promise<string[]> => {
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (follower:ACTOR)-[:FOLLOWS]->(u:ACTOR {id: $id})
+        RETURN follower.id AS id
+        `,
+        { id: actorId }
+      );
+
+      return result.records.map(record => record.get("id"));
+    } finally {
+      await session.close();
+    }
+  },
+
 };

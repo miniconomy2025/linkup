@@ -3,6 +3,8 @@ import { ActivityRepository } from "../repositories/activity.repository";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { OutboxService } from "./outbox.service";
 import { RequestConflict } from "../middleware/errorHandler";
+import { InboxService } from "./inbox.service";
+import { ActivityObjectService } from "./activityObject.service";
 
 const apiUrl = process.env.BASE_URL;
 
@@ -40,7 +42,10 @@ export const ActivityService = {
     
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
     
-    // Fanout to inboxes
+    const post = await ActivityObjectService.getPostById(postId);
+    const postActorId = post.attributedTo;
+
+    const _inboxItem = await InboxService.addActivityToInbox(activity, postActorId);
 
     return activity;
   },
@@ -71,7 +76,7 @@ export const ActivityService = {
 
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    // Fanout to inboxes
+    const _inboxItem = await InboxService.addActivityToInbox(activity, followedActorId);
 
     return activity;
   },
@@ -103,7 +108,7 @@ export const ActivityService = {
 
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    // Fanout to inboxes
+    const _inboxItem = await InboxService.addActivityToInbox(activity, followedActorId);
     
     return activity
   }
