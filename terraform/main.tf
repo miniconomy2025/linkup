@@ -21,7 +21,6 @@ data "aws_vpc" "default" {
 
 data "aws_ssm_parameter" "ubuntu2204" {
   name   = "/aws/service/canonical/ubuntu/server/jammy/stable/current/amd64/hvm/ebs-gp2/ami-id"
-  region = var.aws_region
 }
 
 
