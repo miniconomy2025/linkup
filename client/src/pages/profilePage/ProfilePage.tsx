@@ -3,6 +3,7 @@ import './ProfilePage.css';
 import { PageLayout } from '../../components/pageLayout/PageLayout';
 import { useAuth } from '../../hooks/useAuth';
 import { RxAvatar } from 'react-icons/rx';
+import { useNavigate } from 'react-router-dom';
 
 const mockPosts = [
   {
@@ -25,7 +26,7 @@ const mockPosts = [
     id: "3",
     username: "bob",
     content: "Check out my new setup 🎮",
-    image: "https://my.alfred.edu/zoom/_images/foster-lake.jpg",
+    video: "https://www.w3schools.com/html/mov_bbb.mp4",
     likes: 25,
     comments: 5,
   },
@@ -34,7 +35,13 @@ const mockPosts = [
 export const ProfilePage: React.FC = () => {
 
     const { user } = useAuth();
+
+    const navigate = useNavigate();
     
+    const handlePostClick = (postId: string) => {
+        navigate(`/post/${postId}`);
+    };
+
     return (
         <PageLayout>
             <div className='profile-container'>
@@ -55,8 +62,19 @@ export const ProfilePage: React.FC = () => {
                 </div>
                 <div className='profile-posts-grid'>
                     {mockPosts.map((post, i) => (
-                        <div key={i} className='post-tile'>
-                            <img src={post.image} width={'100%'} height={'100%'}/>
+                        <div key={i} className='post-tile' onClick={() => handlePostClick(post.id)}>
+                            {post.image && (
+                                <img src={post.image} width={'100%'} height={'100%'}/>
+                            )}
+                            {post.video && (
+                                <video
+                                    src={post.video}
+                                    className='post-video'
+                                    playsInline
+                                    loop
+                                    controls
+                                />
+                            )}
                         </div>
                     ))}
                 </div>

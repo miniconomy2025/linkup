@@ -12,6 +12,7 @@
 
 .search-item-avatar {
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .search-item-button {
