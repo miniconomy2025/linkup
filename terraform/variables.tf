@@ -26,16 +26,50 @@ variable "budget_emails" {
   type        = list(string)
 }
 
-# MongoDB Atlas
-variable "atlas_public_key" {}
-variable "atlas_private_key" {}
-variable "atlas_org_id" {}
-variable "mongo_username" { default = "appuser" }
-variable "mongo_password" {}
-variable "mongo_db_name" { default = "linkup" }
+variable "atlas_public_key" {
+  description = "MongoDB Atlas public API key"
+  type        = string
+  sensitive   = true
+}
 
-# Neo4j Aura
-variable "neo4j_client_id" {}
-variable "neo4j_client_secret" {}
-variable "neo4j_tenant_id" {}
-variable "neo4j_instance_name" { default = "linkup-neo4j" }
+variable "atlas_private_key" {
+  description = "MongoDB Atlas private API key"
+  type        = string
+  sensitive   = true
+}
+
+variable "atlas_org_id" {
+  description = "MongoDB Atlas Organisation ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "mongo_username" {
+  default = "linkupuser"
+}
+
+variable "mongo_password" {
+  description = "MongoDB Atlas password"
+  type        = string
+  sensitive   = true
+}
+
+variable "mongo_db_name" {
+  default = "linkup"
+}
+
+variable "neo4j_username" {
+  default = "neo4j"
+}
+
+variable "neo4j_password" {
+  description = "Neo4J password"
+  type        = string
+  sensitive   = true
+}
+
+variable "neo4j_instance_uri" {}
+
+variable "neo4j_instance_name" {
+  default = "linkup-neo4j"
+}

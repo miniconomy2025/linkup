@@ -20,6 +20,12 @@ jobs:
       id-token: write
       contents: read
 
+    env:
+      TF_VAR_atlas_private_key: ${{ secrets.ATLAS_PRIVATE_KEY }}
+      TF_VAR_atlas_public_key: ${{ secrets.ATLAS_PUBLIC_KEY }}
+      TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
+      TF_VAR_neo4j_password: ${{ secrets.NEO4J_PASSWORD }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
