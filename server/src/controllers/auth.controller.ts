@@ -36,8 +36,8 @@ export const AuthController = {
             const appUrl = process.env.FRONTEND_URL;
             const url = process.env.BASE_URL;
 
-            await  ActorGraphRepository.createActor(`${url}/actors/${googleId}`)
             if (!actor) {
+                     await  ActorGraphRepository.createActor(`${url}/actors/${googleId}`)
                     actor = await ActorService.createActor({
                     id: `${url}/actors/${googleId}`,
                     type: "Person",

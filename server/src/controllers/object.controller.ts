@@ -56,13 +56,13 @@ export const ObjectController = {
     }
   },
 
-  postVideo: async (req: Request, res: Response, next: NextFunction) => {
+  postVideo: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {      
       if (!req.file) {
         throw new BadRequestError('No file uploaded');
       }
 
-      const image = await ActivityObjectService.postImage(req.file.buffer, req.body.sub, req.body.caption);
+      const image = await ActivityObjectService.postVideo(req.file, req.user.googleId, req.body.caption);
 
       res.status(201).json(image);
     } catch (error) {

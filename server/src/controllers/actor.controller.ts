@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ActorService } from '../services/actor.service';
 import { BadRequestError } from '../middleware/errorHandler';
-export type RequestWithUser = Request & { user?: any };
+import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 export const ActorController = {
   getActorById: async (req: Request, res: Response, next: NextFunction) => {
@@ -48,7 +48,7 @@ export const ActorController = {
       next(error);
     }
   },
-  getUserProfile: async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
     const user = req.user
     if(user){
        const summary = await ActorService.getActorProfile(user.googleId);
