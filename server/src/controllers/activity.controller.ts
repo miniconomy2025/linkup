@@ -1,7 +1,8 @@
 import { Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
-import { BadRequestError } from '../middleware/errorHandler';
+import { BadRequestError, NotAuthenticatedError } from '../middleware/errorHandler';
 import { ActivityService } from '../services/activity.service';
+const apiUrl = process.env.BASE_URL
 
 export const ActivityController = {
     createLikeActivity: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -18,4 +19,25 @@ export const ActivityController = {
         next(error);
         }
     },
+
+    createFollowActorActivity: async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const followedActorId = req.query.actorId as string;
+      if (!followedActorId) {
+        throw new BadRequestError("Follwoed actor id is required");
+      } else if (!req.user || !req.user.googleId) {
+        throw new NotAuthenticatedError("User not authenticated");
+      } else {
+        const followerId = `${apiUrl}/actors/${req.user.googleId}`;
+        const activity = await ActivityService.followActor(followerId,followedActorId);
+        res.status(201).json(activity);
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
 }; 

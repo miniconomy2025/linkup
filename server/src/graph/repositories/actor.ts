@@ -80,4 +80,19 @@ export const ActorGraphRepository = {
       await session.close();
     }
   },
+  createFollowActorActivity: async (followerId: string, followedActorId : string): Promise<void> => {
+    const session = driver.session();
+    try {
+      await session.run(
+        `
+      MERGE (follower:User {id: $followerId})
+      MERGE (target:User {id: $followedActorId})
+      MERGE (follower)-[:FOLLOWS]->(target)
+      `,
+        { followerId, followedActorId }
+      );
+    } finally {
+      await session.close();
+    }
+  },
 };
