@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ActorService } from '../services/actor.service';
-import { BadRequestError } from '../middleware/errorHandler';
+import { BadRequestError, NotAuthenticatedError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+const apiUrl   = process.env.BASE_URL
 
 export const ActorController = {
   getActorById: async (req: Request, res: Response, next: NextFunction) => {
@@ -58,5 +59,10 @@ export const ActorController = {
       res.status(401).json({ message: 'User not authenticated' });
     }
        
-  }
+  },
+  getUserPosts: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
+    const user = req.user
+    const summary = await ActorService.getActorCreateActivities(`${apiUrl}/actors/${user.googleId}`);
+    return res.status(200).json(summary);
+  },
 }; 

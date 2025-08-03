@@ -1,5 +1,6 @@
 import { ActorModel } from '../models/actor.model';
-import { Actor } from '../types/activitypub';
+import { CreateModel } from '../models/create.model';
+import { Actor, CreateActivity } from '../types/activitypub';
 
 export const ActorRepository = {
   getActorById: async (id: string): Promise<Actor | null> => {
@@ -10,4 +11,7 @@ export const ActorRepository = {
     await created.save();
     return created.toObject();
   },
+   getCreateActivitiesByActor: async (actorId: string): Promise<CreateActivity[]> => {
+    return await CreateModel.find({ actor: actorId, type: 'Create' }).lean();
+  },    
 }; 
