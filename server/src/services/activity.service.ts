@@ -62,7 +62,6 @@ export const ActivityService = {
 
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    //TODO: Fanout to inboxes
 
     return activity;
   },
