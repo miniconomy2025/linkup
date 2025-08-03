@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { FcLikePlaceholder } from 'react-icons/fc';
 import { FaRegComments } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import { likePost } from '../../api/requests/activity';
 
 // Simulate a paginated API for mock data
 const allMockPosts = [
@@ -227,6 +229,20 @@ const FeedPage: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [posts, page, hasMore]);
 
+    const notifySuccess = () => toast.success('Post created Successfully!');
+    const notifyError = () => toast.error('Error! Something went wrong.');
+
+    const handlePostLike = async (postId: string) => {
+        try {
+            await likePost({ postId });
+            notifySuccess();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+            console.log(err)
+            notifyError();
+        };
+    };
+
     return (
         <PageLayout>
             <div className='feed-container'>
@@ -235,9 +251,7 @@ const FeedPage: React.FC = () => {
                         // Create ref for each video post if not exists
                         if (post.video && !videoRefs.current[post.id]) {
                             videoRefs.current[post.id] = React.createRef<HTMLVideoElement>();
-                        }
-
-                        console.log(post)
+                        };
 
                         return (
                             <div key={post.id} className='post-card'>
@@ -275,10 +289,21 @@ const FeedPage: React.FC = () => {
 
                                 <div className='post-actions'>
                                     <span className='post-action'>
-                                        <FcLikePlaceholder size={20} /> {post.likes}
+                                        <FcLikePlaceholder 
+                                            size={20} 
+                                            onClick={() => handlePostLike(post.id)} 
+                                            className='like-action' 
+                                        /> 
+                                        {/* {post.likes} TODO Potentially add like amount*/}
                                     </span>
                                     <span className='post-action'>
-                                        <FaRegComments size={20} color={'#555'} /> {post.comments}
+                                        <FaRegComments 
+                                            size={20} 
+                                            color={'#555'} 
+                                            onClick={() => handlePostClick(post.id)}  
+                                            className='comment-action'
+                                        /> 
+                                        {/* {post.comments} TODO Potentially add comment amount*/}
                                     </span>
                                 </div>
                             </div>
