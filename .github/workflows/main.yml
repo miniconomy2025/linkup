@@ -112,7 +112,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: |
             server/dist/
-            server/package*.json
+            server/package.json
           target: ~/app/backend
 
       - name: Restart Backend with PM2
