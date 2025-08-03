@@ -3,8 +3,8 @@ import { CreateModel } from '../models/create.model';
 import { Actor, CreateActivity } from '../types/activitypub';
 
 export const ActorRepository = {
-  getActorById: async (id: string): Promise<Actor | null> => {
-    return ActorModel.findOne({ preferredUsername: id }).lean<Actor>().exec();
+  getActorByGoogleId: async (googleId: string): Promise<Actor | null> => {
+    return ActorModel.findOne({ preferredUsername: googleId }).lean<Actor>().exec();
   },
    createActor: async (actor: Actor): Promise<Actor> => {
     const created = new ActorModel(actor);
