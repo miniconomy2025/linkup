@@ -50,6 +50,14 @@ resource "aws_security_group" "app_sg" {
   }
 
   ingress {
+    description = "Neo4j Browser HTTPS"
+    from_port   = 7473
+    to_port     = 7473
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
     description = "Neo4j Bolt"
     from_port   = 7687
     to_port     = 7687

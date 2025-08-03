@@ -1,25 +1,18 @@
 #!/bin/bash
 set -e
 
-# Update and install prerequisites
+# Update and install essentials
 apt update -y && apt upgrade -y
 apt install -y curl wget gnupg unzip software-properties-common
 
-# Node.js (v18)
+# Node.js (v22)
 curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 apt install -y nodejs
 
-# MongoDB
-curl -fsSL https://pgp.mongodb.com/server-6.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb.gpg
-echo "deb [ signed-by=/usr/share/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list
-apt update && apt install -y mongodb-org
-systemctl start mongod && systemctl enable mongod
+# PM2 for managing Node apps
+npm install -g pm2
 
-# Neo4j
-wget -O - https://debian.neo4j.com/neotechnology.gpg.key | gpg --dearmor -o /usr/share/keyrings/neo4j.gpg
-echo "deb [signed-by=/usr/share/keyrings/neo4j.gpg] https://debian.neo4j.com stable 5" | tee /etc/apt/sources.list.d/neo4j.list
-apt update && apt install -y neo4j
-systemctl enable neo4j && systemctl start neo4j
+#install Nginx for serving frontend
+ apt install -y nginx
 
-# Done
-echo "Setup complete."
+echo "Node.js and PM2 installed. Ready for app deployment."
