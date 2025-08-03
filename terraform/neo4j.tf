@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    restapi = {
-      source  = "mastercard/restapi"
-      version = "1.18.2"
-    }
-  }
-}
-
 provider "restapi" {
   alias = "neo4j"
   uri   = "https://api.neo4j.io"

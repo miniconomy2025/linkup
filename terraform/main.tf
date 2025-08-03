@@ -1,5 +1,19 @@
-provider "aws" {
-  region = var.aws_region
+terraform {
+  required_providers {
+    restapi = {
+      source  = "mastercard/restapi"
+      version = "1.18.2"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+      region = var.aws_region
+    }
+    mongodbatlas = {
+      source  = "mongodb/mongodbatlas"
+      version = "1.15.0"
+    }
+  }
 }
 
 data "aws_vpc" "default" {
