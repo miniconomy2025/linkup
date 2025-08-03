@@ -73,6 +73,7 @@ export const SearchPage = () => {
                 <div className='search-list'>
                     {users.map(user => (
                         <SearchItem 
+                            id={user.userId}
                             key={user.userId}
                             name={user.name}
                             username={user.username}
