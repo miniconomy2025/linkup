@@ -1,7 +1,7 @@
 provider "restapi" {
   alias = "neo4j"
   uri   = "https://api.neo4j.io"
-
+  write_returns_object = true
   headers = {
     "Content-Type" = "application/json"
   }
