@@ -20,24 +20,37 @@ export const ActivityController = {
         }
     },
 
-    createFollowActorActivity: async (
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const followedActorId = req.query.actorId as string;
-      if (!followedActorId) {
-        throw new BadRequestError("Follwoed actor id is required");
-      } else if (!req.user || !req.user.googleId) {
-        throw new NotAuthenticatedError("User not authenticated");
-      } else {
-        const followerId = `${apiUrl}/actors/${req.user.googleId}`;
-        const activity = await ActivityService.followActor(followerId,followedActorId);
-        res.status(201).json(activity);
+    createFollowActorActivity: async (req: AuthenticatedRequest,res: Response,next: NextFunction) => {
+      try {
+        const followedActorId = req.body.actorId as string;
+        if (!followedActorId) {
+          throw new BadRequestError("Followed actor id is required");
+        } else if (!req.user || !req.user.googleId) {
+          throw new NotAuthenticatedError("User not authenticated");
+        } else {
+          const followerId = `${apiUrl}/actors/${req.user.googleId}`;
+          const activity = await ActivityService.followActor(followerId,followedActorId);
+          res.status(201).json(activity);
+        }
+      } catch (error) {
+        next(error);
       }
-    } catch (error) {
-      next(error);
+    },
+
+    createUndoActivity: async (req: AuthenticatedRequest,res: Response,next: NextFunction) => {
+      try {
+        const followedActorId = req.body.actorId as string;
+        if (!followedActorId) {
+          throw new BadRequestError("Followed actor id is required");
+        }
+
+        const followerId = `${apiUrl}/actors/${req.user.googleId}`;
+
+        const activity = await ActivityService.unfollowActor(followerId,followedActorId);
+
+        res.status(200).json(activity);
+      } catch (error) {
+        next(error);
+      }
     }
-  },
 }; 

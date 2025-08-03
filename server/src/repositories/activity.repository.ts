@@ -9,6 +9,14 @@ export const ActivityRepository = {
     const created = await CreateModel.create(createActivity);
     return created.toObject() as CreateActivity;
   },
+  
+  getFollowActivityByActorAndObject: async (
+    actor: string,
+    object: string
+  ): Promise<FollowActivity | null> => {
+    const followActivity = await FollowModel.findOne({ actor, object }).lean();
+    return followActivity;
+  },
 
   saveFollowActivity: async (followActivity: FollowActivity): Promise<FollowActivity> => {
     const created = await FollowModel.create(followActivity);

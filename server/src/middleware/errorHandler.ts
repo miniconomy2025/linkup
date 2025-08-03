@@ -27,6 +27,15 @@ export class NotAuthenticatedError extends Error {
   }
 }
 
+export class RequestConflict extends Error {
+  status: number;
+  constructor(message = 'Conflict') {
+    super(message);
+    this.status = 409;
+    this.name = 'Conflict';
+  }
+}
+
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
   // Log the error for debugging
   console.error(err);
