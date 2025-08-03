@@ -10,6 +10,7 @@ import searchRoutes from './routes/search.route';
 import objectRoutes from './routes/object.route';
 import profileRoutes from './routes/profile.route';
 import activityRoutes from './routes/activity.route';
+import healthRoute from './routes/health.route';
 
 import { errorHandler } from './middleware/errorHandler';
 
@@ -21,7 +22,7 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 connectMongoDB();
 
 app.use('/auth', authRoutes);
-
+app.use('/', healthRoute);
 app.use('/api/search', searchRoutes);
 app.use('/api/objects', objectRoutes);
 app.use('/api/profiles', profileRoutes);
