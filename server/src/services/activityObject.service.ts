@@ -1,13 +1,34 @@
 import { s3Service } from "../config/s3Uploader";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { ActivityObjectRepository } from "../repositories/activityObject.repository";
-import { ImageObject, NoteObject, VideoObject } from "../types/activitypub";
+import { ActivityObject, ImageObject, NoteObject, VideoObject } from "../types/activitypub";
 import { ActivityService } from "./activity.service";
+import { InboxService } from "./inbox.service";
 import { OutboxService } from "./outbox.service";
 
 const apiUrl = process.env.BASE_URL;
 
 export const ActivityObjectService = {
+  getPostById: async (postId: string): Promise<ActivityObject> => {
+    if (postId.startsWith(apiUrl!)) {
+      const post = ActivityObjectRepository.getObjectById(postId);
+
+      return post;
+    }
+    else {
+      // External post
+
+      const activityObject: ActivityObject = {
+        attributedTo: "test",
+        type: "Image",
+        url: "test"
+      }
+
+      return activityObject;
+    }
+
+  }, 
+
   postNote: async (content: string, googleId: string): Promise<NoteObject> => {
     const noteObject = await ActivityObjectRepository.createNote({
       type: 'Note',
@@ -19,9 +40,9 @@ export const ActivityObjectService = {
 
     const activity = await ActivityService.makeCreateActivity(noteObject);
 
-    const outboxItem = await OutboxService.addActivityToOutbox(activity);
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    // Fanout to inboxes
+    await InboxService.fanoutActivityToFollowersInboxes(activity);
 
     return noteObject;
   },
@@ -44,9 +65,9 @@ export const ActivityObjectService = {
 
     const activity = await ActivityService.makeCreateActivity(imageObject);
 
-    const outboxItem = await OutboxService.addActivityToOutbox(activity);
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    // Fanout to inboxes
+    await InboxService.fanoutActivityToFollowersInboxes(activity);
 
     return imageObject;
   },
@@ -69,11 +90,11 @@ export const ActivityObjectService = {
 
     const activity = await ActivityService.makeCreateActivity(videoObject);
   
-    await OutboxService.addActivityToOutbox(activity);
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
+
+    await InboxService.fanoutActivityToFollowersInboxes(activity);
 
     return videoObject;
   }
-
-
 
 }; 

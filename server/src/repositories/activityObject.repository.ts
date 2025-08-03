@@ -1,9 +1,22 @@
 import { NoteModel } from '../models/note.model';
 import { ImageModel } from '../models/image.model';
 import { VideoModel } from '../models/video.model';
-import { ImageObject, NoteObject, VideoObject } from '../types/activitypub';
+import { ActivityObject, ImageObject, NoteObject, VideoObject } from '../types/activitypub';
+import { Model } from 'mongoose';
 
 export const ActivityObjectRepository = {
+  getObjectById: async (id: string): Promise<ActivityObject> => {
+    const models: Model<any>[] = [NoteModel, ImageModel, VideoModel];
+
+    for (const model of models) {
+      const activityObject = await model.findOne({ id }).exec();
+      if (activityObject) {
+        return activityObject.toObject() as ActivityObject;
+      }
+    }
+    throw new Error(`Object with ID ${id} not found.`);
+  },
+
   createNote: async (note: NoteObject): Promise<NoteObject> => {
     const created = await NoteModel.create(note);
     return created.toObject() as NoteObject;
