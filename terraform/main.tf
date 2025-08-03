@@ -9,10 +9,15 @@ terraform {
       version = ">= 5.34.0"
     }
     mongodbatlas = {
-      public_key  = var.atlas_public_key
-      private_key = var.atlas_private_key
+      source  = "mongodb/mongodbatlas"
+      version = "1.15.0"
     }
   }
+}
+
+provider "mongodbatlas" {
+  public_key  = var.atlas_public_key
+  private_key = var.atlas_private_key
 }
 
 data "aws_vpc" "default" {
