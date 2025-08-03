@@ -7,7 +7,6 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
-      region = var.aws_region
     }
     mongodbatlas = {
       source  = "mongodb/mongodbatlas"
