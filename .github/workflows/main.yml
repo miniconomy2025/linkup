@@ -120,10 +120,55 @@ jobs:
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            which pm2 || (curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs && sudo npm install -g pm2)
-            cd ~/app/backend/server/dist
-            pm2 restart linkup-api || pm2 start server.js --name linkup-api
+            # Ensure Node.js and PM2 are installed
+            which node || (curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs)
+            which pm2 || sudo npm install -g pm2
+
+            cd ~/app/backend/dist
+
+            if pm2 describe linkup-api > /dev/null; then
+              echo "Restarting existing PM2 app..."
+              pm2 restart linkup-api
+            else
+              echo "Starting new PM2 app..."
+              pm2 start server.js --name linkup-api
+            fi
+
             pm2 save
+
+      - name: Configure Nginx as Reverse Proxy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ vars.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo apt update -y
+            sudo apt install -y nginx
+
+            # Create Nginx config
+            cat <<EOF | sudo tee /etc/nginx/sites-available/linkup
+            server {
+                listen 80;
+                server_name _;
+
+                location / {
+                    proxy_pass http://localhost:3000;
+                    proxy_http_version 1.1;
+                    proxy_set_header Upgrade \$http_upgrade;
+                    proxy_set_header Connection 'upgrade';
+                    proxy_set_header Host \$host;
+                    proxy_cache_bypass \$http_upgrade;
+                }
+            }
+            EOF
+
+            sudo ln -sf /etc/nginx/sites-available/linkup /etc/nginx/sites-enabled/default
+            sudo nginx -t && sudo systemctl reload nginx
+
+      - name: Health Check
+        run: |
+          curl --fail https://${{ secrets.EC2_HOST }}/health || exit 1
 
   client-deploy:
     name: Deploy Frontend
@@ -166,7 +211,7 @@ jobs:
             sudo tee /etc/nginx/sites-available/default > /dev/null <<EOF
             server {
               listen 80;
-              server_name yourdomain.com www.yourdomain.com; ##TODO: custom domain/ ec2
+              server_name ec2-13-246-192-21.af-south-1.compute.amazonaws.com
             
               root /home/ubuntu/app/client;
               index index.html;
