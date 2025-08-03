@@ -15,7 +15,7 @@ export const ActivityObjectService = {
       content: content
     });
 
-    // Add to graph
+    await ActorGraphRepository.createPostForUser(noteObject.id!, `${apiUrl}/actors/${googleId}`);
 
     const activity = await ActivityService.makeCreateActivity(noteObject);
 
@@ -52,28 +52,27 @@ export const ActivityObjectService = {
   },
 
   postVideo: async (file: any, googleId: string, caption = ''): Promise<VideoObject> => { 
+    const fileUrl = await s3Service.uploadFileBufferToS3(
+      file.buffer,
+      file.originalname,
+      'videos'
+    );
 
-  const fileUrl = await s3Service.uploadFileBufferToS3(
-    file.buffer,
-    file.originalname,
-    'videos'
-  );
+    const videoObject = await ActivityObjectRepository.createVideo({
+      attributedTo: `${apiUrl}/actors/${googleId}`,
+      type: 'Video',
+      url: fileUrl,
+      name: caption
+    });
 
-  const videoObject = await ActivityObjectRepository.createVideo({
-    attributedTo: `${apiUrl}/actors/${googleId}`,
-    type: 'Video',
-    url: fileUrl,
-    name: caption
-  });
+    await ActorGraphRepository.createPostForUser(videoObject.id!, `${apiUrl}/actors/${googleId}`);
 
-  await ActorGraphRepository.createPostForUser(videoObject.id!, `${apiUrl}/actors/${googleId}`);
+    const activity = await ActivityService.makeCreateActivity(videoObject);
+  
+    await OutboxService.addActivityToOutbox(activity);
 
-  const activity = await ActivityService.makeCreateActivity(videoObject);
- 
-  await OutboxService.addActivityToOutbox(activity);
-
-  return videoObject;
-}
+    return videoObject;
+  }
 
 
 
