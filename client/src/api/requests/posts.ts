@@ -13,3 +13,10 @@ export interface GetPostParams {
 };
 
 export const getPost = ({ url }: GetPostParams) => apiFetch(`/objects/posts?postId=${encodeURIComponent(url)}`);
+
+export interface GetFeedParams {
+    page?: number;
+    limit?: number;
+};
+
+export const getFeed = ({ page = 1, limit = 2 }: GetFeedParams) => apiFetch(`/feeds?page=${page}&limit=${limit}`);

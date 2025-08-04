@@ -21,23 +21,21 @@ const SearchItem: React.FC<SearchItemProps> = ({ id, name, username, avatar, fol
     };
 
     return (
-        <div className="search-item-container">
+        <div className="search-item-container" onClick={handleActorClick}>
             <img 
                 src={avatar} 
                 alt='avatar' 
                 width={40} 
                 height={40} 
                 className='search-item-avatar'
-                onClick={handleActorClick}
             />
             <div className='search-item-info-container'>
                 <div>
                     <div>{name}</div>
-                    <div>{username}</div>
                 </div>
-                <button className={following ? 'search-item-button' : 'search-item-button-active'}>
+                {/* <button className={following ? 'search-item-button' : 'search-item-button-active'}>
                     {following ? 'Following' : 'Follow'}
-                </button>
+                </button> */}
             </div>
         </div>
     );

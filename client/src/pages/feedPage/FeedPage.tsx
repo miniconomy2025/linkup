@@ -3,93 +3,12 @@ import './FeedPage.css';
 import { PageLayout } from '../../components/pageLayout/PageLayout';
 import { PostImage } from '../../components/postImage/PostImage';
 import { useNavigate } from 'react-router-dom';
-
 import { FcLikePlaceholder } from 'react-icons/fc';
+import { FcLike } from 'react-icons/fc';
 import { FaRegComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { likePost } from '../../api/requests/activity';
-
-// Simulate a paginated API for mock data
-const allMockPosts = [
-    {
-        id: '1',
-        username: 'alice',
-        content: 'What a beautiful day!',
-        video: 'https://www.w3schools.com/html/mov_bbb.mp4',
-        likes: 10,
-        comments: 2,
-    },
-    {
-        id: '2',
-        username: 'bob',
-        content: 'Check out my new setup 🎮',
-        image: 'https://my.alfred.edu/zoom/_images/foster-lake.jpg',
-        likes: 25,
-        comments: 5,
-    },
-    {
-        id: '3',
-        username: 'carol',
-        content: 'Nature is healing 🌿',
-        image: 'https://picsum.photos/id/1018/400/300',
-        likes: 30,
-        comments: 7,
-    },
-    {
-        id: '4',
-        username: 'dave',
-        content: "Chillin' with coffee ☕",
-        text: 'In the vast and ever-evolving landscape of technology, innovation drives the pace at which societies transform and adapt to new challenges and opportunities. From the earliest days of mechanical inventions to the rise of digital computing, human creativity has consistently pushed boundaries, leading to breakthroughs that have reshaped industries and daily life. Today, artificial intelligence and machine learning stand at the forefront of this revolution, enabling machines to process vast amounts of data, recognize patterns, and even make decisions with a degree of autonomy that was once considered the realm of science fiction. This technological progress has brought about profound changes, from healthcare advancements that personalize treatments based on genetic information to autonomous vehicles promising to redefine transportation safety and efficiency. However, as technology becomes more integrated into every aspect of human experience, ethical considerations grow increasingly complex. Questions about data privacy, algorithmic bias, and the impact of automation on employment demand careful thought and responsible stewardship to ensure that innovation benefits all members of society. Amidst these challenges, education remains a critical pillar, equipping individuals with the skills and knowledge to navigate a rapidly changing world and participate meaningfully in shaping the future. Ultimately, the story of technology is a story of human ingenuity and resilience, reflecting our enduring quest to understand, improve, and connect with the world around us.',
-        likes: 12,
-        comments: 1,
-    },
-    {
-        id: '5',
-        username: 'eve',
-        content: 'Cloudy vibes ⛅',
-        image: 'https://picsum.photos/id/1016/400/300',
-        likes: 14,
-        comments: 3,
-    },
-    {
-        id: '6',
-        username: 'frank',
-        content: 'Travel throwback 📸',
-        image: 'https://picsum.photos/id/1020/400/300',
-        likes: 17,
-        comments: 6,
-    },
-    {
-        id: '7',
-        username: 'grace',
-        content: 'Sunset dreams 🌇',
-        image: 'https://picsum.photos/id/1011/400/300',
-        likes: 22,
-        comments: 4,
-    },
-    {
-        id: '8',
-        username: 'henry',
-        content: 'Coding grind 👨‍💻',
-        video: 'https://www.w3schools.com/html/mov_bbb.mp4',
-        likes: 40,
-        comments: 9,
-    },
-];
-
-const fetchMockPosts = async (page: number, limit: number) => {
-    const start = (page - 1) * limit;
-    const end = page * limit;
-    const results = allMockPosts.slice(start, end);
-    const total = allMockPosts.length;
-    return {
-        results,
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit),
-    };
-};
+import { getFeed } from '../../api/requests/posts';
 
 const FeedPage: React.FC = () => {
     const videoRefs = useRef<Record<string, React.RefObject<HTMLVideoElement>>>({});
@@ -103,40 +22,44 @@ const FeedPage: React.FC = () => {
     const navigate = useNavigate();
 
     const handlePostClick = (postId: string) => {
-        navigate(`/post/${postId}`);
+        const encodedId = encodeURIComponent(postId);
+        navigate(`/post/${encodedId}`);
     };
 
     const handleActorClick = (actorId: string) => {
-        navigate(`/profile/${actorId}`);
+        const encodedId = encodeURIComponent(actorId);
+        navigate(`/profile/${encodedId}`);
     };
 
     const loadMorePosts = async () => {
         if (loading || !hasMore) return;
         setLoading(true);
-        const response = await fetchMockPosts(page, 2);
+        const response = await getFeed({ page, limit: 4 });
+        console.log(response)
+        if (response.length === 0) {
+            setHasMore(false);
+            setLoading(false);
+            return;
+        };
 
         setPosts((prev) => {
             // Create a set of existing IDs for quick lookup
-            const existingIds = new Set(prev.map(post => post.id));
+            const existingIds = new Set(prev.map(post => post._id));
             // Filter out duplicates from new results
-            const newPosts = response.results.filter(post => !existingIds.has(post.id));
+            const newPosts = response.filter(post => !existingIds.has(post._id));
             return [...prev, ...newPosts];
         });
 
         setPage((prev) => prev + 1);
-        if (response.page >= response.pages) {
-            setHasMore(false);
-        }
         setLoading(false);
     };
 
     // Load first posts
     useEffect(() => {
-        // load first 4 posts (2 pages)
-        fetchMockPosts(1, 4).then(response => {
-            setPosts(response.results);
+        getFeed({page: 1, limit: 4}).then(response => {
+            setPosts(response);
             setPage(2); // next page would be 2
-            setHasMore(response.page < response.pages);
+            setHasMore(response.length === 4);
         });
     }, []);
 
@@ -236,7 +159,6 @@ const FeedPage: React.FC = () => {
         try {
             await likePost({ postId });
             notifySuccess();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             console.log(err)
             notifyError();
@@ -255,21 +177,24 @@ const FeedPage: React.FC = () => {
 
                         return (
                             <div key={post.id} className='post-card'>
-                                <div className='post-header' onClick={() => handleActorClick(post.username)}>
-                                    @{post.username}
+                                <div className='post-header' onClick={() => handleActorClick(post.actor.name)}>
+                                    @ {post.actor.name}
                                 </div>
 
-                                {post.image && (
+                                {post.object.type === 'Image' && (
+                                    <>
                                     <div className='post-media' onClick={() => handlePostClick(post.id)}>
-                                        <PostImage src={post.image} alt='post' />
+                                        <PostImage src={post.object.url} alt='post' />
                                     </div>
+                                    <div className='post-caption'>{post?.object?.name}</div>
+                                    </>
                                 )}
 
-                                {post.video && (
-                                    <div className='post-media'>
+                                {post.object.type === 'Video' && (
+                                    <><div className='post-media'>
                                         <video
-                                            ref={videoRefs.current[post.id]}
-                                            src={post.video}
+                                            ref={videoRefs.current[post._id]}
+                                            src={post.object.url}
                                             className='post-video'
                                             muted
                                             playsInline
@@ -277,34 +202,40 @@ const FeedPage: React.FC = () => {
                                             controls
                                         />
                                     </div>
+                                    <div className='post-caption'>{post?.object?.name}</div>
+                                    </>
                                 )}
                                 
-                                {post.text && (
+                                {post.object.type === 'Note' && (
                                     <div className='post-media'>
-                                        <div className='post-content-scrollable'>{post.text}</div>
+                                        <div className='post-content-scrollable'>{post.object.content}</div>
                                     </div>
                                 )}
 
-                                <div className='post-caption'>{post.content}</div>
-
                                 <div className='post-actions'>
                                     <span className='post-action'>
-                                        <FcLikePlaceholder 
-                                            size={20} 
-                                            onClick={() => handlePostLike(post.id)} 
-                                            className='like-action' 
-                                        /> 
-                                        {/* {post.likes} TODO Potentially add like amount*/}
+                                        {post.liked === false ? (
+                                            <FcLikePlaceholder 
+                                                size={20} 
+                                                onClick={() => handlePostLike(post.id)} 
+                                                className='like-action' 
+                                            /> 
+                                        ): (
+                                            <FcLike
+                                                size={20} 
+                                                // onClick={() => handlePostLike(post.id)} unlike TODO
+                                                className='like-action' 
+                                            /> 
+                                        )}
                                     </span>
-                                    <span className='post-action'>
+                                    {/* <span className='post-action'>
                                         <FaRegComments 
                                             size={20} 
                                             color={'#555'} 
                                             onClick={() => handlePostClick(post.id)}  
                                             className='comment-action'
                                         /> 
-                                        {/* {post.comments} TODO Potentially add comment amount*/}
-                                    </span>
+                                    </span> */}
                                 </div>
                             </div>
                         );
