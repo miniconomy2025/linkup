@@ -1,7 +1,10 @@
-import { ActivityObject, CreateActivity, FollowActivity, LikeActivity, OutboxItem } from "../types/activitypub";
+import { ActivityObject, CreateActivity, FollowActivity, LikeActivity, OutboxItem, UndoActivity } from "../types/activitypub";
 import { ActivityRepository } from "../repositories/activity.repository";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { OutboxService } from "./outbox.service";
+import { RequestConflict } from "../middleware/errorHandler";
+import { InboxService } from "./inbox.service";
+import { ActivityObjectService } from "./activityObject.service";
 
 const apiUrl = process.env.BASE_URL;
 
@@ -17,7 +20,7 @@ export const ActivityService = {
   },
 
   makeLikeActivity: async (actorId: string, postId: string): Promise<LikeActivity> => {
-    const activity = ActivityRepository.saveLikeActivity({
+    const activity = await ActivityRepository.saveLikeActivity({
       actor: actorId,
       object: postId,
       type: 'Like'
@@ -29,19 +32,26 @@ export const ActivityService = {
   likePost: async (postId: string, googleId: string): Promise<LikeActivity> => {
     const actorId = `${apiUrl}/actors/${googleId}`;
 
+    if (await ActorGraphRepository.hasUserLikedPost(postId, actorId)) {
+      throw new RequestConflict('User has already liked this post');
+    }
+
     await ActorGraphRepository.createLikeForPost(postId, actorId);
     
     const activity = await ActivityService.makeLikeActivity(actorId, postId);
     
-    const outboxItem = await OutboxService.addActivityToOutbox(activity);
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
     
-    // Fanout to inboxes
+    const post = await ActivityObjectService.getPostById(postId);
+    const postActorId = post.attributedTo;
+
+    const _inboxItem = await InboxService.addActivityToInbox(activity, postActorId);
 
     return activity;
   },
 
   makeFollowActorActivity: async (actorId: string, followedActorId: string): Promise<FollowActivity> => {
-    const activity = ActivityRepository.saveFollowActivity({
+    const activity = await ActivityRepository.saveFollowActivity({
       actor: actorId,
       object: followedActorId,
       type: "Follow",
@@ -50,6 +60,10 @@ export const ActivityService = {
   },
 
   followActor: async (followerId: string, followedActorId: string ): Promise<FollowActivity> => {
+    if (await ActorGraphRepository.hasUserFollowedActor(followerId, followedActorId)) {
+      throw new RequestConflict('User is already following this user');
+    }
+
     await ActorGraphRepository.createFollowActorActivity(
       followerId,
       followedActorId
@@ -62,7 +76,40 @@ export const ActivityService = {
 
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
+    const _inboxItem = await InboxService.addActivityToInbox(activity, followedActorId);
 
     return activity;
   },
+
+  makeUndoFollowActivity: async (actorId: string, followedActorId: string): Promise<UndoActivity> => {
+    const followActivity = await ActivityRepository.getFollowActivityByActorAndObject(actorId, followedActorId);
+
+    if (!followActivity) {
+      throw new RequestConflict('User is not following this user');
+    }
+
+    const activity = await ActivityRepository.saveUndoActivity({
+      actor: actorId,
+      type: 'Undo',
+      object: followActivity
+    });
+
+    return activity;
+  },
+
+  unfollowActor: async (followerId: string, followedActorId: string ): Promise<UndoActivity> => {
+    if (!await ActorGraphRepository.hasUserFollowedActor(followerId, followedActorId)) {
+      throw new RequestConflict('User is not following this user');
+    }
+
+    await ActorGraphRepository.removeFollowActor(followerId, followedActorId);
+
+    const activity = await ActivityService.makeUndoFollowActivity(followerId, followedActorId);
+
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
+
+    const _inboxItem = await InboxService.addActivityToInbox(activity, followedActorId);
+    
+    return activity
+  }
 };

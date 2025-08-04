@@ -5,13 +5,13 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 const apiUrl   = process.env.BASE_URL
 
 export const ActorController = {
-  getActorById: async (req: Request, res: Response, next: NextFunction) => {
+  getActorByGoogleId: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
       if (!id) {
         throw new BadRequestError('Actor ID is required');
       }
-      const actor = await ActorService.getActorById(id);
+      const actor = await ActorService.getActorByGoogleId(id);
       res.json(actor);
     } catch (error) {
       next(error);

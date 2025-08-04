@@ -1,13 +1,34 @@
 import { s3Service } from "../config/s3Uploader";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { ActivityObjectRepository } from "../repositories/activityObject.repository";
-import { ImageObject, NoteObject, VideoObject } from "../types/activitypub";
+import { ActivityObject, ImageObject, NoteObject, VideoObject } from "../types/activitypub";
 import { ActivityService } from "./activity.service";
+import { InboxService } from "./inbox.service";
 import { OutboxService } from "./outbox.service";
 
 const apiUrl = process.env.BASE_URL;
 
 export const ActivityObjectService = {
+  getPostById: async (postId: string): Promise<ActivityObject> => {
+    if (postId.startsWith(apiUrl!)) {
+      const post = ActivityObjectRepository.getObjectById(postId);
+
+      return post;
+    }
+    else {
+      // External post
+
+      const activityObject: ActivityObject = {
+        attributedTo: "test",
+        type: "Image",
+        url: "test"
+      }
+
+      return activityObject;
+    }
+
+  }, 
+
   postNote: async (content: string, googleId: string): Promise<NoteObject> => {
     const noteObject = await ActivityObjectRepository.createNote({
       type: 'Note',
@@ -15,13 +36,13 @@ export const ActivityObjectService = {
       content: content
     });
 
-    // Add to graph
+    await ActorGraphRepository.createPostForUser(noteObject.id!, `${apiUrl}/actors/${googleId}`);
 
     const activity = await ActivityService.makeCreateActivity(noteObject);
 
-    const outboxItem = await OutboxService.addActivityToOutbox(activity);
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    // Fanout to inboxes
+    await InboxService.fanoutActivityToFollowersInboxes(activity);
 
     return noteObject;
   },
@@ -44,37 +65,36 @@ export const ActivityObjectService = {
 
     const activity = await ActivityService.makeCreateActivity(imageObject);
 
-    const outboxItem = await OutboxService.addActivityToOutbox(activity);
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    // Fanout to inboxes
+    await InboxService.fanoutActivityToFollowersInboxes(activity);
 
     return imageObject;
   },
 
   postVideo: async (file: any, googleId: string, caption = ''): Promise<VideoObject> => { 
+    const fileUrl = await s3Service.uploadFileBufferToS3(
+      file.buffer,
+      file.originalname,
+      'videos'
+    );
 
-  const fileUrl = await s3Service.uploadFileBufferToS3(
-    file.buffer,
-    file.originalname,
-    'videos'
-  );
+    const videoObject = await ActivityObjectRepository.createVideo({
+      attributedTo: `${apiUrl}/actors/${googleId}`,
+      type: 'Video',
+      url: fileUrl,
+      name: caption
+    });
 
-  const videoObject = await ActivityObjectRepository.createVideo({
-    attributedTo: `${apiUrl}/actors/${googleId}`,
-    type: 'Video',
-    url: fileUrl,
-    name: caption
-  });
+    await ActorGraphRepository.createPostForUser(videoObject.id!, `${apiUrl}/actors/${googleId}`);
 
-  await ActorGraphRepository.createPostForUser(videoObject.id!, `${apiUrl}/actors/${googleId}`);
+    const activity = await ActivityService.makeCreateActivity(videoObject);
+  
+    const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-  const activity = await ActivityService.makeCreateActivity(videoObject);
- 
-  await OutboxService.addActivityToOutbox(activity);
+    await InboxService.fanoutActivityToFollowersInboxes(activity);
 
-  return videoObject;
-}
-
-
+    return videoObject;
+  }
 
 }; 

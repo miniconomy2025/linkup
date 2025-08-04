@@ -5,13 +5,14 @@ import FeedPage from './pages/feedPage/FeedPage';
 import { useAuth } from './hooks/useAuth';
 import { ProfilePage } from './pages/profilePage/ProfilePage';
 import { SearchPage } from './pages/searchPage/SearchPage';
-import { NotificationsPage } from './pages/notificationsPage/NotificationsPage';
 import { PostPage } from './pages/postPage/PostPage';
 import { LoginSuccessPage } from './pages/loginSuccessPage/LoginSuccessPage';
 import AuthenticatedLayout from './layouts/authenticatedLayout/AuthenticatedLayout';
 import CreatePostPage from './pages/createPostPage/CreatePostPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FollowingPage } from './pages/followingPage/FollowingPage';
+import { FollowersPage } from './pages/followersPage/FollowersPage';
 
 const App = () => {
 
@@ -41,7 +42,8 @@ const App = () => {
                             <Route path='/profile/:username' element={<ProfilePage />} />
                             <Route path='/search' element={<SearchPage />} />
                             <Route path='/create' element={<CreatePostPage />} />
-                            <Route path='/notifications' element={<NotificationsPage />} />
+                            <Route path='/following' element={<FollowingPage />} />
+                            <Route path='/followers' element={<FollowersPage />} />
                             <Route path='/post/:id' element={<PostPage />} />
                         </Route>
                     ) : (

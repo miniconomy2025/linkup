@@ -18,7 +18,7 @@ export const ObjectController = {
         throw new BadRequestError('Content required to post a note');
       }
 
-      const note = await ActivityObjectService.postNote(req.body.content, req.user.sub);
+      const note = await ActivityObjectService.postNote(req.body.content, req.user.googleId);
 
       res.status(201).json(note);
     } catch (error) {
@@ -62,9 +62,9 @@ export const ObjectController = {
         throw new BadRequestError('No file uploaded');
       }
 
-      const image = await ActivityObjectService.postVideo(req.file, req.user.googleId, req.body.caption);
+      const video = await ActivityObjectService.postVideo(req.file, req.user.googleId, req.body.caption);
 
-      res.status(201).json(image);
+      res.status(201).json(video);
     } catch (error) {
       next(error);
     }

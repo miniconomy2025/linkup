@@ -21,7 +21,6 @@ const Navbar: React.FC = () => {
       <nav className="sidebar-links">
         <Link to="/feed"><IoHomeOutline size={20} /><span className="label">Home</span></Link>
         <Link to="/search"><FiSearch size={20} /><span className="label">Search</span></Link>
-        <Link to="/notifications"><MdOutlineNotifications size={20} /><span className="label">Notifications</span></Link>
         <Link to="/create"><FiPlusSquare size={20} /><span className="label">Create</span></Link>
         <Link to={`/profile/${user?.name.toLowerCase().replace(/\s+/g, '')}`}>
           {user?.avatar ? (

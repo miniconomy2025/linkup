@@ -32,7 +32,7 @@ export const AuthController = {
 
             const { email, name, sub: googleId, picture = '' } = payload;
             
-            let actor = await ActorService.getActorById(googleId);
+            let actor = await ActorService.getActorByGoogleId(googleId);
             const appUrl = process.env.FRONTEND_URL;
             const url = process.env.BASE_URL;
 
