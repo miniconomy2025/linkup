@@ -5,7 +5,7 @@ let isConnected = false;
 export const connectMongoDB = async (): Promise<typeof mongoose> => {
   if (isConnected) 
     return mongoose;
-  
+
   const uri = process.env.MONGO_URI!;
 
   await mongoose.connect(uri, {
