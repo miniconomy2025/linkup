@@ -115,7 +115,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{vars.EC2_USER}}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: server/dist/
+          source: |
+            server/dist/
+            server/package.json
           target: ~/app/backend
 
       - name: Restart Backend with PM2
