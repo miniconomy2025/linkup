@@ -17,8 +17,10 @@ export const ActorRepository = {
     return await CreateModel.find({ actor: actorId, type: 'Create' }).lean();
   }, 
 
-  getActorInboxCreateItems: async (actorId: string): Promise<(CreateActivity & { liked: boolean })[]> => {
-    const inboxItems = await InboxItemModel.find({ actor: actorId }).sort({ createdAt: -1 }).exec();
+  getActorInboxCreateItems: async (actorId: string, page = 1,limit = 10 ): Promise<any> => {
+    const skip = (page - 1) * limit;
+    
+    const inboxItems = await InboxItemModel.find({ actor: actorId }).sort({ createdAt: -1 }).skip(skip).limit(limit).exec();
     const activityIds = inboxItems.map((item) => item.activity);
 
     const activities = await CreateModel.find({id: { $in: activityIds },}).exec();
