@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ActorService } from '../services/actor.service';
 import { BadRequestError, NotAuthenticatedError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+
 const apiUrl   = process.env.BASE_URL
 
 export const ActorController = {
@@ -34,21 +35,96 @@ export const ActorController = {
     }
   },
   
-  getUserFollowers: async (req: Request, res: Response, next: NextFunction) => {
+  getUserFollowers: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
+      const actorId = `${apiUrl}/actors/${req.user.googleId}`;
 
+      const followers = await ActorService.getActorsFollowers(actorId);
+
+      res.status(200).json(followers);
     } catch (error) {
       next(error);
     }
   },
 
-  getUserFollowing: async (req: Request, res: Response, next: NextFunction) => {
+  getActorFollowers: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
+      const actorId = req.query.actorId;
 
+      if (!actorId) {
+        throw new BadRequestError('Actor ID is required')
+      }
+
+      const followers = await ActorService.getActorsFollowers(decodeURIComponent(actorId as string));
+
+      res.status(200).json(followers);
     } catch (error) {
       next(error);
     }
   },
+
+  getFollowersActivityPub: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id;
+
+      if (!id) {
+        throw new BadRequestError('Actor ID is required')
+      }
+
+      const actorId = `${apiUrl}/actors/${id}`;
+      const followers = await ActorService.getActorsFollowing(actorId);
+
+      res.status(200).json(followers);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getUserFollowing: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const actorId = `${apiUrl}/actors/${req.user.googleId}`;
+
+      const following = await ActorService.getActorsFollowing(actorId);
+
+      res.status(200).json(following);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getActorFollowing: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const actorId = req.query.actorId;
+
+      if (!actorId) {
+        throw new BadRequestError('Actor ID is required')
+      }
+
+      const following = await ActorService.getActorsFollowing(decodeURIComponent(actorId as string));
+
+      res.status(200).json(following);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  getFollowingActivityPub: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id;
+
+      if (!id) {
+        throw new BadRequestError('Actor ID is required')
+      }
+
+      const actorId = `${apiUrl}/actors/${id}`;
+      const following = await ActorService.getActorsFollowing(actorId);
+
+      res.status(200).json(following);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
     const user = req.user
     if(user){

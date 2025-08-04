@@ -165,4 +165,24 @@ export const ActorGraphRepository = {
     }
   },
 
+  getFollowingIds: async (actorId: string): Promise<string[]> => {
+    const session = driver.session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (u:ACTOR {id: $id})-[:FOLLOWS]->(followed:ACTOR)
+        RETURN DISTINCT followed
+        `,
+        { id: actorId }
+      );
+
+      return result.records.map((record) => {
+        const node = record.get("followed");
+        return node.properties.id;
+      });
+    } finally {
+      await session.close();
+    }
+  }
+
 };

@@ -4,8 +4,8 @@ const router = Router();
 
 router.get('/:id', ActorController.getActorByGoogleId);
 router.get('/:id/outbox', ActorController.getUserOutbox);
-router.get('/:id/followers', ActorController.getUserFollowers);
-router.get('/:id/following', ActorController.getUserFollowing);
+router.get('/:id/followers', ActorController.getFollowersActivityPub);
+router.get('/:id/following', ActorController.getFollowingActivityPub);
 
 router.post('/:id/inbox', ActorController.postActivityToInbox); // All activities posted here (like, follow, undo)
 
