@@ -64,5 +64,5 @@ export const ActorController = {
     const user = req.user
     const summary = await ActorService.getActorCreateActivities(`${apiUrl}/actors/${user.googleId}`);
     return res.status(200).json(summary);
-  },
+  }
 }; 

@@ -11,6 +11,7 @@ import objectRoutes from './routes/object.route';
 import profileRoutes from './routes/profile.route';
 import activityRoutes from './routes/activity.route';
 import healthRoute from './routes/health.route';
+import feedsRouter from './routes/feeds.route'
 
 import { errorHandler } from './middleware/errorHandler';
 
@@ -27,6 +28,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/objects', objectRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/activities', activityRoutes);
+app.use('/api/feeds', feedsRouter);
 
 app.use(errorHandler);
 

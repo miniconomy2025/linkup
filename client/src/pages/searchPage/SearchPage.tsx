@@ -39,7 +39,6 @@ export const SearchPage = () => {
         setError(null);
         try {
             const response = await searchActor({ query: searchQuery, page, limit: 5 });
-            console.log(response)
             // assuming response: { results, total, page, limit, pages }
             const mappedUsers: User[] = response.results.map((actor: any, index: number) => ({
                 userId: index, // or actor._id if available
