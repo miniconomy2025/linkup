@@ -58,7 +58,7 @@ const CreatePostPage: React.FC = () => {
                 formData.append('caption', caption);
                 await newVideoPost(formData);
             } else if (postType === 'text') {
-                await newTextPost({ content: textContent, caption });
+                await newTextPost({ content: textContent });
             }
             notifySuccess();
             setPostType(null);
@@ -152,13 +152,6 @@ const CreatePostPage: React.FC = () => {
                             maxLength={1500}
                         />
                         <div className='char-counter'>{textContent.length}/1500</div>
-                        <input
-                            type='text'
-                            placeholder='Add a caption...'
-                            value={caption}
-                            onChange={(e) => setCaption(e.target.value)}
-                            className='caption-input'
-                        />
                     </div>
                 )}
 

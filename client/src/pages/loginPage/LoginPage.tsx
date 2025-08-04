@@ -15,7 +15,7 @@ export const LoginPage: React.FC = () => {
 
     return (
         <div className="login-container">
-            <h2>Sign In to MySocial</h2>
+            <h2>Sign In to LinkUp</h2>
             <button className="google-button" onClick={redirectToGoogle}>
                 <img src={"https://img.icons8.com/color/48/000000/google-logo.png"} alt={"Google icon"} />
                 Continue with Google
