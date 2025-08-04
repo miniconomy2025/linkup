@@ -2,11 +2,14 @@ import { ActorGraphRepository } from '../graph/repositories/actor';
 import { ActorModel } from '../models/actor.model';
 import { CreateModel } from '../models/create.model';
 import { InboxItemModel } from '../models/inboxitem.model';
-import { Actor, CreateActivity } from '../types/activitypub';
+import { Actor, CreateActivity, PersonActor } from '../types/activitypub';
 
 export const ActorRepository = {
   getActorByGoogleId: async (googleId: string): Promise<Actor | null> => {
     return ActorModel.findOne({ preferredUsername: googleId }).lean<Actor>().exec();
+  },
+   getActorById: async (id: string): Promise<Actor | null> => {
+    return ActorModel.findOne({ id }).lean<Actor>().exec();
   },
    createActor: async (actor: Actor): Promise<Actor> => {
     const created = new ActorModel(actor);
@@ -35,7 +38,8 @@ export const ActorRepository = {
           activity.object.id!,
           actorId
         );
-        return { ...activity.toObject(), liked };
+        const actor =  await ActorRepository.getActorById(actorId);
+        return { ...activity.toObject(), liked,actor : {name : actor?.name } };
       })
     );
 
