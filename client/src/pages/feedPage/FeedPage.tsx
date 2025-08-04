@@ -229,7 +229,7 @@ const FeedPage: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [posts, page, hasMore]);
 
-    const notifySuccess = () => toast.success('Post created Successfully!');
+    const notifySuccess = () => toast.success('Post liked Successfully!');
     const notifyError = () => toast.error('Error! Something went wrong.');
 
     const handlePostLike = async (postId: string) => {

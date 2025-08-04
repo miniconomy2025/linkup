@@ -1,6 +1,6 @@
-import FollowRequest from '../../components/followRequest/FollowRequest';
+import Followers from '../../components/follower/Followers';
 import { PageLayout } from '../../components/pageLayout/PageLayout';
-import './NotificationsPage.css';
+import './FollowersPage.css';
 
 const mockFollowRequests = [
     {
@@ -23,18 +23,18 @@ const mockFollowRequests = [
     }
 ]
 
-export const NotificationsPage: React.FC = () => {
+export const FollowersPage: React.FC = () => {
     return (
         <PageLayout>
             <div className='notifications-container'>
+                <h1 className='section-title'>Followers</h1>
                 <div className='follow-requests-container'>
-                    <h1 className='section-title'>Follow Requests</h1>
-                    {mockFollowRequests.map(followRequest => (
-                        <FollowRequest 
-                            id={followRequest.userId} 
-                            name={followRequest.name} 
-                            username={followRequest.username} 
-                            avatar={followRequest.avatar} 
+                    {mockFollowRequests.map(actor => (
+                        <Followers
+                            id={actor.userId} 
+                            name={actor.name} 
+                            username={actor.username} 
+                            avatar={actor.avatar} 
                         />
                     ))}
                 </div>
