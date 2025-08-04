@@ -49,7 +49,7 @@ const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter
           actorId
         );
         const actor =  await ActorRepository.getActorById(actorId);
-        return { ...activity.toObject(), liked,actor : {name : actor?.name } };
+        return { ...activity.toObject(), liked,actor : {name : actor?.name, id :actor?.id } };
       })
     );
 
