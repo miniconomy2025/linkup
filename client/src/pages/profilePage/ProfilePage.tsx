@@ -3,7 +3,7 @@ import './ProfilePage.css';
 import { PageLayout } from '../../components/pageLayout/PageLayout';
 import { useAuth } from '../../hooks/useAuth';
 import { RxAvatar } from 'react-icons/rx';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const mockPosts = [
   {
@@ -54,8 +54,8 @@ export const ProfilePage: React.FC = () => {
                         </div>
                         <div className='profile-top-info-numbers-container'>
                             <div>7 Posts</div>
-                            <a>342 followers</a>
-                            <a>251 following</a>
+                            <Link to="/followers">342 followers</Link>
+                            <Link to="/following">251 following</Link>
                         </div>
                         <div className='profile-top-info-name'>Name</div>
                     </div>

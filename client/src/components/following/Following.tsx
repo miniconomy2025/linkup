@@ -1,14 +1,14 @@
-import './FollowRequest.css';
+import './Following.css';
 import { useNavigate } from 'react-router-dom';
 
-interface FollowRequestProps {
+interface FollowingProps {
     id: number;
     name: string;
     username: string;
     avatar: string;
 };
 
-const FollowRequest: React.FC<FollowRequestProps> = ({ id, name, username, avatar }) => {
+const Following: React.FC<FollowingProps> = ({ id, name, username, avatar }) => {
 
     const navigate = useNavigate();
 
@@ -17,7 +17,7 @@ const FollowRequest: React.FC<FollowRequestProps> = ({ id, name, username, avata
     };
 
     return (
-        <div className="follow-request-item-container">
+        <div className="following-item-container">
             <div className='follow-request-item-info-container'>
                 <img 
                     src={avatar} 
@@ -33,15 +33,12 @@ const FollowRequest: React.FC<FollowRequestProps> = ({ id, name, username, avata
                 </div>
             </div>
             <div className='follow-request-actions'>
-                <button className='follow-request-item-button'>
-                    Reject
-                </button>
-                <button className={'follow-request-item-button-active'}>
-                    Accept
+                <button className='button-secondary' onClick={handleUserClick}>
+                    View
                 </button>
             </div>
         </div>
     );
 };
 
-export default FollowRequest;
+export default Following;
