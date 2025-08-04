@@ -103,6 +103,7 @@ jobs:
           echo "CALLBACK_URL=${{ secrets.CALLBACK_URL }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
+          echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
 
       - name: Debug Build Output
         run: |
