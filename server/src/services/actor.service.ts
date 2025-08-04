@@ -18,4 +18,7 @@ export const ActorService = {
   getActorCreateActivities: async (actorId: string): Promise<CreateActivity[]> => {
     return ActorRepository.getCreateActivitiesByActor(actorId);
   },
+   getFeeds: async (actorId: string): Promise<any[]> => {
+    return ActorRepository.getActorInboxCreateItems(actorId)
+  },
 }; 
