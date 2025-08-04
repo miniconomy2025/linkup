@@ -29,8 +29,18 @@ export const ActorRepository = {
     const activities = await CreateModel.find({id: { $in: activityIds },}).exec();
 
     const activityMap = new Map(activities.map((a) => [a.id, a]));
+     const ownActivities = await CreateModel
+    .find({ actor: actorId })
+    .sort({ createdAt: -1 }) 
+    .exec();
 
-    const orderedActivities = activityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
+    const allActivityIds = [
+    ...activityIds,
+    // ...ownActivities.map(a => a.id)
+];
+console.log(allActivityIds.length);
+
+const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
 
     const results = await Promise.all(
       orderedActivities.map(async (activity) => {
