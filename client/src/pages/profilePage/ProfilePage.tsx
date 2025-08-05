@@ -39,12 +39,13 @@ export const ProfilePage: React.FC = () => {
                 let response;
                 let postsResponse;
                 
-                if (decodedUrl !== 'me' && decodedUrl !== currentActorId) {
-                    // console.log("TODO get other user")
-                    
-                } else {
+                if (decodedUrl === 'me' || decodedUrl === currentActorId) {
                     response = await getActorProfile();
                     postsResponse = await getActorPosts();
+                    
+                    
+                } else {
+                    // console.log("TODO get other user")
                 };
                 
                 console.log(response)
@@ -59,7 +60,7 @@ export const ProfilePage: React.FC = () => {
             }
         };
         fetchActorProfile();
-    }, []);
+    }, [decodedUrl, currentActorId]);
 
     const [followLoading, setFollowLoading] = useState(false);
 

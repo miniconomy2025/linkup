@@ -158,6 +158,13 @@ const FeedPage: React.FC = () => {
     const handlePostLike = async (postId: string) => {
         try {
             await likePost({ postId });
+            setPosts((prevPosts) =>
+                prevPosts.map((post) =>
+                    post.object.id === postId
+                        ? { ...post, liked: true }
+                        : post
+                )
+            );
             notifySuccess();
         } catch (err) {
             console.log(err)
@@ -217,13 +224,12 @@ const FeedPage: React.FC = () => {
                                         {post.liked === false ? (
                                             <FcLikePlaceholder 
                                                 size={20} 
-                                                onClick={() => handlePostLike(post.id)} 
+                                                onClick={() => handlePostLike(post.object.id)} 
                                                 className='like-action' 
                                             /> 
                                         ): (
                                             <FcLike
                                                 size={20} 
-                                                // onClick={() => handlePostLike(post.id)} unlike TODO
                                                 className='like-action' 
                                             /> 
                                         )}
