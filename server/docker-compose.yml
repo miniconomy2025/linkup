@@ -32,10 +32,15 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c "
-      sleep 5;
-      mc alias set local http://minio:9000 admin password123;
-      mc mb local/linkup-media;
-      mc policy set public local/linkup-media;
+        echo 'Waiting for MinIO to be ready...';
+        until mc alias set local http://minio:9000 admin password123; do
+          sleep 3;
+        done;
+        echo 'Creating bucket...';
+        mc mb local/linkup-media || true;
+        echo 'Setting public read-only policy...';
+        mc anonymous set download local/linkup-media;
+        echo 'Bucket is now publicly readable.';
       "
 
   mongodb:
