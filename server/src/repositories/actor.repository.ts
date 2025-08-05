@@ -2,7 +2,9 @@ import { ActorGraphRepository } from '../graph/repositories/actor';
 import { ActorModel } from '../models/actor.model';
 import { CreateModel } from '../models/create.model';
 import { InboxItemModel } from '../models/inboxitem.model';
-import { Actor, CreateActivity, PersonActor } from '../types/activitypub';
+import { Actor, CreateActivity } from '../types/activitypub';
+
+const apiUrl = process.env.BASE_URL;
 
 export const ActorRepository = {
   getActorByGoogleId: async (googleId: string): Promise<Actor | null> => {
@@ -27,6 +29,7 @@ export const ActorRepository = {
     const activityIds = inboxItems.map((item) => item.activity);
 
     const activities = await CreateModel.find({id: { $in: activityIds },}).exec();
+    // Get external activities too
 
     const activityMap = new Map(activities.map((a) => [a.id, a]));
      const ownActivities = await CreateModel
@@ -37,10 +40,10 @@ export const ActorRepository = {
     const allActivityIds = [
     ...activityIds,
     // ...ownActivities.map(a => a.id)
-];
-console.log(allActivityIds.length);
+    ];
+    console.log(allActivityIds.length);
 
-const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
+    const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
 
     const results = await Promise.all(
       orderedActivities.map(async (activity) => {
@@ -48,7 +51,13 @@ const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter
           activity.object.id!,
           actorId
         );
-        const actor =  await ActorRepository.getActorById(actorId);
+        let actor = null
+        if (activity.actor.startsWith(apiUrl!)) {
+          actor =  await ActorRepository.getActorById(activity.actor);
+        }
+        else {
+          // Get external actor
+        }
         return { ...activity.toObject(), liked,actor : {name : actor?.name, id :actor?.id } };
       })
     );

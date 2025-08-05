@@ -1,8 +1,9 @@
+import { Model } from 'mongoose';
 import { CreateModel } from '../models/create.model';
 import { FollowModel } from '../models/follow.model';
 import { LikeModel } from '../models/like.model';
 import { UndoModel } from '../models/undo.model';
-import { CreateActivity, FollowActivity, LikeActivity, UndoActivity} from '../types/activitypub';
+import { Activity, CreateActivity, FollowActivity, LikeActivity, UndoActivity} from '../types/activitypub';
 
 export const ActivityRepository = {
   saveCreateActivity: async (createActivity: CreateActivity): Promise<CreateActivity> => {
@@ -32,4 +33,20 @@ export const ActivityRepository = {
     const created = await UndoModel.create(undoActivity);
     return created.toObject() as UndoActivity;
   },    
+
+  getActivityById: async (id: string): Promise<Activity | null> => {
+    const createActivity = await CreateModel.findById(id).lean();
+    if (createActivity) return createActivity as Activity;
+
+    const followActivity = await FollowModel.findById(id).lean();
+    if (followActivity) return followActivity as Activity;
+
+    const likeActivity = await LikeModel.findById(id).lean();
+    if (likeActivity) return likeActivity as Activity;
+
+    const undoActivity = await UndoModel.findById(id).lean();
+    if (undoActivity) return undoActivity as Activity;
+
+    return null;
+  },
 }; 

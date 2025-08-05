@@ -1,7 +1,9 @@
 import { ActorRepository } from '../repositories/actor.repository';
-import { Actor, CreateActivity } from '../types/activitypub';
+import { Activity, Actor, CreateActivity } from '../types/activitypub';
 import { ActorGraphRepository } from '../graph/repositories/actor';
 import { UserNotFoundError } from '../middleware/errorHandler';
+import { OutboxRepository } from '../repositories/outbox.repository';
+import { ActivityRepository } from '../repositories/activity.repository';
 
 const apiUrl = process.env.BASE_URL;
 
@@ -25,6 +27,22 @@ export const ActorService = {
     return ActorRepository.getActorInboxCreateItems(actorId,page,limit)
   },
   
+  getActorOutboxActivities: async (actorId: string): Promise<Activity[]> => {
+    const outboxItems = await OutboxRepository.getActorOutboxItems(actorId);
+
+    const activities = [];
+
+    for (const item of outboxItems) {
+      const activity = await ActivityRepository.getActivityById(item.activity);
+
+      if (activity) {
+        activities.push(activity);
+      }
+    }
+
+    return activities;
+  },
+
   getActorsFollowers: async (actorId: string) => {
     if (actorId.startsWith(apiUrl!)) {
       const followerIds = await ActorGraphRepository.getFollowerIds(actorId);
