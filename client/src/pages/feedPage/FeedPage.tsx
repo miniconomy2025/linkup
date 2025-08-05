@@ -35,7 +35,7 @@ const FeedPage: React.FC = () => {
         if (loading || !hasMore) return;
         setLoading(true);
         const response = await getFeed({ page, limit: 4 });
-        console.log(response)
+
         if (response.length === 0) {
             setHasMore(false);
             setLoading(false);
@@ -59,7 +59,7 @@ const FeedPage: React.FC = () => {
         getFeed({page: 1, limit: 4}).then(response => {
             setPosts(response);
             setPage(2); // next page would be 2
-            setHasMore(response.length === 4);
+            setHasMore(response.length > 0);
         });
     }, []);
 
@@ -241,7 +241,7 @@ const FeedPage: React.FC = () => {
                         );
                     })}
                     {loading && <p>Loading more posts...</p>}
-                    {!hasMore && <p style={{ textAlign: 'center' }}>No more posts</p>}
+                    {!hasMore && <p style={{ textAlign: 'center' }}>{posts?.length > 0 ? 'No more posts' : 'No posts available'}</p>}
                 </div>
                 
             </div>

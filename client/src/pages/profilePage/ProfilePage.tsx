@@ -7,13 +7,16 @@ import { LoadingPage } from '../../components/loadingSpinner/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { getActorPosts, getActorProfile } from '../../api/requests/actor';
 import type { Actor } from '../../types/types';
+import { followActor } from '../../api/requests/activity';
 
 export const ProfilePage: React.FC = () => {
 
+    const userString = localStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : null;
+    const currentActorId = user?.id ?? null;
+
     const { id } = useParams();
     const decodedUrl = decodeURIComponent(id || '');
-
-    console.log(decodedUrl)
 
     const navigate = useNavigate();
     
@@ -35,9 +38,10 @@ export const ProfilePage: React.FC = () => {
             try {
                 let response;
                 let postsResponse;
-                if (decodedUrl === '') {
-                    response = await getActorProfile();
-                    postsResponse = await getActorPosts();
+                
+                if (decodedUrl !== 'me' && decodedUrl !== currentActorId) {
+                    // console.log("TODO get other user")
+                    
                 } else {
                     response = await getActorProfile();
                     postsResponse = await getActorPosts();
@@ -57,6 +61,21 @@ export const ProfilePage: React.FC = () => {
         fetchActorProfile();
     }, []);
 
+    const [followLoading, setFollowLoading] = useState(false);
+
+    const handleFollowActor = async () => {
+        try {
+            setFollowLoading(true);
+            await followActor({ actorId: decodedUrl });
+            toast.success('Successfully followed actor!')
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+            notifyError();
+        } finally {
+            setFollowLoading(false);
+        };
+    };
+
     if (loading) return (
         <LoadingPage />
     );
@@ -69,11 +88,14 @@ export const ProfilePage: React.FC = () => {
                     <div className='profile-top-info-container'>
                         <div className='profile-top-info-edit-container'>
                             <div className='profile-top-info-username'>{profile?.name}</div>
+                            {decodedUrl !== 'me' && decodedUrl !== currentActorId && (
+                                <button className='button-secondary' onClick={handleFollowActor} disabled={followLoading}>Follow</button>
+                            )}
                         </div>
                         <div className='profile-top-info-numbers-container'>
                             <div>{profile?.posts || 0} Posts</div>
-                            <Link to="/followers" className='profile-link'>{profile?.followers || 0} followers</Link>
-                            <Link to="/following" className='profile-link'>{profile?.following || 0}  following</Link>
+                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${decodedUrl}` : '/followers/me'} className='profile-link'>{profile?.followers || 0} followers</Link>
+                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${decodedUrl}` : '/following/me'} className='profile-link'>{profile?.following || 0}  following</Link>
                         </div>
                     </div>
                 </div>

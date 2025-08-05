@@ -12,3 +12,6 @@ export const searchActor = ({ query, page = 1, limit = 10 }: SearchActorParams) 
 
 export const getActorProfile = (): Promise<Actor> => apiFetch('/profiles/me');
 export const getActorPosts = () => apiFetch('/profiles/me/posts');
+
+export const getCurrentActorFollowers = () => apiFetch(`/profiles/me/followers`);
+export const getCurrentActorFollowing = () => apiFetch(`/profiles/me/following`);

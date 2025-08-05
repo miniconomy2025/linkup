@@ -35,7 +35,7 @@ export const LoginSuccessPage = () => {
                 email: decoded.email,
                 avatar: decoded.picture || '',
             };
-
+            
             setUser(user);
 
             localStorage.setItem('user', JSON.stringify(user));

@@ -39,11 +39,11 @@ const App = () => {
                     {isAuthenticated ? (
                         <Route element={<AuthenticatedLayout />}>
                             <Route path='/feed' element={<FeedPage />} />
-                            <Route path='/profile/:username' element={<ProfilePage />} />
+                            <Route path='/profile/:id' element={<ProfilePage />} />
                             <Route path='/search' element={<SearchPage />} />
                             <Route path='/create' element={<CreatePostPage />} />
-                            <Route path='/following' element={<FollowingPage />} />
-                            <Route path='/followers' element={<FollowersPage />} />
+                            <Route path='/following/:id' element={<FollowingPage />} />
+                            <Route path='/followers/:id' element={<FollowersPage />} />
                             <Route path='/post/:id' element={<PostPage />} />
                         </Route>
                     ) : (

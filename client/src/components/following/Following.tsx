@@ -12,10 +12,11 @@ const Following: React.FC<FollowingProps> = ({ id, name, username, avatar }) => 
 
     const navigate = useNavigate();
 
-    const handleUserClick = () => {
-        navigate(`/profile/${id}`);
+    const handleActorClick = () => {
+        const encodedId = encodeURIComponent(id);
+        navigate(`/profile/${encodedId}`);
     };
-
+    
     return (
         <div className="following-item-container">
             <div className='follow-request-item-info-container'>
@@ -25,18 +26,18 @@ const Following: React.FC<FollowingProps> = ({ id, name, username, avatar }) => 
                     width={40} 
                     height={40} 
                     className='follow-request-item-avatar'
-                    onClick={handleUserClick}
+                    onClick={handleActorClick}
                 />
                 <div >
                     <div>{name}</div>
                     <div>{username}</div>
                 </div>
             </div>
-            <div className='follow-request-actions'>
+            {/* <div className='follow-request-actions'>
                 <button className='button-secondary' onClick={handleUserClick}>
                     View
                 </button>
-            </div>
+            </div> */}
         </div>
     );
 };

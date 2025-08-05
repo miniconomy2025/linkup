@@ -5,19 +5,20 @@ import './SearchItem.css';
 interface SearchItemProps {
     id: number;
     name: string;
-    username: string;
+    // username: string;
     avatar: string;
-    followers: number;
-    visible: boolean;
-    following: boolean;
+    // followers: number;
+    // visible: boolean;
+    // following: boolean;
 };
 
-const SearchItem: React.FC<SearchItemProps> = ({ id, name, username, avatar, following }) => {
+const SearchItem: React.FC<SearchItemProps> = ({ id, name, avatar }) => {
 
     const navigate = useNavigate();
 
     const handleActorClick = () => {
-        navigate(`/profile/${id}`);
+        const encodedId = encodeURIComponent(id);
+        navigate(`/profile/${encodedId}`);
     };
 
     return (
