@@ -16,7 +16,7 @@ export const ProfilePage: React.FC = () => {
     const currentActorId = user?.id ?? null;
 
     const { id } = useParams();
-    const decodedUrl = decodeURIComponent(id || '');
+    const decodedUrl = decodeURIComponent(id || 'me');
 
     const navigate = useNavigate();
     
@@ -33,6 +33,7 @@ export const ProfilePage: React.FC = () => {
     const [posts, setPosts] = useState<any>([]);
 
     useEffect(() => {
+        if (!decodedUrl && !currentActorId) return;
         const fetchActorProfile = async () => {
             setLoading(true);
             try {
@@ -60,7 +61,7 @@ export const ProfilePage: React.FC = () => {
             }
         };
         fetchActorProfile();
-    }, [decodedUrl, currentActorId]);
+    }, [decodedUrl]);
 
     const [followLoading, setFollowLoading] = useState(false);
 

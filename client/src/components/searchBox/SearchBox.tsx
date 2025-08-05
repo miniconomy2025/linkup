@@ -21,7 +21,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
 
   return (
     <div className="search-box">
-      <span className="search-icon"><FiSearch size={16} /></span>
       <input
         type="text"
         placeholder="Search users..."
@@ -29,6 +28,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
       />
+      <span className="search-icon"><FiSearch size={16} onClick={() => onSearch(query)}/></span>
     </div>
   );
 };

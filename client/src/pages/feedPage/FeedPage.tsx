@@ -35,7 +35,7 @@ const FeedPage: React.FC = () => {
         if (loading || !hasMore) return;
         setLoading(true);
         const response = await getFeed({ page, limit: 4 });
-
+        // console.log(response)
         if (response.length === 0) {
             setHasMore(false);
             setLoading(false);
@@ -56,7 +56,8 @@ const FeedPage: React.FC = () => {
 
     // Load first posts
     useEffect(() => {
-        getFeed({page: 1, limit: 4}).then(response => {
+        getFeed({ page: 1, limit: 4 }).then(response => {
+            // console.log(response)
             setPosts(response);
             setPage(2); // next page would be 2
             setHasMore(response.length > 0);
@@ -184,7 +185,7 @@ const FeedPage: React.FC = () => {
 
                         return (
                             <div key={post.id} className='post-card'>
-                                <div className='post-header' onClick={() => handleActorClick(post.actor.name)}>
+                                <div className='post-header' onClick={() => handleActorClick(post.actor.id)}>
                                     @ {post.actor.name}
                                 </div>
 
