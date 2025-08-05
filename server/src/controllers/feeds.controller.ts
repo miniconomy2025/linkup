@@ -19,7 +19,7 @@ export const FeedsController = {
          const pageSize = parseInt(req.query.limit as string)
         const actorId = `${apiUrl}/actors/${req.user.googleId}`
         const summary = await ActorService.getFeeds(actorId,page,pageSize);
-        return res.status(200).json(summary);
+        res.status(200).json(summary);
       }
     } catch (error) {
       next(error);
