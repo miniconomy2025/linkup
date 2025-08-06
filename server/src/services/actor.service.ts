@@ -47,10 +47,10 @@ export const ActorService = {
     const activitySummary = await ActorGraphRepository.getActivitySummary(actor?.id || "");
    
 
-    const following = await ActorGraphRepository.hasUserFollowedActor(loggedInActorId,id)
+    const isFollowing = await ActorGraphRepository.hasUserFollowedActor(loggedInActorId,id)
       
 
-    return {...actor, ...activitySummary, following };
+    return {...actor, ...activitySummary, isFollowing };
   },
 
   getActorsFollowers: async (actorId: string) => {

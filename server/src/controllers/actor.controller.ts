@@ -155,7 +155,7 @@ export const ActorController = {
   getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
     const user = req.user
     if(user){
-       const summary = await ActorService.getActorByGoogleId(user.googleId);
+       const summary = await ActorService.getActorProfileByGoogleId(user.googleId);
         return res.status(200).json(summary);
     }
     else{

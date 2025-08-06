@@ -1,5 +1,5 @@
 export interface ActorActivitySummary {
-  followers: number;
-  following: number;
+  followersCount: number;
+  followingCount: number;
   posts: number;
 }
