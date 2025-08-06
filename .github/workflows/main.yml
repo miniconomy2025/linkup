@@ -203,5 +203,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{vars.EC2_USER}}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: client/build/
+          source: ./client/dist/**
           target: ~/app/client
