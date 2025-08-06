@@ -162,7 +162,7 @@ jobs:
 
               # Serve frontend built with Vite
               location / {
-                root /home/ubuntu/app/client;
+                root /home/ubuntu/app/client/dist;
                 index index.html;
                 try_files \$uri /index.html;
               }
@@ -210,7 +210,7 @@ jobs:
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{vars.EC2_USER}}
+          username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: ./client/dist/**
+          source: ./client/dist/
           target: ~/app/client
