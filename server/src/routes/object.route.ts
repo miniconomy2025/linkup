@@ -10,6 +10,7 @@ const router = Router();
 router.post('/notes', authenticateJWT, ObjectController.postNote);
 router.post('/images', authenticateJWT, upload.single('file'), ObjectController.postImage);
 router.post('/videos', authenticateJWT, upload.single('file'), ObjectController.postVideo);
+router.get('/posts', authenticateJWT, ObjectController.getPostById);
 
 // Activitypub
 router.get('/notes/:id', ObjectController.getNoteById);

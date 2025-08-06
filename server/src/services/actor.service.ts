@@ -15,7 +15,7 @@ export const ActorService = {
    createActor: async (actor: Actor): Promise<Actor> => {
     return await ActorRepository.createActor(actor);
   },
-  getActorProfile: async (preferredUsername: string) => {
+  getActorProfileByGoogleId: async (preferredUsername: string) => {
     const actor = await ActorRepository.getActorByGoogleId(preferredUsername);
     const activitySummary = await ActorGraphRepository.getActivitySummary(actor?.id || "");
     return {...actor, ...activitySummary};
@@ -41,6 +41,16 @@ export const ActorService = {
     }
 
     return activities;
+  },
+   getActorProfileById : async (id: string, loggedInActorId :string) => {
+    const actor = await ActorRepository.getActorById(id);
+    const activitySummary = await ActorGraphRepository.getActivitySummary(actor?.id || "");
+   
+
+    const following = await ActorGraphRepository.hasUserFollowedActor(loggedInActorId,id)
+      
+
+    return {...actor, ...activitySummary, following };
   },
 
   getActorsFollowers: async (actorId: string) => {
