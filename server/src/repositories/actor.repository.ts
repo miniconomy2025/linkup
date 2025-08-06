@@ -8,10 +8,10 @@ const apiUrl = process.env.BASE_URL;
 
 export const ActorRepository = {
   getActorByGoogleId: async (googleId: string): Promise<Actor | null> => {
-    return ActorModel.findOne({ preferredUsername: googleId }).lean<Actor>().exec();
+    return await ActorModel.findOne({ preferredUsername: googleId }).lean<Actor>().exec();
   },
    getActorById: async (id: string): Promise<Actor | null> => {
-    return ActorModel.findOne({ id }).lean<Actor>().exec();
+    return await ActorModel.findOne({ id }).lean<Actor>().exec();
   },
    createActor: async (actor: Actor): Promise<Actor> => {
     const created = new ActorModel(actor);

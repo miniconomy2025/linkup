@@ -13,7 +13,7 @@ export const ActorService = {
     return actor;
   },
    createActor: async (actor: Actor): Promise<Actor> => {
-    return ActorRepository.createActor(actor);
+    return await ActorRepository.createActor(actor);
   },
   getActorProfile: async (preferredUsername: string) => {
     const actor = await ActorRepository.getActorByGoogleId(preferredUsername);
@@ -21,10 +21,10 @@ export const ActorService = {
     return {...actor, ...activitySummary};
   },
   getActorCreateActivities: async (actorId: string): Promise<CreateActivity[]> => {
-    return ActorRepository.getCreateActivitiesByActor(actorId);
+    return await ActorRepository.getCreateActivitiesByActor(actorId);
   },
    getFeeds: async (actorId: string,page:number,limit:number): Promise<any[]> => {
-    return ActorRepository.getActorInboxCreateItems(actorId,page,limit)
+    return await ActorRepository.getActorInboxCreateItems(actorId,page,limit)
   },
   
   getActorOutboxActivities: async (actorId: string): Promise<Activity[]> => {

@@ -1,16 +1,27 @@
-import { ActivityObject, CreateActivity, FollowActivity, LikeActivity, OutboxItem, UndoActivity } from "../types/activitypub";
+import { Activity, ActivityObject, CreateActivity, FollowActivity, LikeActivity, OutboxItem, UndoActivity } from "../types/activitypub";
 import { ActivityRepository } from "../repositories/activity.repository";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { OutboxService } from "./outbox.service";
-import { RequestConflict } from "../middleware/errorHandler";
+import { ActivityNotFoundError, BadRequestError, RequestConflict } from "../middleware/errorHandler";
 import { InboxService } from "./inbox.service";
 import { ActivityObjectService } from "./activityObject.service";
 
 const apiUrl = process.env.BASE_URL;
 
 export const ActivityService = {
+  getActivitytById: async (activityId: string): Promise<Activity> => {
+    if (activityId.startsWith(apiUrl!)) {
+      const activity = await ActivityRepository.getActivityById(activityId);
+  
+      return activity;
+    }
+    else {
+      throw new ActivityNotFoundError();
+    }
+  },
+
   makeCreateActivity: async (activityObject: ActivityObject): Promise<CreateActivity> => {
-    const activity = ActivityRepository.saveCreateActivity({
+    const activity = await ActivityRepository.saveCreateActivity({
       actor: activityObject.attributedTo,
       object: activityObject,
       type: 'Create'
