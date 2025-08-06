@@ -46,7 +46,20 @@ export const ActorController = {
       const actorId = actor.id;
       const activities = await ActorService.getActorOutboxActivities(actorId);
 
-      res.status(200).json(activities);
+      const orderedActivities = 
+        activities.sort((a, b) => {
+          const dateA = a.published ? new Date(a.published).getTime() : 0;
+          const dateB = b.published ? new Date(b.published).getTime() : 0;
+          return dateB - dateA;
+        });
+
+      res.status(200).json({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": `${actor.name}'s outbox`,
+        "type": "OrderedCollection",
+        "totalItems": activities.length,
+        "orderedItems": orderedActivities
+      });
     } catch (error) {
       next(error);
     }
@@ -96,7 +109,13 @@ export const ActorController = {
       const actorId = actor.id;
       const followers = await ActorService.getActorsFollowing(actorId);
 
-      res.status(200).json(followers);
+      res.status(200).json({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": `${actor.name}'s followers`,
+        "type": "OrderedCollection",
+        "totalItems": followers ? followers.length : 0,
+        "orderedItems": followers
+      });
     } catch (error) {
       next(error);
     }
@@ -146,7 +165,13 @@ export const ActorController = {
       const actorId = actor.id;
       const following = await ActorService.getActorsFollowing(actorId);
 
-      res.status(200).json(following);
+      res.status(200).json({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": `${actor.name}'s following`,
+        "type": "OrderedCollection",
+        "totalItems": following ? following.length : 0,
+        "orderedItems": following
+      });
     } catch (error) {
       next(error);
     }
