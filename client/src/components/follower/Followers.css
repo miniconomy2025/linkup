@@ -8,6 +8,7 @@
     padding: 8px 16px;
     background-color: #fff;
     gap: 1rem;
+    cursor: pointer;
 }
 
 @media (max-width: 560px) {
@@ -18,7 +19,6 @@
 
 .follow-request-item-avatar {
     border-radius: 50%;
-    cursor: pointer;
 }
 
 .follow-request-item-button {

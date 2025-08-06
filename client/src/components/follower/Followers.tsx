@@ -18,7 +18,7 @@ const Followers: React.FC<FollowingProps> = ({ id, name, username, avatar }) => 
     };
 
     return (
-        <div className="following-item-container">
+        <div className="following-item-container" onClick={handleActorClick}>
             <div className='follow-request-item-info-container'>
                 <img 
                     src={avatar} 
@@ -26,18 +26,17 @@ const Followers: React.FC<FollowingProps> = ({ id, name, username, avatar }) => 
                     width={40} 
                     height={40} 
                     className='follow-request-item-avatar'
-                    onClick={handleActorClick}
                 />
                 <div >
                     <div>{name}</div>
                     <div>{username}</div>
                 </div>
             </div>
-            <div className='follow-request-actions'>
+            {/* <div className='follow-request-actions'>
                 <button className='button-secondary'>
                     Unfollow
                 </button>
-            </div>
+            </div> */}
         </div>
     );
 };

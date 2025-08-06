@@ -18,7 +18,7 @@ const Following: React.FC<FollowingProps> = ({ id, name, username, avatar }) => 
     };
     
     return (
-        <div className="following-item-container">
+        <div className="following-item-container" onClick={handleActorClick}>
             <div className='follow-request-item-info-container'>
                 <img 
                     src={avatar} 
@@ -26,7 +26,6 @@ const Following: React.FC<FollowingProps> = ({ id, name, username, avatar }) => 
                     width={40} 
                     height={40} 
                     className='follow-request-item-avatar'
-                    onClick={handleActorClick}
                 />
                 <div >
                     <div>{name}</div>
