@@ -154,14 +154,22 @@ jobs:
             
             NGINX_CONF="/etc/nginx/sites-available/linkup"
             DOMAIN="ec2-13-246-192-21.af-south-1.compute.amazonaws.com"
-            
+
             sudo bash -c "cat > $NGINX_CONF" <<EOF
             server {
               listen 80;
               server_name $DOMAIN;
-              
+
+              # Serve frontend built with Vite
               location / {
-                proxy_pass http://localhost:3000;
+                root /home/ubuntu/app/client;
+                index index.html;
+                try_files \$uri /index.html;
+              }
+
+              # Reverse proxy for backend API
+              location /api/ {
+                proxy_pass http://localhost:3000/;
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade \$http_upgrade;
                 proxy_set_header Connection 'upgrade';
@@ -170,7 +178,8 @@ jobs:
               }
             }
             EOF
-      
+
+            # Enable site and reload Nginx
             sudo ln -sf $NGINX_CONF /etc/nginx/sites-enabled/default
             sudo nginx -t && sudo systemctl reload nginx
 
