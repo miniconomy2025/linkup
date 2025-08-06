@@ -3,7 +3,7 @@ import Followers from '../../components/follower/Followers';
 import { PageLayout } from '../../components/pageLayout/PageLayout';
 import './FollowersPage.css';
 import { useEffect, useState } from 'react';
-import { getCurrentActorFollowers } from '../../api/requests/actor';
+import { getActorFollowers, getCurrentActorFollowers } from '../../api/requests/actor';
 import { toast } from 'react-toastify';
 import { LoadingPage } from '../../components/loadingSpinner/LoadingSpinner';
 
@@ -23,12 +23,10 @@ export const FollowersPage: React.FC = () => {
             try {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 let response: any;
-                
                 if (decodedUrl !== 'me' && decodedUrl !== currentActorId) {
-                    // Load other users following
+                    response = await getActorFollowers({ url: decodedUrl });
                 } else {
                     response = await getCurrentActorFollowers();
-                    console.log(response)
                 };
                 setFollowers(response);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars

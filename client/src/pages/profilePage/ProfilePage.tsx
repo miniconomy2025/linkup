@@ -96,8 +96,8 @@ export const ProfilePage: React.FC = () => {
                         </div>
                         <div className='profile-top-info-numbers-container'>
                             <div>{profile?.posts || 0} Posts</div>
-                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${decodedUrl}` : '/followers/me'} className='profile-link'>{profile?.followers || 0} followers</Link>
-                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${decodedUrl}` : '/following/me'} className='profile-link'>{profile?.following || 0}  following</Link>
+                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${encodeURIComponent(decodedUrl)}` : '/followers/me'} className='profile-link'>{profile?.followers || 0} followers</Link>
+                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${encodeURIComponent(decodedUrl)}` : '/following/me'} className='profile-link'>{profile?.following || 0}  following</Link>
                         </div>
                     </div>
                 </div>

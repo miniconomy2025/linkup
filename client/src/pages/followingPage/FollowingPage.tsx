@@ -4,7 +4,7 @@ import { PageLayout } from '../../components/pageLayout/PageLayout';
 import './FollowingPage.css';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { getCurrentActorFollowing } from '../../api/requests/actor';
+import { getActorFollowing, getCurrentActorFollowing } from '../../api/requests/actor';
 import { LoadingPage } from '../../components/loadingSpinner/LoadingSpinner';
 
 export const FollowingPage: React.FC = () => {
@@ -25,10 +25,9 @@ export const FollowingPage: React.FC = () => {
                 let response: any;
                 
                 if (decodedUrl !== 'me' && decodedUrl !== currentActorId) {
-                    // Load other users following
+                    response = await getActorFollowing({ url: decodedUrl });
                 } else {
                     response = await getCurrentActorFollowing();
-                    console.log(response)
                 };
                 setFollowing(response);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
