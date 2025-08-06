@@ -38,8 +38,8 @@ export const ActorGraphRepository = {
 
       const record = result.records[0];
       return {
-        followers: record.get("followers").toNumber(),
-        following: record.get("following").toNumber(),
+        followersCount: record.get("followers").toNumber(),
+        followingCount: record.get("following").toNumber(),
         posts: record.get("posts").toNumber(),
       };
     } finally {
