@@ -1,18 +1,19 @@
 import './PostPage.css';
 import { PageLayout } from '../../components/pageLayout/PageLayout';
-import { PostImage } from '../../components/postImage/PostImage';
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { LoadingPage } from '../../components/loadingSpinner/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { getPost } from '../../api/requests/posts';
+import { FcLike, FcLikePlaceholder } from 'react-icons/fc';
+import { likePost } from '../../api/requests/activity';
 
 export const PostPage: React.FC = () => {
 
     const { id } = useParams();
     const decodedUrl = decodeURIComponent(id || '');
     const [loading, setLoading] = useState(false);
-    const [post, setPost] = useState({});
+    const [post, setPost] = useState<unknown>({});
 
     const notifyError = () => toast.error('Error! Something went wrong.');
 
@@ -35,6 +36,17 @@ export const PostPage: React.FC = () => {
         fetchPost();
     }, []);
 
+    const handlePostLike = async (postId: string) => {
+        try {
+            await likePost({ postId });
+            setPost((prevPost) => prevPost ? { ...prevPost, liked: true } : prevPost);
+            toast.success("Liked post!")
+        } catch (err) {
+            console.log(err)
+            notifyError();
+        };
+    };
+
     if (loading) return (
         <LoadingPage />
     );
@@ -42,15 +54,37 @@ export const PostPage: React.FC = () => {
     return (
         <PageLayout>
             <div className='post-container'>
-                <div className='image-container'>
-                    {/* TODO handle if image */}
-                    {/* TODO handle if note */}
-                    {/* TODO handle if video */}
-               {/* <PostImage src={post.image} alt='post'/> */}
+                 <div className='post-tile-ind'>
+                    {post?.type === 'Image' && (
+                        <img src={post?.url} />
+                    )}
+                    {post?.type === 'Video' && (
+                        <video
+                            src={post?.url}
+                            className='post-video'
+                            playsInline
+                            loop
+                            controls
+                        />
+                    )}
+                    {post?.type === 'Note' && (
+                        <div className='post-media-note'>
+                            <div className='post-content-scrollable'>{post.content}</div>
+                        </div>
+                    )}
                 </div>
-                <div>
-                    comments
-                </div>
+                {post.liked === false ? (
+                    <FcLikePlaceholder
+                        size={20} 
+                        onClick={() => handlePostLike(post.id)} 
+                        className='like-action' 
+                    /> 
+                ): (
+                    <FcLike
+                        size={20} 
+                        className='like-action' 
+                    /> 
+                )}
             </div>
         </PageLayout>
     );

@@ -5,9 +5,8 @@ import { RxAvatar } from 'react-icons/rx';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { LoadingPage } from '../../components/loadingSpinner/LoadingSpinner';
 import { toast } from 'react-toastify';
-import { getActorPosts, getActorProfile } from '../../api/requests/actor';
-import type { Actor } from '../../types/types';
-import { followActor } from '../../api/requests/activity';
+import { getActorPosts, getActorProfile, getOtherActorPosts, getOtherActorProfile } from '../../api/requests/actor';
+import { followActor, unfollowActor } from '../../api/requests/activity';
 
 export const ProfilePage: React.FC = () => {
 
@@ -29,7 +28,7 @@ export const ProfilePage: React.FC = () => {
 
     const notifyError = () => toast.error('Error! Something went wrong.');
 
-    const [profile, setProfile] = useState<Actor>();
+    const [profile, setProfile] = useState();
     const [posts, setPosts] = useState<any>([]);
 
     useEffect(() => {
@@ -43,14 +42,10 @@ export const ProfilePage: React.FC = () => {
                 if (decodedUrl === 'me' || decodedUrl === currentActorId) {
                     response = await getActorProfile();
                     postsResponse = await getActorPosts();
-                    
-                    
                 } else {
-                    // console.log("TODO get other user")
+                    response = await getOtherActorProfile({ url: decodedUrl });
+                    postsResponse = await getOtherActorPosts({ url: decodedUrl });
                 };
-                
-                console.log(response)
-                console.log(postsResponse)
                 setPosts(postsResponse);
                 setProfile(response);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -69,7 +64,24 @@ export const ProfilePage: React.FC = () => {
         try {
             setFollowLoading(true);
             await followActor({ actorId: decodedUrl });
+            const response = await getOtherActorProfile({ url: decodedUrl });
+            setProfile(response);
             toast.success('Successfully followed actor!')
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+            notifyError();
+        } finally {
+            setFollowLoading(false);
+        };
+    };
+
+    const handleUnfollowActor = async () => {
+        try {
+            setFollowLoading(true);
+            await unfollowActor({ actorId: decodedUrl });
+            const response = await getOtherActorProfile({ url: decodedUrl });
+            setProfile(response);
+            toast.success('Successfully unfollowed actor!');
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             notifyError();
@@ -90,21 +102,24 @@ export const ProfilePage: React.FC = () => {
                     <div className='profile-top-info-container'>
                         <div className='profile-top-info-edit-container'>
                             <div className='profile-top-info-username'>{profile?.name}</div>
-                            {decodedUrl !== 'me' && decodedUrl !== currentActorId && (
+                            {decodedUrl !== 'me' && decodedUrl !== currentActorId && (profile?.isFollowing === false) && (
                                 <button className='button-secondary' onClick={handleFollowActor} disabled={followLoading}>Follow</button>
+                            )}
+                            {decodedUrl !== 'me' && decodedUrl !== currentActorId && (profile?.isFollowing === true) && (
+                                <button className='button-secondary' onClick={handleUnfollowActor} disabled={followLoading}>Unfollow</button>
                             )}
                         </div>
                         <div className='profile-top-info-numbers-container'>
                             <div>{profile?.posts || 0} Posts</div>
-                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${encodeURIComponent(decodedUrl)}` : '/followers/me'} className='profile-link'>{profile?.followers || 0} followers</Link>
-                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${encodeURIComponent(decodedUrl)}` : '/following/me'} className='profile-link'>{profile?.following || 0}  following</Link>
+                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${encodeURIComponent(decodedUrl)}` : '/followers/me'} className='profile-link'>{profile?.followersCount || 0} followers</Link>
+                            <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${encodeURIComponent(decodedUrl)}` : '/following/me'} className='profile-link'>{profile?.followingCount || 0}  following</Link>
                         </div>
                     </div>
                 </div>
                 <div className='profile-posts-grid'>
                     {posts && posts.map(post => {
                         return (
-                        <div className='post-tile' onClick={() => handlePostClick(post.id)}>
+                        <div className='post-tile' onClick={() => handlePostClick(post.object.id)}>
                             {post?.object?.type === 'Image' && (
                                 <img src={post.object?.url} width={'100%'} height={'100%'}/>
                             )}

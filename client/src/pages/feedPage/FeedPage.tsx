@@ -191,7 +191,7 @@ const FeedPage: React.FC = () => {
 
                                 {post.object.type === 'Image' && (
                                     <>
-                                    <div className='post-media' onClick={() => handlePostClick(post.id)}>
+                                    <div className='post-media' onClick={() => handlePostClick(post.object.id)}>
                                         <PostImage src={post.object.url} alt='post' />
                                     </div>
                                     <div className='post-caption'>{post?.object?.name}</div>
