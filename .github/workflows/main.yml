@@ -212,5 +212,6 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{vars.EC2_USER}}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: ./client/dist/**
+          source: client/dist/**
+          strip_components: 2
           target: ~/app/client
