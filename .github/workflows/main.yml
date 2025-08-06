@@ -153,7 +153,7 @@ jobs:
             sudo apt install -y nginx
             
             NGINX_CONF="/etc/nginx/sites-available/linkup"
-            DOMAIN="ec2-13-246-192-21.af-south-1.compute.amazonaws.com"
+            DOMAIN="ec2-13-244-78-172.af-south-1.compute.amazonaws.com"
 
             sudo bash -c "cat > $NGINX_CONF" <<EOF
             server {
@@ -162,19 +162,18 @@ jobs:
 
               # Serve frontend built with Vite
               location / {
-                root /home/ubuntu/app/client/dist;
+                root /home/ubuntu/app/client/client/dist;
                 index index.html;
-                try_files \$uri /index.html;
+                try_files $uri /index.html;
               }
 
-              # Reverse proxy for backend API
               location /api/ {
                 proxy_pass http://localhost:3000/;
                 proxy_http_version 1.1;
-                proxy_set_header Upgrade \$http_upgrade;
+                proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection 'upgrade';
-                proxy_set_header Host \$host;
-                proxy_cache_bypass \$http_upgrade;
+                proxy_set_header Host $host;
+                proxy_cache_bypass $http_upgrade;
               }
             }
             EOF
