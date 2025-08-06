@@ -104,6 +104,7 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
 
       - name: Debug Build Output
         run: |
@@ -214,7 +215,7 @@ jobs:
       - name: Copy .env to dist
         working-directory: ./client
         run: cp .env dist/
-        
+
       - name: Upload Build to EC2
         uses: appleboy/scp-action@master
         with:
