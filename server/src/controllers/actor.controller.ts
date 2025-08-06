@@ -152,25 +152,95 @@ export const ActorController = {
     }
   },
 
-  getUserProfile: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    try {
-      const user = req.user
-      const summary = await ActorService.getActorProfile(user.googleId);
-
-      res.status(200).json(summary);
-    } catch (error) {
-      next(error);
-    }  
+  getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
+    const user = req.user
+    if(user){
+       const summary = await ActorService.getActorByGoogleId(user.googleId);
+        return res.status(200).json(summary);
+    }
+    else{
+      res.status(401).json({ message: 'User not authenticated' });
+    }
   },
-
-  getUserPosts: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  getUserPosts: async (
+    req: AuthenticatedRequest,
+    res: Response,
+    _next: NextFunction
+  ) => {
     try {
-      const user = req.user
-      const summary = await ActorService.getActorCreateActivities(`${apiUrl}/actors/${user.googleId}`);
+      const actorId = req.query.actorId as string;
+      if (!actorId) {
+        throw new BadRequestError("Actor id is required");
+      }
+      if (actorId.includes(process.env.BASE_URL!)) {
+        const posts = await ActorService.getActorCreateActivities(actorId);
+        res.status(200).json(posts);
+      } else {
+        const response = await fetch(`${actorId}/outbox`, {
+          headers: {
+            Accept: "application/activity+json",
+          },
+        });
 
-      res.status(200).json(summary);
+        //Extract xyz from response
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch remote outbox: ${response.statusText}`
+          );
+        }
+
+        const remoteOutbox = await response.json();
+        res.status(200).json(remoteOutbox);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to retrieve posts" });
+    }
+  },
+  getMyPosts: async (
+    req: AuthenticatedRequest,
+    res: Response,
+    _next: NextFunction
+  ) => {
+    const user = req.user;
+    const summary = await ActorService.getActorCreateActivities(
+      `${apiUrl}/actors/${user.googleId}`
+    );
+    return res.status(200).json(summary);
+  },
+  getActorProfileById: async (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const actorId = req.query.actorId as string;
+      const user = req.user;
+      if (!user) {
+        throw new NotAuthenticatedError("Üser not authenticared");
+      } else if (!actorId) {
+        throw new BadRequestError("actor id is required");
+      } else {
+        let actor;
+        const loggedInActorId = `${process.env.BASE_URL}/actors/${user.googleId}`;
+        if (actorId.includes(process.env.BASE_URL!)) {
+          actor = await ActorService.getActorProfileById(
+            actorId,
+            loggedInActorId
+          );
+        } else {
+          const response = await fetch(`${actorId}/outbox`, {
+            headers: {
+              Accept: "application/activity+json",
+            },
+          });
+          actor = await response.json();
+        }
+        res.status(200).json(actor);
+      }
     } catch (error) {
       next(error);
-    }  
-  }
-}; 
+    }
+  },
+};

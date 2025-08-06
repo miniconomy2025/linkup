@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { BadRequestError, ObjectNotFoundError } from '../middleware/errorHandler';
+import { BadRequestError, ObjectNotFoundError, NotAuthenticatedError } from '../middleware/errorHandler';
 import { ActivityObjectService } from '../services/activityObject.service';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 const apiUrl = process.env.BASE_URL;
+import { ActorGraphRepository } from '../graph/repositories/actor';
 
 export const ObjectController = {
   getNoteById: async (req: Request, res: Response, next: NextFunction) => {
@@ -103,6 +104,28 @@ export const ObjectController = {
       const video = await ActivityObjectService.postVideo(req.file, req.user.googleId, req.body.caption);
 
       res.status(201).json(video);
+    } catch (error) {
+      next(error);
+    }
+  },
+    getPostById: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {      
+      const postId = req.query.postId as string
+      const user = req.user;
+      if(!user){
+         throw new NotAuthenticatedError("Not authenticated")
+      }
+      else if(!postId){
+        throw new BadRequestError("Post id required")
+      }
+      else{
+        const post = await ActivityObjectService.getPostById(postId)
+        const liked = await ActorGraphRepository.hasUserLikedPost(postId,`${process.env.BASE_URL}/actors/${user.googleId}`)
+
+      res.status(201).json({...post,liked});
+
+      }
+      
     } catch (error) {
       next(error);
     }

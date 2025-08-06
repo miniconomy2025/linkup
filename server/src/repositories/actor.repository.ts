@@ -25,10 +25,10 @@ export const ActorRepository = {
   getActorInboxCreateItems: async (actorId: string, page = 1,limit = 10 ): Promise<any> => {
     const skip = (page - 1) * limit;
     
-    const inboxItems = await InboxItemModel.find({ actor: actorId }).sort({ createdAt: -1 }).skip(skip).limit(limit).exec();
+    const inboxItems = await InboxItemModel.find({ actor: actorId })
     const activityIds = inboxItems.map((item) => item.activity);
 
-    const activities = await CreateModel.find({id: { $in: activityIds },}).exec();
+    const activities = await CreateModel.find({id: { $in: activityIds },}).sort({ createdAt: -1 }).skip(skip).limit(limit).exec();
     // Get external activities too
 
     const activityMap = new Map(activities.map((a) => [a.id, a]));
@@ -41,7 +41,6 @@ export const ActorRepository = {
     ...activityIds,
     // ...ownActivities.map(a => a.id)
     ];
-    console.log(allActivityIds.length);
 
     const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
 
