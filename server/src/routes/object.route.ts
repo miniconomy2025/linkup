@@ -7,11 +7,13 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const router = Router();
 
-router.get('/images/:id', ObjectController.getImageById);
-router.get('/videos/:id', ObjectController.getVideoById);
-
 router.post('/notes', authenticateJWT, ObjectController.postNote);
 router.post('/images', authenticateJWT, upload.single('file'), ObjectController.postImage);
 router.post('/videos', authenticateJWT, upload.single('file'), ObjectController.postVideo);
+
+// Activitypub
+router.get('/notes/:id', ObjectController.getNoteById);
+router.get('/images/:id', ObjectController.getImageById);
+router.get('/videos/:id', ObjectController.getVideoById);
 
 export default router; 

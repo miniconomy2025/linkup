@@ -1,12 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
-import { BadRequestError } from '../middleware/errorHandler';
+import { BadRequestError, ObjectNotFoundError } from '../middleware/errorHandler';
 import { ActivityObjectService } from '../services/activityObject.service';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+
+const apiUrl = process.env.BASE_URL;
 
 export const ObjectController = {
   getNoteById: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const id = req.params.id;
+      
+      if (!id) {
+        throw new BadRequestError('Object ID is required')
+      }
+      
+      const postId = `${apiUrl}/objects/notes/${id}`;
+      const note = await ActivityObjectService.getPostById(postId);
+      if (!note) {
+        throw new ObjectNotFoundError();
+      }
 
+      res.status(200).json(note);
     } catch (error) {
       next(error);
     }
@@ -28,7 +42,19 @@ export const ObjectController = {
 
   getImageById: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const id = req.params.id;
+      
+      if (!id) {
+        throw new BadRequestError('Object ID is required')
+      }
+      
+      const postId = `${apiUrl}/objects/images/${id}`;
+      const image = await ActivityObjectService.getPostById(postId);
+      if (!image) {
+        throw new ObjectNotFoundError();
+      }
 
+      res.status(200).json(image);
     } catch (error) {
       next(error);
     }
@@ -50,7 +76,19 @@ export const ObjectController = {
   
   getVideoById: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const id = req.params.id;
+      
+      if (!id) {
+        throw new BadRequestError('Object ID is required')
+      }
+      
+      const postId = `${apiUrl}/objects/videos/${id}`;
+      const vidoes = await ActivityObjectService.getPostById(postId);
+      if (!vidoes) {
+        throw new ObjectNotFoundError();
+      }
 
+      res.status(200).json(vidoes);
     } catch (error) {
       next(error);
     }

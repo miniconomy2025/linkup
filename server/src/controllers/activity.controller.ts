@@ -1,10 +1,50 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
-import { BadRequestError, NotAuthenticatedError } from '../middleware/errorHandler';
+import { ActivityNotFoundError, BadRequestError, NotAuthenticatedError } from '../middleware/errorHandler';
 import { ActivityService } from '../services/activity.service';
 const apiUrl = process.env.BASE_URL
 
 export const ActivityController = {
+    getCreateById: async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.params.id;
+        
+        if (!id) {
+          throw new BadRequestError('Activity ID is required')
+        }
+        
+        const activityId = `${apiUrl}/activities/creates/${id}`;
+        const activity = await ActivityService.getActivitytById(activityId);
+        if (!activity) {
+          throw new ActivityNotFoundError();
+        }
+  
+        res.status(200).json(activity);
+      } catch (error) {
+        next(error);
+      }
+    },
+
+    getLikeById: async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.params.id;
+        
+        if (!id) {
+          throw new BadRequestError('Activity ID is required')
+        }
+        
+        const activityId = `${apiUrl}/activities/likes/${id}`;
+        const activity = await ActivityService.getActivitytById(activityId);
+        if (!activity) {
+          throw new ActivityNotFoundError();
+        }
+  
+        res.status(200).json(activity);
+      } catch (error) {
+        next(error);
+      }
+    },
+
     createLikeActivity: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
         try {
             const postId = req.body.postId;
@@ -20,6 +60,26 @@ export const ActivityController = {
         }
     },
 
+    getFollowById: async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.params.id;
+        
+        if (!id) {
+          throw new BadRequestError('Activity ID is required')
+        }
+        
+        const activityId = `${apiUrl}/activities/follows/${id}`;
+        const activity = await ActivityService.getActivitytById(activityId);
+        if (!activity) {
+          throw new ActivityNotFoundError();
+        }
+  
+        res.status(200).json(activity);
+      } catch (error) {
+        next(error);
+      }
+    },
+
     createFollowActorActivity: async (req: AuthenticatedRequest,res: Response,next: NextFunction) => {
       try {
         const followedActorId = req.body.actorId as string;
@@ -32,6 +92,26 @@ export const ActivityController = {
           const activity = await ActivityService.followActor(followerId,followedActorId);
           res.status(201).json(activity);
         }
+      } catch (error) {
+        next(error);
+      }
+    },
+
+    getUndoById: async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.params.id;
+        
+        if (!id) {
+          throw new BadRequestError('Activity ID is required')
+        }
+        
+        const activityId = `${apiUrl}/activities/undos/${id}`;
+        const activity = await ActivityService.getActivitytById(activityId);
+        if (!activity) {
+          throw new ActivityNotFoundError();
+        }
+  
+        res.status(200).json(activity);
       } catch (error) {
         next(error);
       }

@@ -9,6 +9,24 @@ export class UserNotFoundError extends Error {
   }
 }
 
+export class ObjectNotFoundError extends Error {
+  status: number;
+  constructor(message = 'Object not found') {
+    super(message);
+    this.status = 404;
+    this.name = 'ObjectNotFoundError';
+  }
+}
+
+export class ActivityNotFoundError extends Error {
+  status: number;
+  constructor(message = 'Activity not found') {
+    super(message);
+    this.status = 404;
+    this.name = 'ActivityNotFoundError';
+  }
+}
+
 export class BadRequestError extends Error {
   status: number;
   constructor(message = 'Bad request') {

@@ -11,7 +11,7 @@ const apiUrl = process.env.BASE_URL;
 export const ActivityObjectService = {
   getPostById: async (postId: string): Promise<ActivityObject> => {
     if (postId.startsWith(apiUrl!)) {
-      const post = ActivityObjectRepository.getObjectById(postId);
+      const post = await ActivityObjectRepository.getObjectById(postId);
 
       return post;
     }
@@ -26,7 +26,6 @@ export const ActivityObjectService = {
 
       return activityObject;
     }
-
   }, 
 
   postNote: async (content: string, googleId: string): Promise<NoteObject> => {

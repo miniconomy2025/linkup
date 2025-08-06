@@ -4,8 +4,21 @@ import { FollowModel } from '../models/follow.model';
 import { LikeModel } from '../models/like.model';
 import { UndoModel } from '../models/undo.model';
 import { Activity, CreateActivity, FollowActivity, LikeActivity, UndoActivity} from '../types/activitypub';
+import { ActivityNotFoundError } from '../middleware/errorHandler';
 
 export const ActivityRepository = {
+  getActivityById: async (id: string): Promise<Activity> => {
+    const models: Model<any>[] = [CreateModel, FollowModel, LikeModel, UndoModel];
+
+    for (const model of models) {
+      const activity = await model.findOne({ id }).exec();
+      if (activity) {
+        return activity.toObject() as Activity;
+      }
+    }
+    throw new ActivityNotFoundError(`Activity with ID ${id} not found.`);
+  },
+
   saveCreateActivity: async (createActivity: CreateActivity): Promise<CreateActivity> => {
     const created = await CreateModel.create(createActivity);
     return created.toObject() as CreateActivity;
@@ -33,20 +46,4 @@ export const ActivityRepository = {
     const created = await UndoModel.create(undoActivity);
     return created.toObject() as UndoActivity;
   },    
-
-  getActivityById: async (id: string): Promise<Activity | null> => {
-    const createActivity = await CreateModel.findById(id).lean();
-    if (createActivity) return createActivity as Activity;
-
-    const followActivity = await FollowModel.findById(id).lean();
-    if (followActivity) return followActivity as Activity;
-
-    const likeActivity = await LikeModel.findById(id).lean();
-    if (likeActivity) return likeActivity as Activity;
-
-    const undoActivity = await UndoModel.findById(id).lean();
-    if (undoActivity) return undoActivity as Activity;
-
-    return null;
-  },
 }; 
