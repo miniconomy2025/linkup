@@ -27,10 +27,18 @@ export const SearchController = {
                     };
                     const data = await response.json();
 
+                    const actorId = data.links?.find((link: any) =>
+                        link.rel === 'self'
+                    );
+
+                    const avatarLink = data.links?.find((link: any) =>
+                        link.rel === 'http://webfinger.net/rel/avatar'
+                    );
+
                     const returnFederatedObject = {
-                        id: data.subject,
+                        id: actorId?.href || null,
                         name: data.subject,
-                        icon: data?.links[1]?.href
+                        icon: avatarLink?.href || null
                     };
 
                     return res.json(returnFederatedObject);
