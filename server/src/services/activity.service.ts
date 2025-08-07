@@ -56,7 +56,7 @@ export const ActivityService = {
     const post = await ActivityObjectService.getPostById(postId);
     const postActorId = post.attributedTo;
 
-    const _inboxItem = await InboxService.addActivityToInbox(activity, postActorId);
+    await InboxService.addActivityToInbox(activity, postActorId);
 
     return activity;
   },
@@ -87,7 +87,7 @@ export const ActivityService = {
 
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    const _inboxItem = await InboxService.addActivityToInbox(activity, followedActorId);
+    await InboxService.addActivityToInbox(activity, followedActorId);
 
     return activity;
   },
@@ -119,7 +119,7 @@ export const ActivityService = {
 
     const _outboxItem = await OutboxService.addActivityToOutbox(activity);
 
-    const _inboxItem = await InboxService.addActivityToInbox(activity, followedActorId);
+    await InboxService.addActivityToInbox(activity, followedActorId);
     
     return activity
   }

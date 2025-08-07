@@ -1,20 +1,21 @@
 import { off } from "process";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { InboxRepository } from "../repositories/inbox.repository";
-import { Activity, InboxItem } from "../types/activitypub";
+import { Activity } from "../types/activitypub";
+import { ExternalApis } from "../config/externalApis";
 
 const apiUrl = process.env.BASE_URL;
 
 export const InboxService = {
     addActivityToInbox: async (activity: Activity, inboxActorId: string): Promise<void> => {
         if (inboxActorId.startsWith(apiUrl!)) {
-            const inboxItem = await InboxRepository.addItem({
+            const _inboxItem = await InboxRepository.addItem({
                 actor: inboxActorId,
                 activity: activity.id!
             });
         }
         else {
-            // External inbox
+            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
         }
     },
 

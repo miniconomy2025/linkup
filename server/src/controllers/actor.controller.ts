@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ActorService } from '../services/actor.service';
 import { BadRequestError, NotAuthenticatedError, UserNotFoundError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import { InboxService } from '../services/inbox.service';
 
 const apiUrl   = process.env.BASE_URL
 
@@ -24,7 +25,25 @@ export const ActorController = {
 
   postActivityToInbox: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { id } = req.params;
+      if (!id) {
+        throw new BadRequestError('Actor ID is required');
+      }
+      const actor = await ActorService.getActorByGoogleId(id);
+      if (!actor) {
+        throw new UserNotFoundError('Actor not found')
+      }
 
+      const activity = req.body.activity;
+
+      if (!activity) {
+        throw new BadRequestError('Activity is required');
+      }
+
+      await InboxService.addActivityToInbox(activity, actor.id!);
+
+
+      res.status(200).json({message: 'Activity received in inbox successfully'})
     } catch (error) {
       next(error);
     }
