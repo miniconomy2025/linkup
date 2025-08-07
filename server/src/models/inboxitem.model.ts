@@ -5,7 +5,7 @@ type InboxItemDoc = InboxItem & Document;
 
 const InboxItemSchema = new Schema<InboxItemDoc>({
   actor:      { type: String, required: true, index: true },
-  activity:   { type: String, required: true, unique: true },
+  activity:   { type: String, required: true },
   receivedAt: { type: Date,   default: () => new Date() },
 }, { timestamps: true, versionKey: false });
 

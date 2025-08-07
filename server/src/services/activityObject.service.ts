@@ -28,14 +28,14 @@ export const ActivityObjectService = {
     }
   }, 
 
-  postNote: async (content: string, googleId: string): Promise<NoteObject> => {
+  postNote: async (content: string, userName: string): Promise<NoteObject> => {
     const noteObject = await ActivityObjectRepository.createNote({
       type: 'Note',
-      attributedTo: `${apiUrl}/actors/${googleId}`,
+      attributedTo: `${apiUrl}/actors/${userName}`,
       content: content
     });
 
-    await ActorGraphRepository.createPostForUser(noteObject.id!, `${apiUrl}/actors/${googleId}`);
+    await ActorGraphRepository.createPostForUser(noteObject.id!, `${apiUrl}/actors/${userName}`);
 
     const activity = await ActivityService.makeCreateActivity(noteObject);
 
@@ -46,7 +46,7 @@ export const ActivityObjectService = {
     return noteObject;
   },
 
-  postImage: async (file: any, googleId: string, caption = ''): Promise<ImageObject> => {
+  postImage: async (file: any, userName: string, caption = ''): Promise<ImageObject> => {
     const fileUrl = await s3Service.uploadFileBufferToS3(
       file.buffer,
       file.originalname,
@@ -54,13 +54,13 @@ export const ActivityObjectService = {
     );
 
     const imageObject = await ActivityObjectRepository.createImage({
-      attributedTo: `${apiUrl}/actors/${googleId}`,
+      attributedTo: `${apiUrl}/actors/${userName}`,
       type: 'Image',
       url: fileUrl,
       name: caption
     })
 
-    await ActorGraphRepository.createPostForUser(imageObject.id!, `${apiUrl}/actors/${googleId}`)
+    await ActorGraphRepository.createPostForUser(imageObject.id!, `${apiUrl}/actors/${userName}`)
 
     const activity = await ActivityService.makeCreateActivity(imageObject);
 
@@ -71,7 +71,7 @@ export const ActivityObjectService = {
     return imageObject;
   },
 
-  postVideo: async (file: any, googleId: string, caption = ''): Promise<VideoObject> => { 
+  postVideo: async (file: any, userName: string, caption = ''): Promise<VideoObject> => { 
     const fileUrl = await s3Service.uploadFileBufferToS3(
       file.buffer,
       file.originalname,
@@ -79,13 +79,13 @@ export const ActivityObjectService = {
     );
 
     const videoObject = await ActivityObjectRepository.createVideo({
-      attributedTo: `${apiUrl}/actors/${googleId}`,
+      attributedTo: `${apiUrl}/actors/${userName}`,
       type: 'Video',
       url: fileUrl,
       name: caption
     });
 
-    await ActorGraphRepository.createPostForUser(videoObject.id!, `${apiUrl}/actors/${googleId}`);
+    await ActorGraphRepository.createPostForUser(videoObject.id!, `${apiUrl}/actors/${userName}`);
 
     const activity = await ActivityService.makeCreateActivity(videoObject);
   

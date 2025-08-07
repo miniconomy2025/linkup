@@ -15,9 +15,9 @@ export const FeedsController = {
       if (!req.user) {
         throw new NotAuthenticatedError("User not authenticated");
       } else {
-         const page = parseInt(req.query.page as string)
-         const pageSize = parseInt(req.query.limit as string)
-        const actorId = `${apiUrl}/actors/${req.user.googleId}`
+        const page = parseInt(req.query.page as string)
+        const pageSize = parseInt(req.query.limit as string)
+        const actorId = `${apiUrl}/actors/${req.user.userName}`
         const summary = await ActorService.getFeeds(actorId,page,pageSize);
         res.status(200).json(summary);
       }

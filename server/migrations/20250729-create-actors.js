@@ -19,7 +19,7 @@ module.exports = {
           },
           preferredUsername: {
             bsonType: 'string',
-            description: 'Google sub'
+            description: 'Unique username'
           },
           name: {
             bsonType: 'string',
@@ -94,6 +94,10 @@ module.exports = {
           updatedAt: {
             bsonType: 'date',
             description: 'Document update timestamp'
+          },
+          googleId: {
+            bsonType: 'string',
+            description: 'Google sub'
           }
         },
         additionalProperties: false
