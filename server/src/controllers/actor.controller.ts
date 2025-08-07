@@ -7,13 +7,13 @@ import { InboxService } from '../services/inbox.service';
 const apiUrl   = process.env.BASE_URL
 
 export const ActorController = {
-  getActorByGoogleId: async (req: Request, res: Response, next: NextFunction) => {
+  getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
       if (!id) {
         throw new BadRequestError('Actor ID is required');
       }
-      const actor = await ActorService.getActorByGoogleId(id);
+      const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
         throw new UserNotFoundError('Actor not found')
       }
@@ -29,7 +29,7 @@ export const ActorController = {
       if (!id) {
         throw new BadRequestError('Actor ID is required');
       }
-      const actor = await ActorService.getActorByGoogleId(id);
+      const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
         throw new UserNotFoundError('Actor not found')
       }
@@ -57,7 +57,7 @@ export const ActorController = {
         throw new BadRequestError('Actor ID is required')
       }
 
-      const actor = await ActorService.getActorByGoogleId(id);
+      const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
         throw new UserNotFoundError('Actor not found');
       }
@@ -86,7 +86,7 @@ export const ActorController = {
   
   getUserFollowers: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const actorId = `${apiUrl}/actors/${req.user.googleId}`;
+      const actorId = `${apiUrl}/actors/${req.user.userName}`;
 
       const followers = await ActorService.getActorsFollowers(actorId);
 
@@ -120,7 +120,7 @@ export const ActorController = {
         throw new BadRequestError('Actor ID is required')
       }
       
-      const actor = await ActorService.getActorByGoogleId(id);
+      const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
         throw new UserNotFoundError('Actor not found');
       }
@@ -142,7 +142,7 @@ export const ActorController = {
 
   getUserFollowing: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const actorId = `${apiUrl}/actors/${req.user.googleId}`;
+      const actorId = `${apiUrl}/actors/${req.user.userName}`;
 
       const following = await ActorService.getActorsFollowing(actorId);
 
@@ -176,7 +176,7 @@ export const ActorController = {
         throw new BadRequestError('Actor ID is required')
       }
 
-      const actor = await ActorService.getActorByGoogleId(id);
+      const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
         throw new UserNotFoundError('Actor not found');
       }
@@ -199,7 +199,7 @@ export const ActorController = {
   getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
     const user = req.user
     if(user){
-       const summary = await ActorService.getActorProfileByGoogleId(user.googleId);
+       const summary = await ActorService.getActorProfileByUserName(user.userName);
         return res.status(200).json(summary);
     }
     else{
@@ -249,7 +249,7 @@ export const ActorController = {
   ) => {
     const user = req.user;
     const summary = await ActorService.getActorCreateActivities(
-      `${apiUrl}/actors/${user.googleId}`
+      `${apiUrl}/actors/${user.userName}`
     );
     return res.status(200).json(summary);
   },
@@ -267,7 +267,7 @@ export const ActorController = {
         throw new BadRequestError("actor id is required");
       } else {
         let actor;
-        const loggedInActorId = `${process.env.BASE_URL}/actors/${user.googleId}`;
+        const loggedInActorId = `${process.env.BASE_URL}/actors/${user.userName}`;
         if (actorId.includes(process.env.BASE_URL!)) {
           actor = await ActorService.getActorProfileById(
             actorId,

@@ -8,17 +8,20 @@ const apiUrl = process.env.BASE_URL;
 
 export const ActorRepository = {
   getActorByGoogleId: async (googleId: string): Promise<Actor | null> => {
-    return await ActorModel.findOne({ preferredUsername: googleId }).lean<Actor>().exec();
+    return await ActorModel.findOne({ googleId: googleId }).lean<Actor>().exec();
   },
-   getActorById: async (id: string): Promise<Actor | null> => {
+  getActorByUserName: async (userName: string): Promise<Actor | null> => {
+    return await ActorModel.findOne({ preferredUsername: userName }).lean<Actor>().exec();
+  },
+  getActorById: async (id: string): Promise<Actor | null> => {
     return await ActorModel.findOne({ id }).lean<Actor>().exec();
   },
-   createActor: async (actor: Actor): Promise<Actor> => {
+  createActor: async (actor: Actor): Promise<Actor> => {
     const created = new ActorModel(actor);
     await created.save();
     return created.toObject();
   },
-   getCreateActivitiesByActor: async (actorId: string): Promise<CreateActivity[]> => {
+  getCreateActivitiesByActor: async (actorId: string): Promise<CreateActivity[]> => {
     return await CreateModel.find({ actor: actorId, type: 'Create' }).lean();
   }, 
 

@@ -33,7 +33,7 @@ export const ObjectController = {
         throw new BadRequestError('Content required to post a note');
       }
 
-      const note = await ActivityObjectService.postNote(req.body.content, req.user.googleId);
+      const note = await ActivityObjectService.postNote(req.body.content, req.user.userName);
 
       res.status(201).json(note);
     } catch (error) {
@@ -67,7 +67,7 @@ export const ObjectController = {
         throw new BadRequestError('No file uploaded');
       }
 
-      const image = await ActivityObjectService.postImage(req.file, req.user.googleId, req.body.caption);
+      const image = await ActivityObjectService.postImage(req.file, req.user.userName, req.body.caption);
 
       res.status(201).json(image);
     } catch (error) {
@@ -101,7 +101,7 @@ export const ObjectController = {
         throw new BadRequestError('No file uploaded');
       }
 
-      const video = await ActivityObjectService.postVideo(req.file, req.user.googleId, req.body.caption);
+      const video = await ActivityObjectService.postVideo(req.file, req.user.userName, req.body.caption);
 
       res.status(201).json(video);
     } catch (error) {
@@ -120,7 +120,7 @@ export const ObjectController = {
       }
       else{
         const post = await ActivityObjectService.getPostById(postId)
-        const liked = await ActorGraphRepository.hasUserLikedPost(postId,`${process.env.BASE_URL}/actors/${user.googleId}`)
+        const liked = await ActorGraphRepository.hasUserLikedPost(postId,`${process.env.BASE_URL}/actors/${user.userName}`)
 
       res.status(201).json({...post,liked});
 

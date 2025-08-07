@@ -5,7 +5,7 @@ type OutboxItemDoc = OutboxItem & Document;
 
 const OutboxItemSchema = new Schema<OutboxItemDoc>({
   actor:    { type: String, required: true, index: true },
-  activity: { type: String, required: true, unique: true },
+  activity: { type: String, required: true },
   createdAt:{ type: Date,   default: () => new Date() },
 }, { timestamps: true, versionKey: false });
 

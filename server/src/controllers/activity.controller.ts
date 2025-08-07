@@ -52,7 +52,7 @@ export const ActivityController = {
                 throw new BadRequestError('PostId is required to like');
             }
 
-            const activity = await ActivityService.likePost(postId, req.user.googleId);
+            const activity = await ActivityService.likePost(postId, req.user.userName);
 
             res.status(201).json(activity);
         } catch (error) {
@@ -85,10 +85,10 @@ export const ActivityController = {
         const followedActorId = req.body.actorId as string;
         if (!followedActorId) {
           throw new BadRequestError("Followed actor id is required");
-        } else if (!req.user || !req.user.googleId) {
+        } else if (!req.user) {
           throw new NotAuthenticatedError("User not authenticated");
         } else {
-          const followerId = `${apiUrl}/actors/${req.user.googleId}`;
+          const followerId = `${apiUrl}/actors/${req.user.userName}`;
           const activity = await ActivityService.followActor(followerId,followedActorId);
           res.status(201).json(activity);
         }
@@ -124,7 +124,7 @@ export const ActivityController = {
           throw new BadRequestError("Followed actor id is required");
         }
 
-        const followerId = `${apiUrl}/actors/${req.user.googleId}`;
+        const followerId = `${apiUrl}/actors/${req.user.userName}`;
 
         const activity = await ActivityService.unfollowActor(followerId,followedActorId);
 
