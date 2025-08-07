@@ -12,6 +12,7 @@ import profileRoutes from './routes/profile.route';
 import activityRoutes from './routes/activity.route';
 import healthRoute from './routes/health.route';
 import feedsRouter from './routes/feeds.route'
+import webfingerRoute from './routes/webfinger.route';
 
 import { errorHandler } from './middleware/errorHandler';
 
@@ -22,6 +23,7 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 
 connectMongoDB();
 
+app.use('/', webfingerRoute);
 app.use('/auth', authRoutes);
 app.use('/', healthRoute);
 app.use('/search', searchRoutes);

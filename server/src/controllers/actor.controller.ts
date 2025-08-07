@@ -3,6 +3,7 @@ import { ActorService } from '../services/actor.service';
 import { BadRequestError, NotAuthenticatedError, UserNotFoundError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { InboxService } from '../services/inbox.service';
+import { ActorGraphRepository } from '../graph/repositories/actor';
 
 const apiUrl   = process.env.BASE_URL
 
@@ -304,6 +305,8 @@ export const ActorController = {
             },
           });
           
+          const isFollowing = await ActorGraphRepository.hasUserFollowedActor(loggedInActorId,actorId);
+
           const actorJson = await response.json();
 
           actor = {
@@ -311,7 +314,8 @@ export const ActorController = {
             preferredUsername: actorJson.preferredUsername,
             icon: {
               url: actorJson?.icon?.url
-            }
+            },
+            isFollowing
           };
         }
         res.status(200).json(actor);
