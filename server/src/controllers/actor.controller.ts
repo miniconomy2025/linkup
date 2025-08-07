@@ -197,7 +197,7 @@ export const ActorController = {
   },
 
   getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
-    const user = req.user
+    const user = req.user;
     if(user){
        const summary = await ActorService.getActorProfileByUserName(user.userName);
         return res.status(200).json(summary);
@@ -281,7 +281,7 @@ export const ActorController = {
           });
           
           const actorJson = await response.json();
-          
+
           actor = {
             name: actorJson.name,
             preferredUsername: actorJson.preferredUsername,
