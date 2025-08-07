@@ -17,7 +17,7 @@ export const InboxService = {
         else {
             console.log(activity);
             try {
-            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity, activity.actor);
+            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
             } catch(error){
                 console.log(error);
                 throw (error);
