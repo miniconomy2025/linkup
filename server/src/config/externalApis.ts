@@ -13,7 +13,8 @@ export const ExternalApis = {
   },
 
   postToExternalApi: async (url: string, payload: any, actorId: string): Promise<any> => {
-    const privateKeyPem = process.env.USER_PRIVATE_KEY;
+    const privateKeyPem = process.env.USER_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    console.log(privateKeyPem? 'Yes' : 'No');
     const keyId = `${actorId}#main-key`;
 
     if (!privateKeyPem) {
