@@ -1,8 +1,8 @@
-import { off } from "process";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { InboxRepository } from "../repositories/inbox.repository";
-import { Activity } from "../types/activitypub";
+import { Activity, ActivityObject } from "../types/activitypub";
 import { ExternalApis } from "../config/externalApis";
+import { ObjectController } from "../controllers/object.controller";
 
 const apiUrl = process.env.BASE_URL;
 
@@ -17,8 +17,62 @@ export const InboxService = {
         else {
             console.log(activity);
             try {
-            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
-            } catch(error){
+                if (activity.type == 'Create') {
+                    const object = activity.object as ActivityObject;
+        
+                    if (object.type != 'Note') {
+                        let noteActivity = activity as any;
+            
+                        if (object.type == 'Image') {
+                            const imageType = ObjectController.getMediaType(object.url);
+            
+                            const noteType = {
+                                attributedTo: object.attributedTo,
+                                content: object.name!,
+                                type: "Note",
+                                id: object.id,
+                                published: object.published,
+                                to: object.to,
+                                attachment: {
+                                    type: "Image",
+                                    mediaType: `image/${imageType}`,
+                                    url: object.url
+                                }
+                            } 
+            
+                            noteActivity.object = noteType;
+                            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
+                        }
+                        else {
+                            const videoType = ObjectController.getMediaType(object.url);
+            
+                            const noteType = {
+                                attributedTo: object.attributedTo,
+                                content: object.name!,
+                                type: "Note",
+                                id: object.id,
+                                published: object.published,
+                                to: object.to,
+                                attachment: {
+                                    type: "Video",
+                                    mediaType: `video/${videoType}`,
+                                    url: object.url
+                                }
+                            }
+                            
+                            noteActivity.object = noteType;
+                            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
+                        }
+                    }
+                    else {
+                        const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
+                    }
+                }
+                else {
+                    const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
+                }
+            }
+            catch(error){
                 console.log(error);
                 throw (error);
             }
