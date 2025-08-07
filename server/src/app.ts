@@ -24,11 +24,11 @@ connectMongoDB();
 
 app.use('/auth', authRoutes);
 app.use('/', healthRoute);
-app.use('/search', searchRoutes);
-app.use('/objects', objectRoutes);
-app.use('/profiles', profileRoutes);
-app.use('/activities', activityRoutes);
-app.use('/feeds', feedsRouter);
+app.use('/api/search', searchRoutes);
+app.use('/api/objects', objectRoutes);
+app.use('/api/profiles', profileRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/feeds', feedsRouter);
 
 app.use(errorHandler);
 

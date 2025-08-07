@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { ActorController } from '../controllers/actor.controller';
 const router = Router();
 
-router.get('/:id', ActorController.getActorByGoogleId);
+router.get('/:id', ActorController.getActorByUsername);
 router.get('/:id/outbox', ActorController.getUserOutbox);
 router.get('/:id/followers', ActorController.getFollowersActivityPub);
 router.get('/:id/following', ActorController.getFollowingActivityPub);

@@ -11,6 +11,12 @@ const client = new OAuth2Client(
 );
 
 export const AuthController = {
+    generateUsername: (name: string): string => {
+        const base = name.trim().toLowerCase().replace(/\s+/g, '');
+        const timestamp = Math.floor(Date.now() / 100000);
+        return `${base}${timestamp}`;
+    },
+
     login: async (req: Request, res: Response, next: NextFunction) => {
         
         if (!req.query.code || typeof req.query.code !== 'string') {
@@ -37,26 +43,29 @@ export const AuthController = {
             const url = process.env.BASE_URL;
 
             if (!actor) {
-                     await  ActorGraphRepository.createActor(`${url}/actors/${googleId}`)
+                    const userName = AuthController.generateUsername(name!);
+
+                    await  ActorGraphRepository.createActor(`${url}/actors/${userName}`)
                     actor = await ActorService.createActor({
-                    id: `${url}/actors/${googleId}`,
+                    id: `${url}/actors/${userName}`,
                     type: "Person",
-                    preferredUsername: googleId,
+                    preferredUsername: userName,
                     name: name!,
-                    inbox: `${url}/actors/${googleId}/inbox`,
-                    outbox: `${url}/actors/${googleId}/outbox`,
-                    followers: `${url}/actors/${googleId}/followers`,
-                    following: `${url}/actors/${googleId}/following`,
+                    inbox: `${url}/actors/${userName}/inbox`,
+                    outbox: `${url}/actors/${userName}/outbox`,
+                    followers: `${url}/actors/${userName}/followers`,
+                    following: `${url}/actors/${userName}/following`,
+                    googleId: googleId,
                     icon: {
                         id: 'test',
                         type: 'Image',  
                         url: picture,
-                        attributedTo: `${url}/actors/${googleId}`,
-                        to: ['https://www.w3.org/ns/activitystreams#Public'],
+                        attributedTo: `${url}/actors/${userName}`,
+                        to: ['https://www.w3.org/ns/activitystreams#Public']
                     }});
         }
     
-            const user = { ...actor, email, googleId, picture };
+            const user = { ...actor, email, googleId, picture, userName: actor.preferredUsername };
             
             if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET is not defined');
             const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });

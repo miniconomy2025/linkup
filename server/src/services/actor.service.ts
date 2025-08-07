@@ -12,11 +12,15 @@ export const ActorService = {
     const actor = await ActorRepository.getActorByGoogleId(googleId);
     return actor;
   },
+  getActorByUserName: async (userName: string): Promise<Actor | null> => {
+    const actor = await ActorRepository.getActorByUserName(userName);
+    return actor;
+  },
    createActor: async (actor: Actor): Promise<Actor> => {
     return await ActorRepository.createActor(actor);
   },
-  getActorProfileByGoogleId: async (preferredUsername: string) => {
-    const actor = await ActorRepository.getActorByGoogleId(preferredUsername);
+  getActorProfileByUserName: async (userName: string) => {
+    const actor = await ActorRepository.getActorByUserName(userName);
     const activitySummary = await ActorGraphRepository.getActivitySummary(actor?.id || "");
     return {...actor, ...activitySummary};
   },
@@ -84,7 +88,7 @@ export const ActorService = {
         throw new UserNotFoundError('The actor was not found')
       }
       
-      const followingIds = await ActorGraphRepository.getFollowerIds(actorId);
+      const followingIds = await ActorGraphRepository.getFollowingIds(actorId) 
       
       let actors = [];
 

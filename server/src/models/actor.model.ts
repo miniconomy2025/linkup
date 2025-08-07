@@ -1,6 +1,5 @@
 import { Schema, model, Document } from 'mongoose';
 import { Actor } from '../types/activitypub';
-
 type ActorDoc = Actor & Document;
 
 const IconSchema = new Schema({
@@ -10,7 +9,7 @@ const IconSchema = new Schema({
   published:    { type: String, default: () => new Date().toISOString() },
   to:           { type: [String], required: true, default: ['https://www.w3.org/ns/activitystreams#Public'] },
   url:          { type: String, required: true },
-  name:         { type: String }
+  name:         { type: String },
 }, {timestamps: true, versionKey: false, _id: false }); // <-- prevents automatic _id field
 
 const ActorSchema = new Schema<ActorDoc>({
@@ -22,7 +21,8 @@ const ActorSchema = new Schema<ActorDoc>({
   outbox:           { type: String, required: true },
   followers:        { type: String, required: true },
   following:        { type: String, required: true },
-  icon:             { type: IconSchema, required: false }
+  icon:             { type: IconSchema, required: false },
+  googleId:         { type: String, required: true, unique: true}
 }, { timestamps: true, versionKey: false });
 
 export const ActorModel = model<ActorDoc>('Actor', ActorSchema);

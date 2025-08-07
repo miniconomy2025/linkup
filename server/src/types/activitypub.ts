@@ -55,6 +55,7 @@ export interface BaseActor {
   followers: string; // Followers collection URI
   following: string;
   icon?: ImageObject; // Profile photo (reusing ImageObject)
+  googleId?: string;
 }
 
 export interface PersonActor extends BaseActor {

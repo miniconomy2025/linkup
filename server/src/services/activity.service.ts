@@ -40,8 +40,8 @@ export const ActivityService = {
     return activity;
   },
 
-  likePost: async (postId: string, googleId: string): Promise<LikeActivity> => {
-    const actorId = `${apiUrl}/actors/${googleId}`;
+  likePost: async (postId: string, userName: string): Promise<LikeActivity> => {
+    const actorId = `${apiUrl}/actors/${userName}`;
 
     if (await ActorGraphRepository.hasUserLikedPost(postId, actorId)) {
       throw new RequestConflict('User has already liked this post');
