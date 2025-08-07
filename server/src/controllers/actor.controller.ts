@@ -19,12 +19,15 @@ export const ActorController = {
         throw new UserNotFoundError('Actor not found')
       }
 
+      const publicKeyPem = process.env.USER_PUBLIC_KEY_PEM?.replace(/\\n/g, '\n');
+      console.log(publicKeyPem);
+
       const actorWithKey = {
         ...actor,
         publicKey: {
           id: `${actor.id}#main-key`,
           owner: actor.id,
-          publicKeyPem: process.env.USER_PUBLIC_KEY_PEM
+          publicKeyPem: publicKeyPem
         }
       };
 
