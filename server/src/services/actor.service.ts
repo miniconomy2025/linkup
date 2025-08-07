@@ -88,7 +88,7 @@ export const ActorService = {
         throw new UserNotFoundError('The actor was not found')
       }
       
-      const followingIds = await ActorGraphRepository.getFollowerIds(actorId);
+      const followingIds = await ActorGraphRepository.getFollowingIds(actorId) 
       
       let actors = [];
 
