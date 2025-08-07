@@ -5,6 +5,7 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 
 const apiUrl = process.env.BASE_URL;
 import { ActorGraphRepository } from '../graph/repositories/actor';
+import { ImageObject, NoteObject, VideoObject } from '../types/activitypub';
 
 export const ObjectController = {
   getNoteById: async (req: Request, res: Response, next: NextFunction) => {
@@ -41,6 +42,12 @@ export const ObjectController = {
     }
   },
 
+  getMediaType: (url: string) => {
+    // Extract everything after the last dot in the URL
+    const match = url.match(/\.([a-zA-Z0-9]+)(?:\?|#|$)/);
+    return match ? match[1] : null;
+  },
+
   getImageById: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = req.params.id;
@@ -50,12 +57,28 @@ export const ObjectController = {
       }
       
       const postId = `${apiUrl}/objects/images/${id}`;
-      const image = await ActivityObjectService.getPostById(postId);
+      const image = await ActivityObjectService.getPostById(postId) as ImageObject;
       if (!image) {
         throw new ObjectNotFoundError();
       }
 
-      res.status(200).json(image);
+      const imageType = ObjectController.getMediaType(image.url);
+
+      const noteType = {
+        attributedTo: image.attributedTo,
+        content: image.name!,
+        type: "Note",
+        id: image.id,
+        published: image.published,
+        to: image.to,
+        attachment: {
+          type: "Image",
+          mediaType: `image/${imageType}`,
+          url: image.url
+        }
+      }
+
+      res.status(200).json(noteType);
     } catch (error) {
       next(error);
     }
@@ -84,12 +107,28 @@ export const ObjectController = {
       }
       
       const postId = `${apiUrl}/objects/videos/${id}`;
-      const vidoes = await ActivityObjectService.getPostById(postId);
+      const vidoes = await ActivityObjectService.getPostById(postId) as VideoObject;
       if (!vidoes) {
         throw new ObjectNotFoundError();
       }
 
-      res.status(200).json(vidoes);
+      const videoType = ObjectController.getMediaType(vidoes.url);
+
+      const noteType = {
+        attributedTo: vidoes.attributedTo,
+        content: vidoes.name!,
+        type: "Note",
+        id: vidoes.id,
+        published: vidoes.published,
+        to: vidoes.to,
+        attachment: {
+          type: "Video",
+          mediaType: `video/${videoType}`,
+          url: vidoes.url
+        }
+      }
+
+      res.status(200).json(noteType);
     } catch (error) {
       next(error);
     }

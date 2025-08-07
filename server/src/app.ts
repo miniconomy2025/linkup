@@ -13,6 +13,7 @@ import activityRoutes from './routes/activity.route';
 import healthRoute from './routes/health.route';
 import feedsRouter from './routes/feeds.route'
 import webfingerRoute from './routes/webfinger.route';
+import actorRoutes from './routes/actors.route';
 
 import { errorHandler } from './middleware/errorHandler';
 
@@ -31,6 +32,7 @@ app.use('/objects', objectRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/activities', activityRoutes);
 app.use('/feeds', feedsRouter);
+app.use('/actors', actorRoutes);
 
 app.use(errorHandler);
 
