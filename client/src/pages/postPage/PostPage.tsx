@@ -73,6 +73,9 @@ export const PostPage: React.FC = () => {
                         </div>
                     )}
                 </div>
+                {(post?.type === 'Image' || post?.type === 'Video') && (
+                    <div>{post?.name}</div>
+                )}
                 {post.liked === false ? (
                     <FcLikePlaceholder
                         size={20} 
