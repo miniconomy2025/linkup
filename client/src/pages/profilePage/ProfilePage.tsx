@@ -53,7 +53,7 @@ export const ProfilePage: React.FC = () => {
                     } catch {
                         console.warn('Failed to fetch other user posts');
                     }
-                };     
+                };
                 setProfile(response);
                 if (postsResponse) setPosts(postsResponse);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars

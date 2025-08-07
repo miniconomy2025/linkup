@@ -9,6 +9,7 @@ import { FaRegComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { likePost } from '../../api/requests/activity';
 import { getFeed } from '../../api/requests/posts';
+import { LoadingPage } from '../../components/loadingSpinner/LoadingSpinner';
 
 const FeedPage: React.FC = () => {
     const videoRefs = useRef<Record<string, React.RefObject<HTMLVideoElement>>>({});
@@ -18,6 +19,7 @@ const FeedPage: React.FC = () => {
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [initialLoading, setInitialLoading] = useState(false);
 
     const navigate = useNavigate();
 
@@ -54,14 +56,23 @@ const FeedPage: React.FC = () => {
         setLoading(false);
     };
 
+    
     // Load first posts
     useEffect(() => {
-        getFeed({ page: 1, limit: 4 }).then(response => {
-            // console.log(response)
-            setPosts(response);
-            setPage(2); // next page would be 2
-            setHasMore(response.length > 0);
-        });
+        try {
+            setInitialLoading(true);
+            getFeed({ page: 1, limit: 4 }).then(response => {
+                // console.log(response)
+                setPosts(response);
+                setPage(2); // next page would be 2
+                setHasMore(response.length > 0);
+            });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (err) {
+            toast.error('Failed loading posts')
+        } finally {
+            setInitialLoading(false);
+        };
     }, []);
 
     useEffect(() => {
@@ -172,6 +183,10 @@ const FeedPage: React.FC = () => {
             notifyError();
         };
     };
+
+    if (initialLoading) return (
+        <LoadingPage />
+    );
 
     return (
         <PageLayout>

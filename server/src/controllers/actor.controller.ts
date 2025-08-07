@@ -310,7 +310,7 @@ export const ActorController = {
             name: actorJson.name,
             preferredUsername: actorJson.preferredUsername,
             icon: {
-              url: actorJson.icon.url
+              url: actorJson?.icon?.url
             }
           };
         }
