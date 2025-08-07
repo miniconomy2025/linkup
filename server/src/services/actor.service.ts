@@ -1,9 +1,10 @@
 import { ActorRepository } from '../repositories/actor.repository';
-import { Activity, Actor, CreateActivity } from '../types/activitypub';
+import { Activity, ActivityObject, Actor, CreateActivity } from '../types/activitypub';
 import { ActorGraphRepository } from '../graph/repositories/actor';
 import { UserNotFoundError } from '../middleware/errorHandler';
 import { OutboxRepository } from '../repositories/outbox.repository';
 import { ActivityRepository } from '../repositories/activity.repository';
+import { ObjectController } from '../controllers/object.controller';
 
 const apiUrl = process.env.BASE_URL;
 
@@ -40,7 +41,59 @@ export const ActorService = {
       const activity = await ActivityRepository.getActivityById(item.activity);
 
       if (activity) {
-        activities.push(activity);
+        if (activity.type = 'Create') {
+          const object = activity.object as ActivityObject;
+          if (object.type != 'Note') {
+            let noteActivity = activity as any;
+
+            if (object.type == 'Image') {
+              const imageType = ObjectController.getMediaType(object.url);
+
+              const noteType = {
+                attributedTo: object.attributedTo,
+                content: object.name!,
+                type: "Note",
+                id: object.id,
+                published: object.published,
+                to: object.to,
+                attachment: {
+                  type: "Image",
+                  mediaType: `image/${imageType}`,
+                  url: object.url
+                }
+              } 
+
+              noteActivity.object = noteType;
+              activities.push(noteActivity);
+            }
+            else {
+              const videoType = ObjectController.getMediaType(object.url);
+
+              const noteType = {
+                attributedTo: object.attributedTo,
+                content: object.name!,
+                type: "Note",
+                id: object.id,
+                published: object.published,
+                to: object.to,
+                attachment: {
+                  type: "Video",
+                  mediaType: `video/${videoType}`,
+                  url: object.url
+                }
+              }
+              
+              noteActivity.object = noteType;
+              activities.push(noteActivity);
+            }
+          }
+          else {
+            activities.push(activity);
+          }
+        }
+        else {
+          activities.push(activity);
+        }
       }
     }
 
