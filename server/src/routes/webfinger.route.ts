@@ -3,6 +3,6 @@ import { WebfingerController } from '../controllers/webfinger.controller';
 
 const router = Router();
 
-router.post('/', WebfingerController.getActorByUsername);
+router.get('/.well-known/webfinger', WebfingerController.getActorByUsername);
 
 export default router; 

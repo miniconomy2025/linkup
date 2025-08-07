@@ -42,7 +42,7 @@ export const ActorRepository = {
 
     const allActivityIds = [
     ...activityIds,
-    // ...ownActivities.map(a => a.id)
+    ...ownActivities.map(a => a.id)
     ];
 
     const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
