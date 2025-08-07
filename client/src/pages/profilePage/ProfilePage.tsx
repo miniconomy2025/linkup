@@ -122,6 +122,7 @@ export const ProfilePage: React.FC = () => {
                             <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${encodeURIComponent(decodedUrl)}` : '/followers/me'} className='profile-link'>{profile?.followersCount || 0} followers</Link>
                             <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${encodeURIComponent(decodedUrl)}` : '/following/me'} className='profile-link'>{profile?.followingCount || 0}  following</Link>
                         </div>
+                        {profile?.preferredUsername && <div className='profile-top-info-name'>{profile.preferredUsername}</div>}
                     </div>
                 </div>
                 <div className='profile-posts-grid'>
