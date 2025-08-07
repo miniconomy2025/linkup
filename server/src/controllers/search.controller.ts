@@ -41,10 +41,11 @@ export const SearchController = {
                     const id = actorId?.href;
 
                     const actor = await ExternalApis.getFromExternalApi(id);
-
+                    console.log(actor);
+                    
                     const returnFederatedObject = {
                         id: actorId?.href || null,
-                        name: actor.name,
+                        name: actor.name ?? actor.displayName ?? actor.preferredUsername ?? actor.username ?? actor.userName ?? id,
                         icon: avatarLink?.href || null
                     };
                     

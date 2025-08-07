@@ -49,7 +49,9 @@ export const ActorController = {
         throw new UserNotFoundError('Actor not found')
       }
 
-      const activity = req.body.activity;
+      const activity = req.body;
+
+      console.log(activity);
 
       if (!activity) {
         throw new BadRequestError('Activity is required');
