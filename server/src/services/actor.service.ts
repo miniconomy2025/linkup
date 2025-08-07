@@ -39,18 +39,16 @@ export const ActorService = {
 
     for (const item of outboxItems) {
       const activity = await ActivityRepository.getActivityById(item.activity);
-      console.log(activity);
 
       if (activity) {
-        if (activity.type = 'Create') {
+        if (activity.type == 'Create') {
           const object = activity.object as ActivityObject;
-          console.log(object);
+
           if (object.type != 'Note') {
             let noteActivity = activity as any;
 
             if (object.type == 'Image') {
               const imageType = ObjectController.getMediaType(object.url);
-              console.log(imageType);
 
               const noteType = {
                 attributedTo: object.attributedTo,
@@ -93,9 +91,6 @@ export const ActorService = {
           else {
             activities.push(activity);
           }
-        }
-        else {
-          activities.push(activity);
         }
       }
     }
