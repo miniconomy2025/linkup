@@ -29,7 +29,7 @@ export const ProfilePage: React.FC = () => {
     const notifyError = () => toast.error('Error! Something went wrong.');
 
     const [profile, setProfile] = useState();
-    const [posts, setPosts] = useState<any>([]);
+    const [posts, setPosts] = useState<any>();
 
     useEffect(() => {
         if (!decodedUrl && !currentActorId) return;
@@ -41,13 +41,22 @@ export const ProfilePage: React.FC = () => {
                 
                 if (decodedUrl === 'me' || decodedUrl === currentActorId) {
                     response = await getActorProfile();
-                    postsResponse = await getActorPosts();
+                    try {
+                        postsResponse = await getActorPosts();
+                    } catch {
+                        console.warn('Failed to fetch your posts');
+                    }
                 } else {
                     response = await getOtherActorProfile({ url: decodedUrl });
-                    postsResponse = await getOtherActorPosts({ url: decodedUrl });
+                    // try {
+                    //     postsResponse = await getOtherActorPosts({ url: decodedUrl });
+                    // } catch {
+                    //     console.warn('Failed to fetch other user posts');
+                    // }
                 };
-                setPosts(postsResponse);
+                
                 setProfile(response);
+                if (postsResponse) setPosts(postsResponse);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (err: unknown) {
                 notifyError();

@@ -274,12 +274,21 @@ export const ActorController = {
             loggedInActorId
           );
         } else {
-          const response = await fetch(`${actorId}/outbox`, {
+          const response = await fetch(`${actorId}`, {
             headers: {
               Accept: "application/activity+json",
             },
           });
-          actor = await response.json();
+          
+          const actorJson = await response.json();
+          
+          actor = {
+            name: actorJson.name,
+            preferredUsername: actorJson.preferredUsername,
+            icon: {
+              url: actorJson.icon.url
+            }
+          };
         }
         res.status(200).json(actor);
       }

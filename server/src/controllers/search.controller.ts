@@ -40,7 +40,7 @@ export const SearchController = {
                         name: data.subject,
                         icon: avatarLink?.href || null
                     };
-
+                    
                     return res.json(returnFederatedObject);
                 } catch (error) {
                     console.error('Failed to fetch WebFinger:', error);
