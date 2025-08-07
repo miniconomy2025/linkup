@@ -32,22 +32,25 @@ export const ActorService = {
     return await ActorRepository.getActorInboxCreateItems(actorId,page,limit)
   },
   
-  getActorOutboxActivities: async (actorId: string): Promise<Activity[]> => {
+  getActorOutboxActivities: async (actorId: string) => {
     const outboxItems = await OutboxRepository.getActorOutboxItems(actorId);
 
     const activities = [];
 
     for (const item of outboxItems) {
       const activity = await ActivityRepository.getActivityById(item.activity);
+      console.log(activity);
 
       if (activity) {
         if (activity.type = 'Create') {
           const object = activity.object as ActivityObject;
+          console.log(object);
           if (object.type != 'Note') {
             let noteActivity = activity as any;
 
             if (object.type == 'Image') {
               const imageType = ObjectController.getMediaType(object.url);
+              console.log(imageType);
 
               const noteType = {
                 attributedTo: object.attributedTo,
