@@ -52,7 +52,7 @@ export const FollowersPage: React.FC = () => {
                         <Followers
                             id={actor.id} 
                             name={actor.name} 
-                            username={actor.username} 
+                            username={actor.preferredUsername ?? actor.username} 
                             avatar={actor?.icon?.url} 
                         />
                     ))}

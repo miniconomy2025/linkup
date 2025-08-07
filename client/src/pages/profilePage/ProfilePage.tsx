@@ -109,7 +109,7 @@ export const ProfilePage: React.FC = () => {
                     {profile?.icon?.url ? <img src={profile.icon.url} alt="avatar" width={120} height={120} className="sidebar-avatar" /> : <RxAvatar size={200} />}
                     <div className='profile-top-info-container'>
                         <div className='profile-top-info-edit-container'>
-                            <div className='profile-top-info-username'>{profile?.name}</div>
+                            <div className='profile-top-info-username'>{profile?.name} ({profile?.preferredUsername ?? profile?.username})</div>
                             {decodedUrl !== 'me' && decodedUrl !== currentActorId && (profile?.isFollowing === false) && (
                                 <button className='button-secondary' onClick={handleFollowActor} disabled={followLoading}>Follow</button>
                             )}
