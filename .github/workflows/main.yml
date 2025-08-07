@@ -105,6 +105,9 @@ jobs:
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
           echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "USER_PUBLIC_KEY_PEM=${{ secrets.USER_PUBLIC_KEY_PEM }}" >> .env
+          echo "USER_PRIVATE_KEY=${{ secrets.USER_PRIVATE_KEY }}" >> .env
+
 
       - name: Debug Build Output
         run: |
