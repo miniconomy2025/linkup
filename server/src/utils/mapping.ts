@@ -9,7 +9,7 @@ export function mapToActivityObject(data: any): ActivityObject {
         type: 'Image',
         attributedTo: data.attributedTo,
         url: data.attachment?.url || data.url,
-        name: data.attachment?.name || data.name,
+        name: data?.content || data.attachment?.name || data.name,
         id: data.id,
         to: data.to,
         published: data.published
