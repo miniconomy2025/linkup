@@ -110,6 +110,26 @@ export const ActorService = {
     return {...actor, ...activitySummary, isFollowing };
   },
 
+    getExternalActorById: async (actorId: string) => {
+    try {
+      const res = await fetch(actorId, {
+        headers: { Accept: "application/activity+json" },
+      });
+
+      if (!res.ok) return null;
+      const actor = await res.json();
+
+      return {
+        id: actor.id,
+        username: actor.preferredUsername,
+        name: actor.name,
+        icon: {url: actor?.icon?.url}
+      };
+    } catch {
+      return null;
+    }
+  },
+
   getActorsFollowers: async (actorId: string) => {
     if (actorId.startsWith(apiUrl!)) {
       const followerIds = await ActorGraphRepository.getFollowerIds(actorId);
@@ -122,10 +142,13 @@ export const ActorService = {
           actors.push(actor);
         }
         else {
-          // External actor
+          const actor = await ActorService.getExternalActorById(followerId)
+          if(actor){
+            actors.push(actor)
+          }
+
         }
       }
-
       return actors;
     }
     else {
@@ -168,18 +191,18 @@ export const ActorService = {
       if (!actor) {
         throw new UserNotFoundError('The actor was not found')
       }
-      
       const followingIds = await ActorGraphRepository.getFollowingIds(actorId) 
-      
       let actors = [];
-
       for (const followingId of followingIds) {
         if (followingId.startsWith(apiUrl!)) {
           const actor = await ActorRepository.getActorById(followingId);
           actors.push(actor);
         }
         else {
-          // External actor
+         const actor = await ActorService.getExternalActorById(followingId)
+         if(actor){
+          actors.push(actor)
+         }
         }
       }
 
