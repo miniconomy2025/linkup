@@ -77,8 +77,36 @@ export const ActorService = {
     }
     else {
       // External actor
+      let actors = [];
+      const externalActorFollowers = await fetch(`${actorId}/followers`, {
+        headers: {
+          Accept: "application/activity+json",
+        },
+      });
+      const data = await externalActorFollowers.json();
+      for (const followerId of data.orderedItems) {
+        try {
+          const externalActorFollower = await fetch(`${followerId}`, {
+            headers: {
+              Accept: "application/activity+json",
+            },
+          });
+          const follower = await externalActorFollower.json();
+          const actorObject = {
+            id: follower.id,
+            name: follower.name,
+            username: follower.preferredUsername,
+            icon: {
+              url: follower?.icon?.url
+            }
+          }
+          actors.push(actorObject);
+        } catch (err) {
+          // Found a error woo hoo
+        }
+      };
+      return actors;
     }
-
   },
 
   getActorsFollowing: async (actorId: string) => {
@@ -106,6 +134,35 @@ export const ActorService = {
     }
     else {
       // External actor
+      let actors = [];
+      const externalActorFollowing = await fetch(`${actorId}/following`, {
+        headers: {
+          Accept: "application/activity+json",
+        },
+      });
+      const data = await externalActorFollowing.json();
+      for (const followerId of data.orderedItems) {
+        try {
+          const externalActorFollowing = await fetch(`${followerId}`, {
+            headers: {
+              Accept: "application/activity+json",
+            },
+          });
+          const following = await externalActorFollowing.json();
+          const actorObject = {
+            id: following.id,
+            name: following.name,
+            username: following.preferredUsername,
+            icon: {
+              url: following?.icon?.url
+            }
+          }
+          actors.push(actorObject);
+        } catch (err) {
+          // Found a error woo hoo
+        }
+      };
+      return actors;
     }
   }
 }; 
