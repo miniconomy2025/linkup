@@ -1,12 +1,12 @@
 name: Full Deploy Pipeline
 
 on:
-#  push:
-#    branches: [main]
-#    paths:
-#      - 'terraform/**'
-#      - 'server/**'
-#      - 'client/**'
+  push:
+   branches: [main]
+   paths:
+     - 'terraform/**'
+     - 'server/**'
+     - 'client/**'
   workflow_dispatch: {}
 jobs:
   infra:
