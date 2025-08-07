@@ -322,9 +322,25 @@ export const ActorController = {
             },
           });
           
-          const isFollowing = await ActorGraphRepository.hasUserFollowedActor(loggedInActorId,actorId);
+          const isFollowing = await ActorGraphRepository.hasUserFollowedActor(loggedInActorId, actorId);
 
           const actorJson = await response.json();
+
+          const actorFollowing = await fetch(`${actorId}/following`, {
+            headers: {
+              Accept: "application/activity+json",
+            },
+          });
+
+          const dataFollowing = await actorFollowing.json();
+
+          const actorFollowers = await fetch(`${actorId}/followers`, {
+            headers: {
+              Accept: "application/activity+json",
+            },
+          });
+
+          const dataFollowers = await actorFollowers.json();
 
           actor = {
             name: actorJson.name,
@@ -332,7 +348,9 @@ export const ActorController = {
             icon: {
               url: actorJson?.icon?.url
             },
-            isFollowing
+            isFollowing,
+            followersCount: dataFollowers?.orderedItems?.length || 0,
+            followingCount: dataFollowing?.orderedItems?.length || 0
           };
         }
         res.status(200).json(actor);
