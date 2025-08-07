@@ -158,27 +158,29 @@ export const ActorService = {
         },
       });
       const data = await externalActorFollowers.json();
-      for (const followerId of data.orderedItems) {
-        try {
-          const externalActorFollower = await fetch(`${followerId}`, {
-            headers: {
-              Accept: "application/activity+json",
-            },
-          });
-          const follower = await externalActorFollower.json();
-          const actorObject = {
-            id: follower.id,
-            name: follower.name,
-            username: follower.preferredUsername,
-            icon: {
-              url: follower?.icon?.url
+      if (data.orderedItems) {
+        for (const followerId of data.orderedItems) {
+          try {
+            const externalActorFollower = await fetch(`${followerId}`, {
+              headers: {
+                Accept: "application/activity+json",
+              },
+            });
+            const follower = await externalActorFollower.json();
+            const actorObject = {
+              id: follower.id,
+              name: follower.name,
+              username: follower.preferredUsername,
+              icon: {
+                url: follower?.icon?.url
+              }
             }
+            actors.push(actorObject);
+          } catch (err) {
+            // Found a error woo hoo
           }
-          actors.push(actorObject);
-        } catch (err) {
-          // Found a error woo hoo
-        }
-      };
+        };
+      }
       return actors;
     }
   },
@@ -215,27 +217,29 @@ export const ActorService = {
         },
       });
       const data = await externalActorFollowing.json();
-      for (const followerId of data.orderedItems) {
-        try {
-          const externalActorFollowing = await fetch(`${followerId}`, {
-            headers: {
-              Accept: "application/activity+json",
-            },
-          });
-          const following = await externalActorFollowing.json();
-          const actorObject = {
-            id: following.id,
-            name: following.name,
-            username: following.preferredUsername,
-            icon: {
-              url: following?.icon?.url
+      if (data.orderedItems) {
+        for (const followerId of data.orderedItems) {
+          try {
+            const externalActorFollowing = await fetch(`${followerId}`, {
+              headers: {
+                Accept: "application/activity+json",
+              },
+            });
+            const following = await externalActorFollowing.json();
+            const actorObject = {
+              id: following.id,
+              name: following.name,
+              username: following.preferredUsername,
+              icon: {
+                url: following?.icon?.url
+              }
             }
+            actors.push(actorObject);
+          } catch (err) {
+            // Found a error woo hoo
           }
-          actors.push(actorObject);
-        } catch (err) {
-          // Found a error woo hoo
-        }
-      };
+        };
+      }
       return actors;
     }
   }

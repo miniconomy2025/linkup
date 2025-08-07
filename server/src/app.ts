@@ -19,7 +19,15 @@ import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 
-app.use(express.json({ limit: '5mb' }));
+app.use(express.json({
+  limit: '5mb',
+  type: [
+    'application/json',
+    'application/activity+json',
+    'application/ld+json'
+  ]
+}));
+
 app.use(cors({ origin: 'http://localhost:5173' }));
 
 connectMongoDB();
