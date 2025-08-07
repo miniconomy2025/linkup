@@ -8,7 +8,7 @@ export const ExternalApis = {
             }
         });
 
-        return response;
+        return response.data;
     },
 
     postToExternalApi: async (url: string, payload: any): Promise<any> => {
