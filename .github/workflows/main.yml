@@ -1,12 +1,12 @@
 name: Full Deploy Pipeline
 
 on:
-#  push:
-#    branches: [main]
-#    paths:
-#      - 'terraform/**'
-#      - 'server/**'
-#      - 'client/**'
+  push:
+   branches: [main]
+   paths:
+     - 'terraform/**'
+     - 'server/**'
+     - 'client/**'
   workflow_dispatch: {}
 jobs:
   infra:
@@ -104,6 +104,7 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "FRONTEND_URL=${{ secrets.FRONTEND_URL }}" >> .env
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" >> .env
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
 
       - name: Debug Build Output
         run: |
@@ -202,15 +203,18 @@ jobs:
       - name: Create .env.production for Vite
         working-directory: ./client
         run: |
-          echo "VITE_API_BASE_URL=${{ secrets.API_URL }}" >> .env.production
-          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env.production
-          echo "VITE_GOOGLE_REDIRECT_URI=${{ secrets.CALLBACK_URL }}" >> .env.production
-
+          echo "VITE_API_BASE_URL=${{ secrets.API_URL }}" >> .env
+          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+          echo "VITE_GOOGLE_REDIRECT_URI=${{ secrets.CALLBACK_URL }}" >> .env
       - name: Install and Build React App
         working-directory: ./client
         run: |
           npm install
           npm run build
+
+      - name: Copy .env to dist
+        working-directory: ./client
+        run: cp .env dist/
 
       - name: Upload Build to EC2
         uses: appleboy/scp-action@master
@@ -218,5 +222,5 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ vars.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: ./client/dist/
+          source: ./client/dist/*,./client/.env
           target: ~/app/client

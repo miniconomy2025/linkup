@@ -63,7 +63,7 @@ export const s3Service = {
       Key: s3Key,
       Body: fileBuffer,
       ContentType: getMimeType(originalName),
-      ACL: ObjectCannedACL.public_read,
+      // ACL: ObjectCannedACL.public_read,
     };
 
     await s3.send(new PutObjectCommand(uploadParams));
