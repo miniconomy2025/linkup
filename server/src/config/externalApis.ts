@@ -4,7 +4,7 @@ export const ExternalApis = {
     getFromExternalApi: async (url: string): Promise<any> => {
         const response = await axios.get(url, {
             headers: {
-                Accept: 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"'
+                Accept: 'application/activity+json, application/ld+json; profile="https://www.w3.org/ns/activitystreams"'
             }
         });
 
