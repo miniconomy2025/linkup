@@ -220,22 +220,46 @@ export const ActorController = {
         const posts = await ActorService.getActorCreateActivities(actorId);
         res.status(200).json(posts);
       } else {
-        const response = await fetch(`${actorId}/outbox`, {
+        // some people need /outbox?cursor=1
+        const responseOutbox = await fetch(`${actorId}/outbox`, {
           headers: {
             Accept: "application/activity+json",
           },
         });
 
-        //Extract xyz from response
+        // const responseJson = await responseOutbox.json();
+        // const responseOutboxFirst = await fetch(responseJson.first, {
+        //   headers: {
+        //     Accept: "application/activity+json",
+        //   },
+        // });
 
-        if (!response.ok) {
+        // Test because cindis posts are local
+        // const responseOutboxTest = await fetch(`${actorId}/outbox?cursor=1`, {
+        //   headers: {
+        //     Accept: "application/activity+json",
+        //   },
+        // });
+        
+        if (!responseOutbox.ok) {
           throw new Error(
-            `Failed to fetch remote outbox: ${response.statusText}`
+            `Failed to fetch remote outbox: ${responseOutbox.statusText}`
           );
         }
 
-        const remoteOutbox = await response.json();
-        res.status(200).json(remoteOutbox);
+        const data = await responseOutbox.json();
+        
+        if (!data.orderedItems) {
+          throw new Error(
+            `Failed to fetch posts`
+          );
+        };
+
+        const posts = data.orderedItems;
+        res.status(200).json(posts);
+
+        // const remoteOutbox = await response.json();
+        // res.status(200).json(remoteOutbox);
       }
     } catch (error) {
       console.error(error);

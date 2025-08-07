@@ -2,6 +2,7 @@ import { s3Service } from "../config/s3Uploader";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { ActivityObjectRepository } from "../repositories/activityObject.repository";
 import { ActivityObject, ImageObject, NoteObject, VideoObject } from "../types/activitypub";
+import { mapToActivityObject } from "../utils/mapping";
 import { ActivityService } from "./activity.service";
 import { InboxService } from "./inbox.service";
 import { OutboxService } from "./outbox.service";
@@ -16,14 +17,16 @@ export const ActivityObjectService = {
       return post;
     }
     else {
-      // External post
+      const externalPost = await fetch(`${postId}`, {
+        headers: {
+          Accept: "application/activity+json",
+        },
+      });
 
-      const activityObject: ActivityObject = {
-        attributedTo: "test",
-        type: "Image",
-        url: "test"
-      }
+      const data = await externalPost.json();
 
+      // Map external post to what we expect:
+      const activityObject: ActivityObject = mapToActivityObject(data)
       return activityObject;
     }
   }, 

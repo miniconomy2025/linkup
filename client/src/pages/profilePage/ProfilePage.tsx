@@ -48,12 +48,12 @@ export const ProfilePage: React.FC = () => {
                     }
                 } else {
                     response = await getOtherActorProfile({ url: decodedUrl });
-                    // try {
-                    //     postsResponse = await getOtherActorPosts({ url: decodedUrl });
-                    // } catch {
-                    //     console.warn('Failed to fetch other user posts');
-                    // }
-                };                
+                    try {
+                        postsResponse = await getOtherActorPosts({ url: decodedUrl });
+                    } catch {
+                        console.warn('Failed to fetch other user posts');
+                    }
+                };     
                 setProfile(response);
                 if (postsResponse) setPosts(postsResponse);
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -126,12 +126,13 @@ export const ProfilePage: React.FC = () => {
                 </div>
                 <div className='profile-posts-grid'>
                     {posts && posts.map(post => {
+                        console.log(post)
                         return (
                         <div className='post-tile' onClick={() => handlePostClick(post.object.id)}>
-                            {post?.object?.type === 'Image' && (
-                                <img src={post.object?.url} width={'100%'} height={'100%'}/>
+                            {(post?.object?.type === 'Image' || post?.object?.attachment?.type === 'Image') && (
+                                <img src={post.object?.url || post?.object?.attachment?.url} width={'100%'} height={'100%'}/>
                             )}
-                            {post?.object?.type === 'Video' && (
+                            {(post?.object?.type === 'Video' || post?.object?.attachment?.type === 'Video') && (
                                 <video
                                     src={post.object?.url}
                                     className='post-video'
@@ -140,7 +141,7 @@ export const ProfilePage: React.FC = () => {
                                     controls
                                 />
                             )}
-                            {post?.object?.type === 'Note' && (
+                            {(!post?.object?.attachment?.type && post?.object?.type === 'Note') && (
                                 <div className='post-media-note'>
                                     <div className='post-content-scrollable'>{post.object.content}</div>
                                 </div>
