@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ActorService } from '../services/actor.service';
 import { BadRequestError, NotAuthenticatedError, UserNotFoundError } from '../middleware/errorHandler';
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
+import { InboxService } from '../services/inbox.service';
 
 const apiUrl   = process.env.BASE_URL
 
@@ -24,7 +25,25 @@ export const ActorController = {
 
   postActivityToInbox: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { id } = req.params;
+      if (!id) {
+        throw new BadRequestError('Actor ID is required');
+      }
+      const actor = await ActorService.getActorByGoogleId(id);
+      if (!actor) {
+        throw new UserNotFoundError('Actor not found')
+      }
 
+      const activity = req.body.activity;
+
+      if (!activity) {
+        throw new BadRequestError('Activity is required');
+      }
+
+      await InboxService.addActivityToInbox(activity, actor.id!);
+
+
+      res.status(200).json({message: 'Activity received in inbox successfully'})
     } catch (error) {
       next(error);
     }
@@ -46,7 +65,20 @@ export const ActorController = {
       const actorId = actor.id;
       const activities = await ActorService.getActorOutboxActivities(actorId);
 
-      res.status(200).json(activities);
+      const orderedActivities = 
+        activities.sort((a, b) => {
+          const dateA = a.published ? new Date(a.published).getTime() : 0;
+          const dateB = b.published ? new Date(b.published).getTime() : 0;
+          return dateB - dateA;
+        });
+
+      res.status(200).json({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": `${actor.name}'s outbox`,
+        "type": "OrderedCollection",
+        "totalItems": activities.length,
+        "orderedItems": orderedActivities
+      });
     } catch (error) {
       next(error);
     }
@@ -96,7 +128,13 @@ export const ActorController = {
       const actorId = actor.id;
       const followers = await ActorService.getActorsFollowing(actorId);
 
-      res.status(200).json(followers);
+      res.status(200).json({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": `${actor.name}'s followers`,
+        "type": "OrderedCollection",
+        "totalItems": followers ? followers.length : 0,
+        "orderedItems": followers
+      });
     } catch (error) {
       next(error);
     }
@@ -146,7 +184,13 @@ export const ActorController = {
       const actorId = actor.id;
       const following = await ActorService.getActorsFollowing(actorId);
 
-      res.status(200).json(following);
+      res.status(200).json({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": `${actor.name}'s following`,
+        "type": "OrderedCollection",
+        "totalItems": following ? following.length : 0,
+        "orderedItems": following
+      });
     } catch (error) {
       next(error);
     }
