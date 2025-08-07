@@ -22,7 +22,7 @@ export const ActorRepository = {
     return created.toObject();
   },
   getCreateActivitiesByActor: async (actorId: string): Promise<CreateActivity[]> => {
-    return await CreateModel.find({ actor: actorId, type: 'Create' }).lean();
+    return await CreateModel.find({ actor: actorId, type: 'Create' }).sort({ createdAt: -1 }).lean();
   }, 
 
   getActorInboxCreateItems: async (actorId: string, page = 1,limit = 10 ): Promise<any> => {

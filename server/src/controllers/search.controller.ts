@@ -1,14 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { SearchService } from '../services/search.service';
+import { ExternalApis } from '../config/externalApis';
 
 export const SearchController = {
     searchActor: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { query } = req.body;
+            let { query } = req.body;
             
             if (!query || typeof query !== 'string') {
                 return res.status(400).json({ error: 'Missing or invalid search query' });
             };
+
+            query = query.trim();
 
             if (query.includes('@')) {
 
@@ -34,10 +37,14 @@ export const SearchController = {
                     const avatarLink = data.links?.find((link: any) =>
                         link.rel === 'http://webfinger.net/rel/avatar'
                     );
+                    
+                    const id = actorId?.href;
+
+                    const actor = await ExternalApis.getFromExternalApi(id);
 
                     const returnFederatedObject = {
                         id: actorId?.href || null,
-                        name: data.subject,
+                        name: actor.name,
                         icon: avatarLink?.href || null
                     };
                     

@@ -57,6 +57,15 @@ export const ActorController = {
 
       await InboxService.addActivityToInbox(activity, actor.id!);
 
+      if (activity.type == 'Follow') {
+        await ActorGraphRepository.createFollowActorActivity(activity.actor, actor.id);
+      }
+      else if (activity.type == 'Like') {
+        await ActorGraphRepository.createLikeForPost(activity.object, activity.actor);
+      }
+      else if (activity.type == 'Undo') {
+        await ActorGraphRepository.removeFollowActor(activity.actor, actor.id);
+      }
 
       res.status(200).json({message: 'Activity received in inbox successfully'})
     } catch (error) {
