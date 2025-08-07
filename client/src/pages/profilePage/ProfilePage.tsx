@@ -109,7 +109,7 @@ export const ProfilePage: React.FC = () => {
                     {profile?.icon?.url ? <img src={profile.icon.url} alt="avatar" width={120} height={120} className="sidebar-avatar" /> : <RxAvatar size={200} />}
                     <div className='profile-top-info-container'>
                         <div className='profile-top-info-edit-container'>
-                            <div className='profile-top-info-username'>{profile?.name} ({profile?.preferredUsername ?? profile?.username})</div>
+                            <div className='profile-top-info-username'>{profile?.name}</div>
                             {decodedUrl !== 'me' && decodedUrl !== currentActorId && (profile?.isFollowing === false) && (
                                 <button className='button-secondary' onClick={handleFollowActor} disabled={followLoading}>Follow</button>
                             )}
@@ -122,6 +122,7 @@ export const ProfilePage: React.FC = () => {
                             <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/followers/${encodeURIComponent(decodedUrl)}` : '/followers/me'} className='profile-link'>{profile?.followersCount || 0} followers</Link>
                             <Link to={decodedUrl !== 'me' && decodedUrl !== currentActorId ? `/following/${encodeURIComponent(decodedUrl)}` : '/following/me'} className='profile-link'>{profile?.followingCount || 0}  following</Link>
                         </div>
+                        {profile?.preferredUsername && <div className='profile-top-info-name'>@ {profile.preferredUsername}</div>}
                     </div>
                 </div>
                 <div className='profile-posts-grid'>
