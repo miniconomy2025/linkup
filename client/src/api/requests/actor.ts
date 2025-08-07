@@ -1,5 +1,4 @@
-import type { Actor } from '../../types/types';
-import { apiFetch } from '../client';
+import { apiFetch, apiPost } from '../client';
 
 export interface SearchActorParams {
     query: string;
@@ -9,6 +8,8 @@ export interface SearchActorParams {
 
 export const searchActor = ({ query, page = 1, limit = 10 }: SearchActorParams) =>
   apiFetch(`/search?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`);
+
+export const searchActor2 = (data: SearchActorParams) => apiPost(`/search`, data);
 
 export const getActorProfile = () => apiFetch('/profiles/me');
 export const getActorPosts = () => apiFetch('/profiles/me/posts');

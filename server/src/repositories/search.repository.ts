@@ -26,5 +26,18 @@ export const SearchRepository = {
         // TODO add a custom field in the results to indicate if they are already following    
 
         return { results, total };
+    },
+    searchActor: async (query: string): Promise<{ actor: Actor | null }> => {
+        const searchRegex = new RegExp(query, 'i'); // case-insensitive regex
+
+        const filter = {
+            $or: [
+                { preferredUsername: { $regex: searchRegex } },
+                { name: { $regex: searchRegex } }
+            ]
+        };
+
+        const actor = await ActorModel.findOne(filter).exec();
+        return { actor };
     }
 }; 

@@ -15,5 +15,9 @@ export const SearchService = {
             limit,
             pages: Math.ceil(total / limit)
         };
+    },
+    searchActor: async (query: string): Promise<{ actor: Actor | null }> => {
+        const actor = await SearchRepository.searchActor(query);
+        return actor;
     }
 }; 

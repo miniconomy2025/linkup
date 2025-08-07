@@ -4,6 +4,6 @@ import { SearchController } from '../controllers/search.controller';
 
 const router = Router();
 
-router.get('/', authenticateJWT, SearchController.searchActor);
+router.post('/', SearchController.searchActor);
 
 export default router; 
