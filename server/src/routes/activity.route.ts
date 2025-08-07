@@ -3,6 +3,7 @@ import { ActivityController } from '../controllers/activity.controller';
 import { authenticateJWT } from '../middleware/authMiddleware';
 const router = Router();
 
+// done
 router.post('/likes', authenticateJWT, ActivityController.createLikeActivity);
 router.post('/follows', authenticateJWT, ActivityController.createFollowActorActivity);
 router.post('/undos', authenticateJWT, ActivityController.createUndoActivity);
