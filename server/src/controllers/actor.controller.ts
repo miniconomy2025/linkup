@@ -5,7 +5,7 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { InboxService } from '../services/inbox.service';
 import { ActorGraphRepository } from '../graph/repositories/actor';
 
-const apiUrl   = process.env.BASE_URL
+const apiUrl = process.env.BASE_URL
 
 export const ActorController = {
   getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +18,18 @@ export const ActorController = {
       if (!actor) {
         throw new UserNotFoundError('Actor not found')
       }
-      res.status(200).json(actor);
+
+      const actorWithKey = {
+        ...actor,
+        publicKey: {
+          id: `${actor.id}#main-key`,
+          owner: actor.id,
+          publicKeyPem: process.env.USER_PUBLIC_KEY_PEM
+        }
+      };
+
+      res.setHeader('Content-Type', 'application/activity+json');
+      res.status(200).json(actorWithKey);
     } catch (error) {
       next(error);
     }
@@ -73,6 +84,7 @@ export const ActorController = {
           return dateB - dateA;
         });
 
+      res.setHeader('Content-Type', 'application/activity+json');
       res.status(200).json({
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": `${actor.name}'s outbox`,
@@ -129,6 +141,7 @@ export const ActorController = {
       const actorId = actor.id;
       const followers = await ActorService.getActorsFollowing(actorId);
 
+      res.setHeader('Content-Type', 'application/activity+json');
       res.status(200).json({
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": `${actor.name}'s followers`,
@@ -185,6 +198,7 @@ export const ActorController = {
       const actorId = actor.id;
       const following = await ActorService.getActorsFollowing(actorId);
 
+      res.setHeader('Content-Type', 'application/activity+json');
       res.status(200).json({
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": `${actor.name}'s following`,

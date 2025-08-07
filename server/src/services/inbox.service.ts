@@ -15,7 +15,13 @@ export const InboxService = {
             });
         }
         else {
-            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
+            console.log(activity);
+            try {
+            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity, activity.actor);
+            } catch(error){
+                console.log(error);
+                throw (error);
+            }
         }
     },
 
