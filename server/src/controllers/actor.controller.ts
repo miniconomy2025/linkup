@@ -9,40 +9,72 @@ const apiUrl = process.env.BASE_URL
 
 export const ActorController = {
   getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      console.log(id);
-      if (!id) {
-        throw new BadRequestError('Actor ID is required');
-      }
-      console.log(id);
-      const actor = await ActorService.getActorByUserName(id);
-      if (!actor) {
-        throw new UserNotFoundError('Actor not found')
-      }
-      console.log(actor);
-      const publicKeyPem = process.env.USER_PUBLIC_KEY_PEM;
-      console.log(publicKeyPem);
-
-      const actorWithKey = {
-        "@context": [
-          "https://www.w3.org/ns/activitystreams",
-          "https://w3id.org/security/v1"
-        ],
-        ...actor,
-        publicKey: {
-          id: `${actor.id}#main-key`,
-          owner: actor.id,
-          publicKeyPem: publicKeyPem
-        }
-      };
-
-      res.setHeader('Content-Type', 'application/activity+json; profile="https://www.w3.org/ns/activitystreams"');
-      res.status(200).json(actorWithKey);
-    } catch (error) {
-      next(error);
+  try {
+    const { id } = req.params;
+    console.log('Requested actor ID:', id);
+    
+    if (!id) {
+      throw new BadRequestError('Actor ID is required');
     }
-  },
+
+    const actor = await ActorService.getActorByUserName(id);
+    if (!actor) {
+      throw new UserNotFoundError('Actor not found');
+    }
+
+    const publicKeyPem = process.env.USER_PUBLIC_KEY_PEM;
+    console.log('Public key loaded:', !!publicKeyPem);
+    
+    // Validate public key exists and is properly formatted
+    if (!publicKeyPem) {
+      console.error('USER_PUBLIC_KEY_PEM environment variable is not set');
+      throw new Error('Public key not configured');
+    }
+
+    // Ensure the public key is properly formatted
+    const formattedPublicKey = publicKeyPem.includes('-----BEGIN') 
+      ? publicKeyPem 
+      : `-----BEGIN PUBLIC KEY-----\n${publicKeyPem}\n-----END PUBLIC KEY-----`;
+
+    const actorWithKey = {
+      "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "https://w3id.org/security/v1"
+      ],
+      ...actor,
+      // Add missing fields that ActivityPub servers expect
+      summary: (actor as any).summary || "", // Bio/description
+      url: (actor as any).url || actor.id, // Profile URL
+      manuallyApprovesFollowers: false, // Whether followers need approval
+      discoverable: true, // Whether the actor should be discoverable
+      indexable: true, // Whether the actor should be indexed
+      
+      // Endpoints object (optional but recommended)
+      endpoints: {
+        sharedInbox: `${process.env.BASE_URL || 'https://linkup.tevlen.co.za'}/api/inbox`
+      },
+
+      // Public key object
+      publicKey: {
+        id: `${actor.id}#main-key`,
+        owner: actor.id,
+        publicKeyPem: formattedPublicKey
+      }
+    };
+
+    // Set proper ActivityPub headers
+    res.setHeader('Content-Type', 'application/activity+json; profile="https://www.w3.org/ns/activitystreams"');
+    res.setHeader('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
+    res.setHeader('Vary', 'Accept'); // Important for content negotiation
+    
+    console.log('Returning actor:', JSON.stringify(actorWithKey, null, 2));
+    res.status(200).json(actorWithKey);
+    
+  } catch (error) {
+    console.error('Error in getActorByUsername:', error);
+    next(error);
+  }
+},
 
   postActivityToInbox: async (req: Request, res: Response, next: NextFunction) => {
     try {
