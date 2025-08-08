@@ -14,15 +14,15 @@ export const ExternalApis = {
     },
 
     postToExternalApi: async (url: string, payload: any): Promise<any> => {
-        const response = await axios.post(url, JSON.stringify(payload), {
+        const response = await axios.post(url, payload, {
             headers: {
                 'Content-Type': 'application/activity+json',
                 'Accept': 'application/activity+json',
-                'Date': new Date().toUTCString()
+                'Date': new Date().toUTCString(),
             },
             maxBodyLength: Infinity,
             maxContentLength: Infinity,
-            validateStatus: () => true // let caller handle non-2xx responses
+            validateStatus: () => true,
         });
 
         console.log('Response status code:', response.status);
@@ -30,7 +30,7 @@ export const ExternalApis = {
         if (response.status >= 200 && response.status < 300) {
             console.log('Success!');
         } else {
-            throw new BadRequestError(`Error or unexpected status: ${response.status}`);
+            throw new BadRequestError(`Error or unexpected status: ${response}`);
         }
 
         return response;

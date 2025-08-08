@@ -41,8 +41,7 @@ export const InboxService = {
                             } 
             
                             noteActivity.object = noteType;
-                            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, {
-                                ...activity, actor: {id: activity.actor}});
+                            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
                         }
                         else {
                             const videoType = ObjectController.getMediaType(object.url);
@@ -62,18 +61,15 @@ export const InboxService = {
                             }
                             
                             noteActivity.object = noteType;
-                            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, {
-                                ...activity, actor: {id: activity.actor}});
+                            const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
                         }
                     }
                     else {
-                        const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, {
-                                ...activity, actor: {id: activity.actor}});
+                        const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
                     }
                 }
                 else {
-                    const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, {
-                                ...activity, actor: {id: activity.actor}});
+                    const _inboxItem = await ExternalApis.postToExternalApi(`${inboxActorId}/inbox`, activity);
                 }
             }
             catch(error){
