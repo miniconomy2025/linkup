@@ -188,7 +188,7 @@ const FeedPage: React.FC = () => {
             await likePost({ postId });
             setPosts((prevPosts) =>
                 prevPosts.map((post) =>
-                    post.object.id === postId
+                    post.id === postId
                         ? { ...post, liked: true }
                         : post
                 )
@@ -218,7 +218,7 @@ const FeedPage: React.FC = () => {
                         return (
                             <div key={post.id} className='post-card'>
                                 <div className='post-header' onClick={() => handleActorClick(post?.attributedTo)}>
-                                    @ {post?.attributedTo}
+                                    @{post?.attributedTo?.split('/')?.pop()}
                                 </div>
 
                                 {post.type === 'Image' && (
