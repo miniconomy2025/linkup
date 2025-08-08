@@ -3,10 +3,11 @@ import { ActorService } from "../services/actor.service";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { NotAuthenticatedError } from "../middleware/errorHandler";
 import { mapToActivityObject } from "../utils/mapping";
+import { ActorGraphRepository } from "../graph/repositories/actor";
 const apiUrl = process.env.BASE_URL;
 
 export const FeedsController = {
-  getUserFeed: async (
+  getUserFeed2: async (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
@@ -26,7 +27,7 @@ export const FeedsController = {
       next(error);
     }
   },
-  getUserFeedTest: async (
+  getUserFeed: async (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
@@ -34,50 +35,79 @@ export const FeedsController = {
     try {
       if (!req?.user?.id) {
         throw new NotAuthenticatedError("User not valid");
-      };
-      const user = "https://linkup.tevlen.co.za/api/actors/chrismchardy17545778"
-    
-      // Fetch all following actors
-      const following = await fetch(`${user}/following`, {
-          headers: {
-              Accept: "application/activity+json",
-          },
+      }
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const actorId = req?.user?.id;
+
+      // const user = "https://linkup.tevlen.co.za/api/actors/chrismchardy17545778"
+
+      const followingRes = await fetch(`${actorId}/following`, {
+        headers: { Accept: "application/activity+json" },
       });
 
-      const data = await following.json();
+      const data = await followingRes.json();
 
-      if (!data?.orderedItems && data?.orderedItems.length <= 0) {
-        throw new NotAuthenticatedError("Not followings found");
-      };
+      if (!data?.orderedItems || data?.orderedItems.length === 0) {
+        throw new NotAuthenticatedError("No followings found");
+      }
 
-      const posts: string | any[] = [];
+      const allPosts: any[] = [];
 
-
-      for (const actor of data?.orderedItems) {
+      for (const actor of data.orderedItems) {
         try {
           const actorOutbox = await fetch(`${actor.id}/outbox`, {
-            headers: {
-              Accept: "application/activity+json",
-            },
+            headers: { Accept: "application/activity+json" },
           });
 
           const outboxData = await actorOutbox.json();
-// console.log(outboxData)
+
           if (outboxData?.orderedItems) {
-            const values = outboxData.orderedItems.map((activity: any) => mapToActivityObject(activity.object));
-           
-            posts.push(...values);
-          };
+            const mappedPosts = outboxData.orderedItems.map((activity: any) =>
+              mapToActivityObject(activity.object)
+            );
 
+            allPosts.push(...mappedPosts);
+          }
         } catch (err) {
-          console.error(`Failed to fetch outbox for ${actor}`, err);
+          console.error(`Failed to fetch outbox for ${actor.id}`, err);
         }
-      };
- console.log(posts)
-      return res.status(200).json(posts);
+      }
 
+      // Filter and sort posts by `published` date
+      const sortedPosts = allPosts
+        .filter((p) => p?.published)
+        .sort(
+          (a, b) =>
+            new Date(b.published).getTime() - new Date(a.published).getTime()
+        );
+
+      // Pagination
+      const start = (page - 1) * limit;
+      const end = start + limit;
+      const paginatedPosts = sortedPosts.slice(start, end);
+
+      // Add `liked` field for each post
+      const postsWithLiked = await Promise.all(
+        paginatedPosts.map(async (post) => {
+          const objectId = post.id;
+          const liked = await ActorGraphRepository.hasUserLikedPost(
+            objectId,
+            actorId
+          );
+          return {
+            ...post,
+            liked,
+          };
+        })
+      );
+
+      console.log(postsWithLiked.length)
+
+      res.status(200).json(postsWithLiked);
     } catch (error) {
-        next(error);
+      next(error);
     }
   },
 };

@@ -5,7 +5,6 @@ import { PostImage } from '../../components/postImage/PostImage';
 import { useNavigate } from 'react-router-dom';
 import { FcLikePlaceholder } from 'react-icons/fc';
 import { FcLike } from 'react-icons/fc';
-import { FaRegComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { likePost } from '../../api/requests/activity';
 import { getFeed } from '../../api/requests/posts';
@@ -34,25 +33,26 @@ const FeedPage: React.FC = () => {
     };
 
     const loadMorePosts = async () => {
-        if (loading || !hasMore) return;
+        if (loadingRef.current || !hasMoreRef.current) return;
+
         setLoading(true);
-        const response = await getFeed({ page, limit: 4 });
-        // console.log(response)
+
+        const currentPage = pageRef.current;
+        const response = await getFeed({ page: currentPage, limit: 4 });
+
         if (response.length === 0) {
             setHasMore(false);
+            hasMoreRef.current = false;
             setLoading(false);
             return;
-        };
+        }
 
-        setPosts((prev) => {
-            // Create a set of existing IDs for quick lookup
-            const existingIds = new Set(prev.map(post => post._id));
-            // Filter out duplicates from new results
-            const newPosts = response.filter(post => !existingIds.has(post._id));
-            return [...prev, ...newPosts];
-        });
+        setPosts((prev) => [...prev, ...response]);
 
-        setPage((prev) => prev + 1);
+        const nextPage = currentPage + 1;
+        setPage(nextPage);
+        pageRef.current = nextPage;
+
         setLoading(false);
     };
 
@@ -62,7 +62,6 @@ const FeedPage: React.FC = () => {
         try {
             setInitialLoading(true);
             getFeed({ page: 1, limit: 4 }).then(response => {
-                // console.log(response)
                 setPosts(response);
                 setPage(2); // next page would be 2
                 setHasMore(response.length > 0);
@@ -149,20 +148,37 @@ const FeedPage: React.FC = () => {
         };
     }, [posts]);
 
+    const pageRef = useRef(page);
+    const loadingRef = useRef(loading);
+    const hasMoreRef = useRef(hasMore);
+
+        useEffect(() => {
+        pageRef.current = page;
+    }, [page]);
+
+    useEffect(() => {
+        loadingRef.current = loading;
+    }, [loading]);
+
+    useEffect(() => {
+        hasMoreRef.current = hasMore;
+    }, [hasMore]);
+
     // Infinite scroll listener
     useEffect(() => {
         const handleScroll = () => {
             const nearBottom =
                 window.innerHeight + document.documentElement.scrollTop >=
                 document.documentElement.offsetHeight - 300;
-            if (nearBottom) {
+
+            if (nearBottom && !loadingRef.current && hasMoreRef.current) {
                 loadMorePosts();
             }
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [posts, page, hasMore]);
+    }, []); 
 
     const notifySuccess = () => toast.success('Post liked Successfully!');
     const notifyError = () => toast.error('Error! Something went wrong.');
@@ -193,6 +209,7 @@ const FeedPage: React.FC = () => {
             <div className='feed-container'>
                 <div className='post-container'>
                     {posts.map((post) => {
+
                         // Create ref for each video post if not exists
                         if (post.video && !videoRefs.current[post.id]) {
                             videoRefs.current[post.id] = React.createRef<HTMLVideoElement>();
@@ -200,24 +217,24 @@ const FeedPage: React.FC = () => {
 
                         return (
                             <div key={post.id} className='post-card'>
-                                <div className='post-header' onClick={() => handleActorClick(post.actor.id)}>
-                                    @ {post.actor.name}
+                                <div className='post-header' onClick={() => handleActorClick(post?.attributedTo)}>
+                                    @ {post?.attributedTo}
                                 </div>
 
-                                {post.object.type === 'Image' && (
+                                {post.type === 'Image' && (
                                     <>
-                                    <div className='post-media' onClick={() => handlePostClick(post.object.id)}>
-                                        <PostImage src={post.object.url} alt='post' />
+                                    <div className='post-media' onClick={() => handlePostClick(post.id)}>
+                                        <PostImage src={post.url} alt='post' />
                                     </div>
-                                    <div className='post-caption'>{post?.object?.name}</div>
+                                    <div className='post-caption'>{post?.name}</div>
                                     </>
                                 )}
 
-                                {post.object.type === 'Video' && (
+                                {post.type === 'Video' && (
                                     <><div className='post-media'>
                                         <video
                                             ref={videoRefs.current[post._id]}
-                                            src={post.object.url}
+                                            src={post.url}
                                             className='post-video'
                                             muted
                                             playsInline
@@ -225,13 +242,13 @@ const FeedPage: React.FC = () => {
                                             controls
                                         />
                                     </div>
-                                    <div className='post-caption'>{post?.object?.name}</div>
+                                    <div className='post-caption'>{post?.name}</div>
                                     </>
                                 )}
                                 
-                                {post.object.type === 'Note' && (
+                                {post.type === 'Note' && (
                                     <div className='post-media'>
-                                        <div className='post-content-scrollable'>{post.object.content}</div>
+                                        <div className='post-content-scrollable'>{post.content}</div>
                                     </div>
                                 )}
 
@@ -240,7 +257,7 @@ const FeedPage: React.FC = () => {
                                         {post.liked === false ? (
                                             <FcLikePlaceholder 
                                                 size={20} 
-                                                onClick={() => handlePostLike(post.object.id)} 
+                                                onClick={() => handlePostLike(post.id)} 
                                                 className='like-action' 
                                             /> 
                                         ): (
@@ -250,14 +267,6 @@ const FeedPage: React.FC = () => {
                                             /> 
                                         )}
                                     </span>
-                                    {/* <span className='post-action'>
-                                        <FaRegComments 
-                                            size={20} 
-                                            color={'#555'} 
-                                            onClick={() => handlePostClick(post.id)}  
-                                            className='comment-action'
-                                        /> 
-                                    </span> */}
                                 </div>
                             </div>
                         );
