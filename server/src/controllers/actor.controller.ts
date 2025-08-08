@@ -8,7 +8,7 @@ import { ActorGraphRepository } from '../graph/repositories/actor';
 const apiUrl = process.env.BASE_URL
 
 export const ActorController = {
-  getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
+getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params;
     console.log('Requested actor ID:', id);
@@ -23,49 +23,137 @@ export const ActorController = {
     }
 
     const publicKeyPem = process.env.USER_PUBLIC_KEY_PEM;
-    console.log('Public key loaded:', !!publicKeyPem);
+    const publicKeyMultibase = process.env.USER_PUBLIC_KEY_MULTIBASE;
+    const edPublicKeyPem = process.env.USER_ED25519_PUBLIC_KEY_PEM;
+    const edPublicKeyMultibase = process.env.USER_ED25519_PUBLIC_KEY_MULTIBASE;
     
-    // Validate public key exists and is properly formatted
+    console.log('Public key loaded:', !!publicKeyPem);
+    console.log('Multibase key loaded:', !!publicKeyMultibase);
+    
+    // Validate at least one public key exists
     if (!publicKeyPem) {
       console.error('USER_PUBLIC_KEY_PEM environment variable is not set');
       throw new Error('Public key not configured');
     }
 
-    // Ensure the public key is properly formatted
-    const formattedPublicKey = publicKeyPem.includes('-----BEGIN') 
-      ? publicKeyPem 
-      : `-----BEGIN PUBLIC KEY-----\n${publicKeyPem}\n-----END PUBLIC KEY-----`;
+    if (publicKeyPem.length < 100) {
+      console.error('Public key appears to be incomplete:', publicKeyPem);
+      throw new Error('Public key is incomplete');
+    }
 
+    // Build assertionMethod array
+    const assertionMethod = [];
+    
+    // Add RSA key if available
+    if (publicKeyMultibase) {
+      assertionMethod.push({
+        id: `${actor.id}#main-key`,
+        type: "Multikey",
+        controller: actor.id,
+        publicKeyMultibase: publicKeyMultibase
+      });
+    }
+
+    // Add Ed25519 key if available
+    if (edPublicKeyMultibase) {
+      assertionMethod.push({
+        id: `${actor.id}#key-2`,
+        type: "Multikey", 
+        controller: actor.id,
+        publicKeyMultibase: edPublicKeyMultibase
+      });
+    }
+
+    // Build publicKey array
+    const publicKeyArray = [];
+    
+    // Add main RSA key
+    publicKeyArray.push({
+      id: `${actor.id}#main-key`,
+      type: "CryptographicKey",
+      owner: actor.id,
+      publicKeyPem: publicKeyPem
+    });
+
+    // Add Ed25519 key if available
+    if (edPublicKeyPem) {
+      publicKeyArray.push({
+        id: `${actor.id}#key-2`,
+        type: "CryptographicKey",
+        owner: actor.id,
+        publicKeyPem: edPublicKeyPem
+      });
+    }
+
+    // Create comprehensive ActivityPub actor object matching the example
     const actorWithKey = {
       "@context": [
         "https://www.w3.org/ns/activitystreams",
-        "https://w3id.org/security/v1"
+        "https://w3id.org/security/v1",
+        "https://w3id.org/security/data-integrity/v1",
+        "https://www.w3.org/ns/did/v1",
+        "https://w3id.org/security/multikey/v1",
+        {
+          "alsoKnownAs": {
+            "@id": "as:alsoKnownAs",
+            "@type": "@id"
+          },
+          "manuallyApprovesFollowers": "as:manuallyApprovesFollowers",
+          "movedTo": {
+            "@id": "as:movedTo",
+            "@type": "@id"
+          },
+          "toot": "http://joinmastodon.org/ns#",
+          "Emoji": "toot:Emoji",
+          "featured": {
+            "@id": "toot:featured",
+            "@type": "@id"
+          },
+          "featuredTags": {
+            "@id": "toot:featuredTags",
+            "@type": "@id"
+          },
+          "discoverable": "toot:discoverable",
+          "suspended": "toot:suspended",
+          "memorial": "toot:memorial",
+          "indexable": "toot:indexable",
+          "schema": "http://schema.org#",
+          "PropertyValue": "schema:PropertyValue",
+          "value": "schema:value",
+          "misskey": "https://misskey-hub.net/ns#",
+          "_misskey_followedMessage": "misskey:_misskey_followedMessage",
+          "isCat": "misskey:isCat"
+        }
       ],
-      ...actor,
-      // Add missing fields that ActivityPub servers expect
-      summary: (actor as any).summary || "", // Bio/description
-      url: (actor as any).url || actor.id, // Profile URL
-      manuallyApprovesFollowers: false, // Whether followers need approval
-      discoverable: true, // Whether the actor should be discoverable
-      indexable: true, // Whether the actor should be indexed
-      
-      // Endpoints object (optional but recommended)
-      endpoints: {
-        sharedInbox: `${process.env.BASE_URL || 'https://linkup.tevlen.co.za'}/api/inbox`
-      },
-
-      // Public key object
-      publicKey: {
-        id: `${actor.id}#main-key`,
-        owner: actor.id,
-        publicKeyPem: formattedPublicKey
-      }
+      id: actor.id,
+      type: "Person",
+      discoverable: true,
+      indexable: true,
+      inbox: actor.inbox,
+      assertionMethod: assertionMethod,
+      publicKey: publicKeyArray,
+      followers: actor.followers,
+      following: actor.following,
+      ...(actor.icon && {
+        icon: {
+          type: "Image",
+          mediaType: "image/jpeg",
+          url: actor.icon.url
+        }
+      }),
+      manuallyApprovesFollowers: false,
+      name: actor.name,
+      outbox: actor.outbox,
+      preferredUsername: actor.preferredUsername,
+      summary: ""
     };
+
+    // No need to remove undefined fields since we use conditional spreading
 
     // Set proper ActivityPub headers
     res.setHeader('Content-Type', 'application/activity+json; profile="https://www.w3.org/ns/activitystreams"');
-    res.setHeader('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
-    res.setHeader('Vary', 'Accept'); // Important for content negotiation
+    res.setHeader('Cache-Control', 'public, max-age=300');
+    res.setHeader('Vary', 'Accept');
     
     console.log('Returning actor:', JSON.stringify(actorWithKey, null, 2));
     res.status(200).json(actorWithKey);
