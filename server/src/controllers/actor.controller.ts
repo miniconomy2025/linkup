@@ -11,9 +11,11 @@ export const ActorController = {
   getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
+      console.log(id);
       if (!id) {
         throw new BadRequestError('Actor ID is required');
       }
+      console.log(id);
       const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
         throw new UserNotFoundError('Actor not found')

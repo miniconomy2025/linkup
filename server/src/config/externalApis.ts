@@ -25,13 +25,7 @@ export const ExternalApis = {
             validateStatus: () => true,
         });
 
-        console.log('Response status code:', response.status);
-
-        if (response.status >= 200 && response.status < 300) {
-            console.log('Success!');
-        } else {
-            throw new BadRequestError(`Error or unexpected status: ${response}`);
-        }
+        console.log('Response status code:', JSON.stringify(response.data, null, 2));
 
         return response;
     }
