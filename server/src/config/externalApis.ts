@@ -14,7 +14,7 @@ export const ExternalApis = {
     },
 
     postToExternalApi: async (url: string, payload: any): Promise<any> => {
-        const response = await axios.post(url, payload, {
+        const response = await axios.post(url, {...payload, "@context": "https://www.w3.org/ns/activitystreams"}, {
             headers: {
                 'Content-Type': 'application/activity+json',
                 'Accept': 'application/activity+json',

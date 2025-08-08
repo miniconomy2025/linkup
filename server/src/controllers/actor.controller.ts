@@ -20,7 +20,7 @@ export const ActorController = {
       if (!actor) {
         throw new UserNotFoundError('Actor not found')
       }
-
+      console.log(actor);
       const publicKeyPem = process.env.USER_PUBLIC_KEY_PEM;
       console.log(publicKeyPem);
 
