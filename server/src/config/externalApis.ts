@@ -1,3 +1,5 @@
+import { BadRequestError } from "../middleware/errorHandler";
+
 const axios = require('axios');
 
 export const ExternalApis = {
@@ -12,13 +14,25 @@ export const ExternalApis = {
     },
 
     postToExternalApi: async (url: string, payload: any): Promise<any> => {
-        const response = await axios.post(url, payload, {
+        const response = await axios.post(url, JSON.stringify(payload), {
             headers: {
-                'Content-Type': 'application/ld+json; profile="https://www.w3.org/ns/activitystreams"',
-                'Accept': 'application/ld+json'
-            }
+                'Content-Type': 'application/activity+json',
+                'Accept': 'application/activity+json',
+                'Date': new Date().toUTCString()
+            },
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity,
+            validateStatus: () => true // let caller handle non-2xx responses
         });
 
+        console.log('Response status code:', response.status);
+
+        if (response.status >= 200 && response.status < 300) {
+            console.log('Success!');
+        } else {
+            throw new BadRequestError(`Error or unexpected status: ${response.status}`);
+        }
+
         return response;
-    },
+    }
 }
