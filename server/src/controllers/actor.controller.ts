@@ -23,6 +23,7 @@ export const ActorController = {
       console.log(publicKeyPem);
 
       const actorWithKey = {
+        "@context": "https://www.w3.org/ns/activitystreams",
         ...actor,
         publicKey: {
           id: `${actor.id}#main-key`,
