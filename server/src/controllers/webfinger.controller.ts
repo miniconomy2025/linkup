@@ -21,9 +21,13 @@ export const WebfingerController = {
                 throw new UserNotFoundError(`User with username ${username} not found`);
             }
 
-            return res.json({
+            return res
+            .type('application/jrd+json')
+            .json({
                 subject: `acct:${username}@${domain}`,
-                aliases: [actor.id],
+                aliases: [
+                actor.id
+                ],
                 links: [
                 {
                     rel: 'self',
@@ -31,7 +35,8 @@ export const WebfingerController = {
                     href: actor.id
                 }
                 ]
-            })
+            });
+
         } catch (error) {
             next(error);
         }
