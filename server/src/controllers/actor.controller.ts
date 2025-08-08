@@ -22,69 +22,6 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
       throw new UserNotFoundError('Actor not found');
     }
 
-    const publicKeyPem = process.env.USER_PUBLIC_KEY_PEM;
-    const publicKeyMultibase = process.env.USER_PUBLIC_KEY_MULTIBASE;
-    const edPublicKeyPem = process.env.USER_ED25519_PUBLIC_KEY_PEM;
-    const edPublicKeyMultibase = process.env.USER_ED25519_PUBLIC_KEY_MULTIBASE;
-    
-    console.log('Public key loaded:', !!publicKeyPem);
-    console.log('Multibase key loaded:', !!publicKeyMultibase);
-    
-    // Validate at least one public key exists
-    if (!publicKeyPem) {
-      console.error('USER_PUBLIC_KEY_PEM environment variable is not set');
-      throw new Error('Public key not configured');
-    }
-
-    if (publicKeyPem.length < 100) {
-      console.error('Public key appears to be incomplete:', publicKeyPem);
-      throw new Error('Public key is incomplete');
-    }
-
-    // Build assertionMethod array
-    const assertionMethod = [];
-    
-    // Add RSA key if available
-    if (publicKeyMultibase) {
-      assertionMethod.push({
-        id: `${actor.id}#main-key`,
-        type: "Multikey",
-        controller: actor.id,
-        publicKeyMultibase: publicKeyMultibase
-      });
-    }
-
-    // Add Ed25519 key if available
-    if (edPublicKeyMultibase) {
-      assertionMethod.push({
-        id: `${actor.id}#key-2`,
-        type: "Multikey", 
-        controller: actor.id,
-        publicKeyMultibase: edPublicKeyMultibase
-      });
-    }
-
-    // Build publicKey array
-    const publicKeyArray = [];
-    
-    // Add main RSA key
-    publicKeyArray.push({
-      id: `${actor.id}#main-key`,
-      type: "CryptographicKey",
-      owner: actor.id,
-      publicKeyPem: publicKeyPem
-    });
-
-    // Add Ed25519 key if available
-    if (edPublicKeyPem) {
-      publicKeyArray.push({
-        id: `${actor.id}#key-2`,
-        type: "CryptographicKey",
-        owner: actor.id,
-        publicKeyPem: edPublicKeyPem
-      });
-    }
-
     // Create comprehensive ActivityPub actor object matching the example
     const actorWithKey = {
       "@context": [
@@ -130,8 +67,6 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
       discoverable: true,
       indexable: true,
       inbox: actor.inbox,
-      assertionMethod: assertionMethod,
-      publicKey: publicKeyArray,
       followers: actor.followers,
       following: actor.following,
       ...(actor.icon && {
