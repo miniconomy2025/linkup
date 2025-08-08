@@ -25,7 +25,10 @@ export const ActorController = {
       console.log(publicKeyPem);
 
       const actorWithKey = {
-        "@context": "https://www.w3.org/ns/activitystreams",
+        "@context": [
+          "https://www.w3.org/ns/activitystreams",
+          "https://w3id.org/security/v1"
+        ],
         ...actor,
         publicKey: {
           id: `${actor.id}#main-key`,
@@ -34,7 +37,7 @@ export const ActorController = {
         }
       };
 
-      res.setHeader('Content-Type', 'application/activity+json');
+      res.setHeader('Content-Type', 'application/activity+json; profile="https://www.w3.org/ns/activitystreams"');
       res.status(200).json(actorWithKey);
     } catch (error) {
       next(error);
