@@ -9,16 +9,18 @@ const apiUrl = process.env.BASE_URL
 
 export const ActorController = {
 getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
+  console.log('🎭 getActorByUsername - START', { id: req.params.id });
   try {
     const { id } = req.params;
-    console.log('Requested actor ID:', id);
     
     if (!id) {
+      console.log('❌ getActorByUsername - ERROR: Actor ID is required');
       throw new BadRequestError('Actor ID is required');
     }
 
     const actor = await ActorService.getActorByUserName(id);
     if (!actor) {
+      console.log('❌ getActorByUsername - ERROR: Actor not found', { id });
       throw new UserNotFoundError('Actor not found');
     }
 
@@ -89,32 +91,34 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
     res.setHeader('Content-Type', 'application/activity+json; profile="https://www.w3.org/ns/activitystreams"');
     res.setHeader('Cache-Control', 'public, max-age=300');
     res.setHeader('Vary', 'Accept');
-    
-    console.log('Returning actor:', JSON.stringify(actorWithKey, null, 2));
+
     res.status(200).json(actorWithKey);
+    console.log('✅ getActorByUsername - END', { id, actorId: actor.id });
     
   } catch (error) {
-    console.error('Error in getActorByUsername:', error);
+    console.error('💥 getActorByUsername - CATCH ERROR:', error);
     next(error);
   }
 },
 
   postActivityToInbox: async (req: Request, res: Response, next: NextFunction) => {
+    console.log('📥 postActivityToInbox - START', { id: req.params.id, activityType: req.body?.type });
     try {
       const { id } = req.params;
       if (!id) {
+        console.log('❌ postActivityToInbox - ERROR: Actor ID is required');
         throw new BadRequestError('Actor ID is required');
       }
       const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
+        console.log('❌ postActivityToInbox - ERROR: Actor not found', { id });
         throw new UserNotFoundError('Actor not found')
       }
 
       const activity = req.body;
 
-      console.log(activity);
-
       if (!activity) {
+        console.log('❌ postActivityToInbox - ERROR: Activity is required');
         throw new BadRequestError('Activity is required');
       }
 
@@ -131,21 +135,26 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
       }
 
       res.status(200).json({message: 'Activity received in inbox successfully'})
+      console.log('✅ postActivityToInbox - END', { id, activityType: activity.type, actorId: actor.id });
     } catch (error) {
+      console.error('💥 postActivityToInbox - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getUserOutbox: async (req: Request, res: Response, next: NextFunction) => {
+    console.log('📤 getUserOutbox - START', { id: req.params.id });
     try {
       const id = req.params.id;
 
       if (!id) {
+        console.log('❌ getUserOutbox - ERROR: Actor ID is required');
         throw new BadRequestError('Actor ID is required')
       }
 
       const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
+        console.log('❌ getUserOutbox - ERROR: Actor not found', { id });
         throw new UserNotFoundError('Actor not found');
       }
 
@@ -167,49 +176,61 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
         "totalItems": activities.length,
         "orderedItems": orderedActivities
       });
+      console.log('✅ getUserOutbox - END', { id, actorId, activitiesCount: activities.length });
     } catch (error) {
+      console.error('💥 getUserOutbox - CATCH ERROR:', error);
       next(error);
     }
   },
   
   getUserFollowers: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    console.log('👥 getUserFollowers - START', { userName: req.user?.userName });
     try {
       const actorId = `${apiUrl}/actors/${req.user.userName}`;
 
       const followers = await ActorService.getActorsFollowers(actorId);
 
       res.status(200).json(followers);
+      console.log('✅ getUserFollowers - END', { actorId, followersCount: followers?.length });
     } catch (error) {
+      console.error('💥 getUserFollowers - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getActorFollowers: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    console.log('👥 getActorFollowers - START', { actorId: req.query.actorId });
     try {
       const actorId = req.query.actorId;
 
       if (!actorId) {
+        console.log('❌ getActorFollowers - ERROR: Actor ID is required');
         throw new BadRequestError('Actor ID is required')
       }
 
       const followers = await ActorService.getActorsFollowers(decodeURIComponent(actorId as string));
 
       res.status(200).json(followers);
+      console.log('✅ getActorFollowers - END', { actorId, followersCount: followers?.length });
     } catch (error) {
+      console.error('💥 getActorFollowers - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getFollowersActivityPub: async (req: Request, res: Response, next: NextFunction) => {
+    console.log('👥 getFollowersActivityPub - START', { id: req.params.id });
     try {
       const id = req.params.id;
 
       if (!id) {
+        console.log('❌ getFollowersActivityPub - ERROR: Actor ID is required');
         throw new BadRequestError('Actor ID is required')
       }
       
       const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
+        console.log('❌ getFollowersActivityPub - ERROR: Actor not found', { id });
         throw new UserNotFoundError('Actor not found');
       }
 
@@ -224,49 +245,61 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
         "totalItems": followers ? followers.length : 0,
         "orderedItems": followers
       });
+      console.log('✅ getFollowersActivityPub - END', { id, actorId, followersCount: followers?.length });
     } catch (error) {
+      console.error('💥 getFollowersActivityPub - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getUserFollowing: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    console.log('👤 getUserFollowing - START', { userName: req.user?.userName });
     try {
       const actorId = `${apiUrl}/actors/${req.user.userName}`;
 
       const following = await ActorService.getActorsFollowing(actorId);
 
       res.status(200).json(following);
+      console.log('✅ getUserFollowing - END', { actorId, followingCount: following?.length });
     } catch (error) {
+      console.error('💥 getUserFollowing - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getActorFollowing: async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    console.log('👤 getActorFollowing - START', { actorId: req.query.actorId });
     try {
       const actorId = req.query.actorId;
 
       if (!actorId) {
+        console.log('❌ getActorFollowing - ERROR: Actor ID is required');
         throw new BadRequestError('Actor ID is required')
       }
 
       const following = await ActorService.getActorsFollowing(decodeURIComponent(actorId as string));
 
       res.status(200).json(following);
+      console.log('✅ getActorFollowing - END', { actorId, followingCount: following?.length });
     } catch (error) {
+      console.error('💥 getActorFollowing - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getFollowingActivityPub: async (req: Request, res: Response, next: NextFunction) => {
+    console.log('👤 getFollowingActivityPub - START', { id: req.params.id });
     try {
       const id = req.params.id;
 
       if (!id) {
+        console.log('❌ getFollowingActivityPub - ERROR: Actor ID is required');
         throw new BadRequestError('Actor ID is required')
       }
 
       const actor = await ActorService.getActorByUserName(id);
       if (!actor) {
+        console.log('❌ getFollowingActivityPub - ERROR: Actor not found', { id });
         throw new UserNotFoundError('Actor not found');
       }
 
@@ -281,19 +314,28 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
         "totalItems": following ? following.length : 0,
         "orderedItems": following
       });
+      console.log('✅ getFollowingActivityPub - END', { id, actorId, followingCount: following?.length });
     } catch (error) {
+      console.error('💥 getFollowingActivityPub - CATCH ERROR:', error);
       next(error);
     }
   },
 
   getUserProfile: async (req: AuthenticatedRequest, res: Response, _next: NextFunction) => {
-    const user = req.user;
-    if(user){
-       const summary = await ActorService.getActorProfileByUserName(user.userName);
-        return res.status(200).json(summary);
-    }
-    else{
-      res.status(401).json({ message: 'User not authenticated' });
+    console.log('👤 getUserProfile - START', { userName: req.user?.userName });
+    try {
+      const user = req.user;
+      if(user){
+         const summary = await ActorService.getActorProfileByUserName(user.userName);
+          console.log('✅ getUserProfile - END', { userName: user.userName });
+          return res.status(200).json(summary);
+      }
+      else{
+        console.log('❌ getUserProfile - ERROR: User not authenticated');
+        res.status(401).json({ message: 'User not authenticated' });
+      }
+    } catch (error) {
+      console.error('💥 getUserProfile - CATCH ERROR:', error);
     }
   },
   getUserPosts: async (
@@ -301,14 +343,17 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
     res: Response,
     _next: NextFunction
   ) => {
+    console.log('📝 getUserPosts - START', { actorId: req.query.actorId });
     try {
       const actorId = req.query.actorId as string;
       if (!actorId) {
+        console.log('❌ getUserPosts - ERROR: Actor id is required');
         throw new BadRequestError("Actor id is required");
       }
       if (actorId.includes(process.env.BASE_URL!)) {
         const posts = await ActorService.getActorCreateActivities(actorId);
         res.status(200).json(posts);
+        console.log('✅ getUserPosts - END (local)', { actorId, postsCount: posts?.length });
       } else {
         // some people need /outbox?cursor=1
         const responseOutbox = await fetch(`${actorId}/outbox`, {
@@ -332,6 +377,11 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
         // });
         
         if (!responseOutbox.ok) {
+          console.log('❌ getUserPosts - ERROR: Failed to fetch remote outbox', { 
+            actorId, 
+            status: responseOutbox.status, 
+            statusText: responseOutbox.statusText 
+          });
           throw new Error(
             `Failed to fetch remote outbox: ${responseOutbox.statusText}`
           );
@@ -340,6 +390,7 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
         const data = await responseOutbox.json();
         
         if (!data.orderedItems) {
+          console.log('❌ getUserPosts - ERROR: Failed to fetch posts - no orderedItems', { actorId });
           throw new Error(
             `Failed to fetch posts`
           );
@@ -347,12 +398,13 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
 
         const posts = data.orderedItems;
         res.status(200).json(posts);
+        console.log('✅ getUserPosts - END (remote)', { actorId, postsCount: posts?.length });
 
         // const remoteOutbox = await response.json();
         // res.status(200).json(remoteOutbox);
       }
     } catch (error) {
-      console.error(error);
+      console.error('💥 getUserPosts - CATCH ERROR:', error);
       res.status(500).json({ error: "Failed to retrieve posts" });
     }
   },
@@ -361,23 +413,32 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
     res: Response,
     _next: NextFunction
   ) => {
-    const user = req.user;
-    const summary = await ActorService.getActorCreateActivities(
-      `${apiUrl}/actors/${user.userName}`
-    );
-    return res.status(200).json(summary);
+    console.log('📝 getMyPosts - START', { userName: req.user?.userName });
+    try {
+      const user = req.user;
+      const summary = await ActorService.getActorCreateActivities(
+        `${apiUrl}/actors/${user.userName}`
+      );
+      console.log('✅ getMyPosts - END', { userName: user.userName, postsCount: summary?.length });
+      return res.status(200).json(summary);
+    } catch (error) {
+      console.error('💥 getMyPosts - CATCH ERROR:', error);
+    }
   },
   getActorProfileById: async (
     req: AuthenticatedRequest,
     res: Response,
     next: NextFunction
   ) => {
+    console.log('👤 getActorProfileById - START', { actorId: req.query.actorId, userName: req.user?.userName });
     try {
       const actorId = req.query.actorId as string;
       const user = req.user;
       if (!user) {
+        console.log('❌ getActorProfileById - ERROR: User not authenticated');
         throw new NotAuthenticatedError("Üser not authenticared");
       } else if (!actorId) {
+        console.log('❌ getActorProfileById - ERROR: actor id is required');
         throw new BadRequestError("actor id is required");
       } else {
         let actor;
@@ -387,6 +448,7 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
             actorId,
             loggedInActorId
           );
+          console.log('✅ getActorProfileById - END (local)', { actorId, loggedInActorId });
         } else {
           const response = await fetch(`${actorId}`, {
             headers: {
@@ -424,10 +486,18 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
             followersCount: dataFollowers?.orderedItems?.length || 0,
             followingCount: dataFollowing?.orderedItems?.length || 0
           };
+          console.log('✅ getActorProfileById - END (remote)', { 
+            actorId, 
+            loggedInActorId, 
+            isFollowing,
+            followersCount: actor.followersCount,
+            followingCount: actor.followingCount
+          });
         }
         res.status(200).json(actor);
       }
     } catch (error) {
+      console.error('💥 getActorProfileById - CATCH ERROR:', error);
       next(error);
     }
   },
