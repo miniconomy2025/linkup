@@ -5,6 +5,7 @@ import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { InboxService } from '../services/inbox.service';
 import { ActorGraphRepository } from '../graph/repositories/actor';
 import { ExternalActivityRepository } from '../repositories/external.activity.repository';
+import { ActivityService } from '../services/activity.service';
 
 const apiUrl = process.env.BASE_URL
 
@@ -128,13 +129,20 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
       await ExternalActivityRepository.createExternalActivity(activity);
 
       if (activity.type == 'Follow') {
-        await ActorGraphRepository.createFollowActorActivity(activity.actor, actor.id);
+        await ActorGraphRepository.createFollowActorActivity(activity.actor.id, actor.id);
       }
       else if (activity.type == 'Like') {
-        await ActorGraphRepository.createLikeForPost(activity.object, activity.actor);
+        const activityOnOurSide = ActivityService.getActivitytById(activity.object);
+        if (activityOnOurSide) {
+          await ActorGraphRepository.createLikeForPost(((await activityOnOurSide).object as any).id, activity.actor);
+        }
+        else {
+          await ActorGraphRepository.createLikeForPost(activity.object, activity.actor);
+        }
+        
       }
       else if (activity.type == 'Undo') {
-        await ActorGraphRepository.removeFollowActor(activity.actor, actor.id);
+        await ActorGraphRepository.removeFollowActor(activity.actor.id, actor.id);
       }
 
       res.status(200).json({message: 'Activity received in inbox successfully'})
