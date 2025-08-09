@@ -108,5 +108,6 @@ export interface OutboxItem {
 export interface InboxItem {
   actor: string;     // Actor’s URI
   activity: string;  // Activity’s URI
+  object?: string;
   receivedAt?: Date; // auto‐set
 }

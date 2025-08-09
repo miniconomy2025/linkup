@@ -4,6 +4,7 @@ import { BadRequestError, NotAuthenticatedError, UserNotFoundError } from '../mi
 import { AuthenticatedRequest } from '../middleware/authMiddleware';
 import { InboxService } from '../services/inbox.service';
 import { ActorGraphRepository } from '../graph/repositories/actor';
+import { ExternalActivityRepository } from '../repositories/external.activity.repository';
 
 const apiUrl = process.env.BASE_URL
 
@@ -123,6 +124,8 @@ getActorByUsername: async (req: Request, res: Response, next: NextFunction) => {
       }
 
       await InboxService.addActivityToInbox(activity, actor.id!);
+
+      await ExternalActivityRepository.createExternalActivity(activity);
 
       if (activity.type == 'Follow') {
         await ActorGraphRepository.createFollowActorActivity(activity.actor, actor.id);

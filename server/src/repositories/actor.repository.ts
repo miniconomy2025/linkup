@@ -1,6 +1,8 @@
+import { ExternalApis } from '../config/externalApis';
 import { ActorGraphRepository } from '../graph/repositories/actor';
 import { ActorModel } from '../models/actor.model';
 import { CreateModel } from '../models/create.model';
+import { ExternalActivityModel } from '../models/externalActivities';
 import { InboxItemModel } from '../models/inboxitem.model';
 import { Actor, CreateActivity } from '../types/activitypub';
 
@@ -25,45 +27,107 @@ export const ActorRepository = {
     return await CreateModel.find({ actor: actorId, type: 'Create' }).sort({ createdAt: -1 }).lean();
   }, 
 
-  getActorInboxCreateItems: async (actorId: string, page = 1,limit = 10 ): Promise<any> => {
-    const skip = (page - 1) * limit;
+  getActorInboxCreateItems: async (actorId: string, page = 1, limit = 10): Promise<any> => {
+    console.log(`[getActorInboxCreateItems] Starting - actorId: ${actorId}, page: ${page}, limit: ${limit}`);
     
-    const inboxItems = await InboxItemModel.find({ actor: actorId })
-    const activityIds = inboxItems.map((item) => item.activity);
+    try {
+        const skip = (page - 1) * limit;
+        console.log(`[getActorInboxCreateItems] Calculated skip: ${skip}`);
 
-    const activities = await CreateModel.find({id: { $in: activityIds },}).sort({ createdAt: -1 }).skip(skip).limit(limit).exec();
-    // Get external activities too
+        // Get inbox items
+        console.log(`[getActorInboxCreateItems] Fetching inbox items for actor: ${actorId}`);
+        const inboxItems = await InboxItemModel.find({ actor: actorId });
+        console.log(`[getActorInboxCreateItems] Found ${inboxItems.length} inbox items`);
 
-    const activityMap = new Map(activities.map((a) => [a.id, a]));
-     const ownActivities = await CreateModel
-    .find({ actor: actorId })
-    .sort({ createdAt: -1 }) 
-    .exec();
+        // Extract activity IDs
+        const activityIds = inboxItems.map((item) => item.activity);
+        console.log(`[getActorInboxCreateItems] Extracted ${activityIds.length} activity IDs:`, activityIds);
 
-    const allActivityIds = [
-    ...activityIds,
-    ...ownActivities.map(a => a.id)
-    ];
+        // Fetch activities from CreateModel
+        console.log(`[getActorInboxCreateItems] Fetching activities from CreateModel with skip: ${skip}, limit: ${limit}`);
+        const activities = await CreateModel.find({ id: { $in: activityIds } })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .exec();
+        console.log(`[getActorInboxCreateItems] Found ${activities.length} activities from CreateModel`);
 
-    const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
+        // Fetch external activities
+        console.log(`[getActorInboxCreateItems] Fetching external activities with skip: ${skip}, limit: ${limit}`);
+        const externalActivities = await ExternalActivityModel.find({ id: { $in: activityIds } })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .exec();
+        console.log(`[getActorInboxCreateItems] Found ${externalActivities.length} external activities`);
 
-    const results = await Promise.all(
-      orderedActivities.map(async (activity) => {
-        const liked = await ActorGraphRepository.hasUserLikedPost(
-          activity.object.id!,
-          actorId
+        // Create combined activity IDs array
+        const allActivityIds = [
+            ...activityIds,
+            ...externalActivities.map(a => a.id),
+            // ...ownActivities.map(a => a.id)
+        ];
+        console.log(`[getActorInboxCreateItems] Combined activity IDs count: ${allActivityIds.length}`);
+
+        // Create activity map
+        const activityMap = new Map(
+            [...activities, ...externalActivities].map((a) => [a.id, a])
         );
-        let actor = null
-        if (activity.actor.startsWith(apiUrl!)) {
-          actor =  await ActorRepository.getActorById(activity.actor);
-        }
-        else {
-          // Get external actor
-        }
-        return { ...activity.toObject(), liked,actor : {name : actor?.name, id :actor?.id } };
-      })
-    );
+        console.log(`[getActorInboxCreateItems] Created activity map with ${activityMap.size} entries`);
 
-    return results;
-  },
+        // Order activities
+        const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
+        console.log(`[getActorInboxCreateItems] Ordered activities count: ${orderedActivities.length}`);
+
+        // Process each activity
+        console.log(`[getActorInboxCreateItems] Processing ${orderedActivities.length} activities`);
+        const results = await Promise.all(
+            orderedActivities.map(async (activity, index) => {
+                console.log(`[getActorInboxCreateItems] Processing activity ${index + 1}/${orderedActivities.length} - ID: ${activity.id}`);
+                
+                try {
+                    // Check if user liked the post
+                    console.log(`[getActorInboxCreateItems] Checking if user liked post - objectId: ${activity.object.id}, actorId: ${actorId}`);
+                    const liked = await ActorGraphRepository.hasUserLikedPost(
+                        activity.object.id!,
+                        actorId
+                    );
+                    console.log(`[getActorInboxCreateItems] Liked status for activity ${activity.id}: ${liked}`);
+
+                    let actor = null;
+                    
+                    // Determine if actor is internal or external
+                    if (activity.actor.startsWith(apiUrl!)) {
+                        console.log(`[getActorInboxCreateItems] Fetching internal actor: ${activity.actor}`);
+                        actor = await ActorRepository.getActorById(activity.actor);
+                        console.log(`[getActorInboxCreateItems] Internal actor fetched:`, actor ? `${actor.name} (${actor.id})` : 'null');
+                    } else {
+                        console.log(`[getActorInboxCreateItems] Fetching external actor: ${activity.actor}`);
+                        actor = await ExternalApis.getFromExternalApi(activity.actor);
+                        console.log(`[getActorInboxCreateItems] External actor fetched:`, actor ? `${actor.name} (${actor.id})` : 'null');
+                    }
+
+                    const result = { 
+                        ...activity.toObject(), 
+                        liked,
+                        actor: { name: actor?.name, id: actor?.id } 
+                    };
+                    console.log(`[getActorInboxCreateItems] Successfully processed activity ${activity.id}`);
+                    return result;
+                    
+                } catch (activityError) {
+                    console.error(`[getActorInboxCreateItems] Error processing activity ${activity.id}:`, activityError);
+                    throw activityError;
+                }
+            })
+        );
+
+        console.log(`[getActorInboxCreateItems] Successfully processed all activities. Returning ${results.length} results`);
+        return results;
+        
+    } catch (error) {
+        console.error(`[getActorInboxCreateItems] Function failed for actorId: ${actorId}, page: ${page}, limit: ${limit}`, error);
+        throw error;
+    }
+},
 }; 

@@ -7,6 +7,7 @@ const InboxItemSchema = new Schema<InboxItemDoc>({
   actor:      { type: String, required: true, index: true },
   activity:   { type: String, required: true },
   receivedAt: { type: Date,   default: () => new Date() },
+  object:     { type: String, required: false},
 }, { timestamps: true, versionKey: false });
 
 InboxItemSchema.index({ actor: 1, receivedAt: -1 });

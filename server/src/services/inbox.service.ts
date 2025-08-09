@@ -1,6 +1,6 @@
 import { ActorGraphRepository } from "../graph/repositories/actor";
 import { InboxRepository } from "../repositories/inbox.repository";
-import { Activity, ActivityObject } from "../types/activitypub";
+import { Activity, ActivityObject, CreateActivity } from "../types/activitypub";
 import { ExternalApis } from "../config/externalApis";
 import { ObjectController } from "../controllers/object.controller";
 
@@ -20,7 +20,8 @@ export const InboxService = {
             try {
                 const _inboxItem = await InboxRepository.addItem({
                     actor: inboxActorId,
-                    activity: activity.id!
+                    activity: activity.id!,
+                    object: (activity.object as any).id
                 });
                 console.log('Successfully added activity to local inbox:', _inboxItem);
             } catch (error) {
