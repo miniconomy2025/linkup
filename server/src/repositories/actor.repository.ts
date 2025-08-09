@@ -43,41 +43,33 @@ export const ActorRepository = {
         const activityIds = inboxItems.map((item) => item.activity);
         console.log(`[getActorInboxCreateItems] Extracted ${activityIds.length} activity IDs:`, activityIds);
 
-        // Fetch activities from CreateModel
-        console.log(`[getActorInboxCreateItems] Fetching activities from CreateModel with skip: ${skip}, limit: ${limit}`);
-        const activities = await CreateModel.find({ id: { $in: activityIds } })
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .exec();
+
+
+        // Fetch activities from CreateModel (no pagination yet)
+        console.log(`[getActorInboxCreateItems] Fetching all activities from CreateModel`);
+        const activities = await CreateModel.find({ id: { $in: activityIds }, type: 'Create' }).exec();
         console.log(`[getActorInboxCreateItems] Found ${activities.length} activities from CreateModel`);
 
-        // Fetch external activities
-        console.log(`[getActorInboxCreateItems] Fetching external activities with skip: ${skip}, limit: ${limit}`);
-        const externalActivities = await ExternalActivityModel.find({ id: { $in: activityIds } })
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit)
-            .exec();
+        // Fetch external activities (no pagination yet)
+        console.log(`[getActorInboxCreateItems] Fetching all external activities`);
+        const externalActivities = await ExternalActivityModel.find({ id: { $in: activityIds }, type: 'Create' }).exec();
         console.log(`[getActorInboxCreateItems] Found ${externalActivities.length} external activities`);
 
-        // Create combined activity IDs array
-        const allActivityIds = [
-            ...activityIds,
-            ...externalActivities.map(a => a.id),
-            // ...ownActivities.map(a => a.id)
-        ];
-        console.log(`[getActorInboxCreateItems] Combined activity IDs count: ${allActivityIds.length}`);
+        // Merge internal + external activities
+        let combinedActivities = [...activities, ...externalActivities];
 
-        // Create activity map
-        const activityMap = new Map(
-            [...activities, ...externalActivities].map((a) => [a.id, a])
-        );
-        console.log(`[getActorInboxCreateItems] Created activity map with ${activityMap.size} entries`);
+        // Sort newest first
+        combinedActivities.sort((a, b) => {
+            return new Date(b.published).getTime() - new Date(a.published).getTime();
+        });
 
-        // Order activities
-        const orderedActivities = allActivityIds.map((id) => activityMap.get(id)).filter(Boolean) as typeof activities;
-        console.log(`[getActorInboxCreateItems] Ordered activities count: ${orderedActivities.length}`);
+        // Apply pagination
+        const paginatedActivities = combinedActivities.slice(skip, skip + limit);
+        console.log(`[getActorInboxCreateItems] Paginated activities count: ${paginatedActivities.length}`);
+
+        // This is now your ordered result
+        const orderedActivities = paginatedActivities;
+
 
         // Process each activity
         console.log(`[getActorInboxCreateItems] Processing ${orderedActivities.length} activities`);
@@ -87,9 +79,9 @@ export const ActorRepository = {
                 
                 try {
                     // Check if user liked the post
-                    console.log(`[getActorInboxCreateItems] Checking if user liked post - objectId: ${activity.object.id}, actorId: ${actorId}`);
+                    console.log(`[getActorInboxCreateItems] Checking if user liked post - objectId: ${activity.object?.id}, actorId: ${actorId}`);
                     const liked = await ActorGraphRepository.hasUserLikedPost(
-                        activity.object.id!,
+                        activity.object?.id!,
                         actorId
                     );
                     console.log(`[getActorInboxCreateItems] Liked status for activity ${activity.id}: ${liked}`);
