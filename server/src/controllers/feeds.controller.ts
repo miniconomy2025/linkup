@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express";
 import { ActorService } from "../services/actor.service";
 import { AuthenticatedRequest } from "../middleware/authMiddleware";
 import { NotAuthenticatedError } from "../middleware/errorHandler";
-import { mapToActivityObject } from "../utils/mapping";
+import { mapToActivityObject, mapToActivityObject2 } from "../utils/mapping";
 import { ActorGraphRepository } from "../graph/repositories/actor";
 const apiUrl = process.env.BASE_URL;
 
@@ -40,7 +40,7 @@ export const FeedsController = {
         const startTime = Date.now();
         const summary = await ActorService.getFeeds(actorId, page, pageSize);
         const mappedPosts = summary.map((activity: any) =>
-          mapToActivityObject(activity.object)
+          mapToActivityObject2(activity.object, activity.liked)
         );
         const endTime = Date.now();
         

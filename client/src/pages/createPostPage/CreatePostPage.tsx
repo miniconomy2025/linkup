@@ -20,23 +20,35 @@ const CreatePostPage: React.FC = () => {
     const notifyError = () => toast.error('Error! Something went wrong.');
 
     const { getRootProps, getInputProps } = useDropzone({
-        accept: postType === 'video' ? { 'video/*': [] } : { 'image/*': [] },
+        accept: postType === 'video'
+            ? { 'video/*': [] }
+            : { 
+                // Accept all images except SVG
+                'image/jpeg': [],
+                'image/png': [],
+                'image/gif': [],
+                'image/webp': []
+            },
         onDrop: (acceptedFiles, fileRejections) => {
-            if (fileRejections.length > 0) {
-                alert(`File too large. Maximum allowed size is 5MB.`);
+            if (acceptedFiles.some(f => f.type === 'image/svg+xml')) {
+                toast.error('SVG files are not allowed.');
                 return;
-            };
+            }
+            if (fileRejections.length > 0) {
+                toast.error(`File too large. Maximum allowed size is 5MB.`);
+                return;
+            }
             const file = acceptedFiles[0];
             if (file) {
                 setMediaFile(file);
                 setMediaPreview(URL.createObjectURL(file));
-            };
+            }
         },
         multiple: false,
         disabled: postType !== 'image' && postType !== 'video',
         maxSize: MAX_FILE_SIZE
     });
-
+    
     const handlePostSubmit = async () => {
         if (postType === 'text' && textContent.length > 1500) {
             toast.error('Text post content cannot exceed 1500 characters.');
