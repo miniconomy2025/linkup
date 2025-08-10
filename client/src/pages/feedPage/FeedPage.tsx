@@ -209,7 +209,6 @@ const FeedPage: React.FC = () => {
             <div className='feed-container'>
                 <div className='post-container'>
                     {posts.map((post) => {
-
                         // Create ref for each video post if not exists
                         if (post.video && !videoRefs.current[post.id]) {
                             videoRefs.current[post.id] = React.createRef<HTMLVideoElement>();

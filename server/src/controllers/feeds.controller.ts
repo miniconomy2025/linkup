@@ -32,24 +32,28 @@ export const FeedsController = {
         
         // Construct actor ID
         const actorId = `${apiUrl}/actors/${req.user.userName}`;
+        // const actorId = "https://linkup.tevlen.co.za/api/actors/chrismchardy17545714"
         console.log(`[getUserFeed] Constructed actorId: ${actorId}`);
         
         // Call ActorService.getFeeds
         console.log(`[getUserFeed] Calling ActorService.getFeeds with actorId: ${actorId}, page: ${page}, pageSize: ${pageSize}`);
         const startTime = Date.now();
         const summary = await ActorService.getFeeds(actorId, page, pageSize);
+        const mappedPosts = summary.map((activity: any) =>
+          mapToActivityObject(activity.object)
+        );
         const endTime = Date.now();
         
         console.log(`[getUserFeed] ActorService.getFeeds completed in ${endTime - startTime}ms`);
-        console.log(`[getUserFeed] Feed summary result:`, {
-          resultCount: Array.isArray(summary) ? summary.length : 'not an array',
-          type: typeof summary,
-          hasData: !!summary
+        console.log(`[getUserFeed] Feed mappedPosts result:`, {
+          resultCount: Array.isArray(mappedPosts) ? mappedPosts.length : 'not an array',
+          type: typeof mappedPosts,
+          hasData: !!mappedPosts
         });
         
         // Send response
         console.log(`[getUserFeed] Sending 200 response with feed data`);
-        res.status(200).json(summary);
+        res.status(200).json(mappedPosts);
         console.log(`[getUserFeed] Response sent successfully`);
       }
     } catch (error) {
