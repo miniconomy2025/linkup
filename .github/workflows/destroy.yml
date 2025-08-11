@@ -1,0 +1,50 @@
+name: Terraform Destroy All
+
+on:
+  workflow_dispatch: # Manual trigger only to avoid accidental destroys
+    inputs:
+      confirm:
+        description: "Type 'destroy' to confirm"
+        required: true
+
+jobs:
+  destroy:
+    name: Destroy All Terraform Resources
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.confirm == 'destroy' }}
+    defaults:
+      run:
+        working-directory: terraform
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      TF_VAR_atlas_private_key: ${{ secrets.ATLAS_PRIVATE_KEY }}
+      TF_VAR_atlas_public_key: ${{ secrets.ATLAS_PUBLIC_KEY }}
+      TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
+      TF_VAR_neo4j_username: ${{ secrets.NEO4J_USER }}
+      TF_VAR_neo4j_password: ${{ secrets.NEO4J_PASSWORD }}
+      TF_VAR_neo4j_uri: ${{ secrets.NEO4J_URI }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.OIDC }}
+          aws-region: af-south-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
